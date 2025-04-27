@@ -1,4 +1,4 @@
-package vn.ecornomere.ecornomereAZ.domain;
+package vn.ecornomere.ecornomereAZ.model;
 
 import java.util.List;
 
@@ -25,6 +25,7 @@ public class User {
     private String address;
     private String phone;
 
+    @SuppressWarnings("unused")
     private String avatar;
 
     @ManyToOne

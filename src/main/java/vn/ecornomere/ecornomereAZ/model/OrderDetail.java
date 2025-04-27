@@ -1,4 +1,4 @@
-package vn.ecornomere.ecornomereAZ.domain;
+package vn.ecornomere.ecornomereAZ.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

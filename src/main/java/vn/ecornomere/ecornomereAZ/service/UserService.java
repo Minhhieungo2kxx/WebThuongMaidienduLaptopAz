@@ -5,7 +5,7 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
-import vn.ecornomere.ecornomereAZ.domain.User;
+import vn.ecornomere.ecornomereAZ.model.User;
 import vn.ecornomere.ecornomereAZ.repository.UserRepository;
 
 @Service
