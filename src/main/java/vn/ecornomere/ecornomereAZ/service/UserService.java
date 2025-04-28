@@ -39,4 +39,9 @@ public class UserService {
   public User handleSaveUser(User newUser) {
     return this.userRepository.save(newUser);
   }
+
+  // public User findUserById(long id) {
+  // return this.userRepository.findById(id);
+  // }
+
 }
