@@ -26,7 +26,7 @@
                 <h3 class="mb-4 text-center">Update User Details</h3>
                 <hr class="mb-4" />
 
-                <form:form method="post" action="/admin/user/update" modelAttribute="updatedUser">
+                <form:form method="post" action="/admin/list/user" modelAttribute="updatedUser">
 
                   <form:input type="hidden" path="id" />
 

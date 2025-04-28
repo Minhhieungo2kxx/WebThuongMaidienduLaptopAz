@@ -70,7 +70,7 @@
                                           <td>${user.phone}</td>
                                           <td>
                                             <%-- Action buttons --%>
-                                              <a href="/admin/user/${user.id}" class="btn btn-info btn-sm me-1"
+                                              <a href="/admin/user/detail/${user.id}" class="btn btn-info btn-sm me-1"
                                                 title="View Details"> <%-- btn-sm để button nhỏ hơn, me-1 thêm margin
                                                   phải, title cho tooltip --%>
                                                   View

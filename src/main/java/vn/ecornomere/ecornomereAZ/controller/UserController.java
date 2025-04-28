@@ -23,21 +23,20 @@ public class UserController {
   @Autowired
   private UserService userService;
 
-  @GetMapping("/")
+  @GetMapping("/login")
   public String getHomePage(Model model) {
-    var userArr = this.userService.findAllUsersByEmailAndAddress("asawholeandlove@gmail.com", "hn");
-    System.out.println(userArr);
 
-    model.addAttribute("data", "test");
     return "home";
   }
 
-  // List user
-  @GetMapping("/admin/user")
-  public String getUserPage(Model model) {
-    var users = this.userService.findAllUsers();
-    model.addAttribute("users", users);
-    return "admin/user/table-user";
+  // Detail User:
+
+  @GetMapping("/admin/user/detail/{id}")
+  public String showDetailForm(@PathVariable("id") Long id, Model model) {
+    User userdetail = userService.findUserById(id)
+        .orElseThrow(() -> new IllegalArgumentException("Invalid user Id: " + id));
+    model.addAttribute("detailUser", userdetail);
+    return "admin/user/detailuser"; //
   }
 
   // Delete user
