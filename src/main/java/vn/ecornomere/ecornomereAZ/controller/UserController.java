@@ -87,12 +87,12 @@ public class UserController {
     return "admin/user/create"; // Tên JSP: create_user.jsp
   }
 
-  // Khi submit form
+  // Khi submit form Luu
   @PostMapping("/admin/user/create")
   public String createUser(@ModelAttribute("newuser") User adduser) {
     userService.handleSaveUser(adduser);
     System.out.println("Ok nha da save " + adduser);
-    return "redirect:/admin/list/user"; // Sau khi lưu thì chuyển về home.jsp
+    return "redirect:/admin/list/user"; // Sau khi lưu thì chuyển về listuser.jsp
   }
 
 }

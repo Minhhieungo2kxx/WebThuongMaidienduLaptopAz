@@ -22,9 +22,7 @@
                         <div class="col-md-8 col-lg-6">
                             <form:form method="get" action="" modelAttribute="detailUser">
 
-
                                 <h3 class="mb-4 text-center">User Detail
-
                                 </h3>
                                 <div class="card shadow-sm">
                                     <div class="card-header bg-primary text-white">
@@ -65,14 +63,14 @@
 
 
                                 </div>
-
-
-                                <div class="text-center mt-4">
-                                    <a href="/admin/list/user" class="btn btn-secondary">
-                                        <i class="fas fa-arrow-left me-2"></i> Back to User List
-                                    </a>
-                                </div>
                             </form:form>
+
+                            <div class="text-center mt-4">
+                                <a href="/admin/list/user" class="btn btn-secondary">
+                                    <i class="fas fa-arrow-left me-2"></i> Back to User List
+                                </a>
+                            </div>
+
 
                         </div>
 
