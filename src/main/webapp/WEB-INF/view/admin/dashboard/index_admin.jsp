@@ -588,8 +588,8 @@
                 <script src="/js/scripts.js"></script>
 
                 crossorigin="anonymous"></script>
-                <script src="/assets/demo/chart-area-demo.js"></script>
-                <script src="/assets/demo/chart-bar-demo.js"></script>
+                <script src="/js/chart-area-demo.js"></script>
+                <script src="/js/chart-bar-demo.js"></script>
 
 
             </body>

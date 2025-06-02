@@ -2,6 +2,8 @@ package vn.ecornomere.ecornomereAZ.model;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -25,6 +27,7 @@ public class User {
     private String address;
     private String phone;
 
+    @JsonIgnore
     private String avatar;
 
     @ManyToOne
@@ -33,14 +36,6 @@ public class User {
 
     @OneToMany(mappedBy = "user")
     private List<Order> orders;
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
 
     public String getEmail() {
         return email;
@@ -110,6 +105,14 @@ public class User {
     public String toString() {
         return "User [id=" + id + ", email=" + email + ", password=" + password + ", fullName=" + fullName
                 + ", address=" + address + ", phone=" + phone + "]";
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
 }

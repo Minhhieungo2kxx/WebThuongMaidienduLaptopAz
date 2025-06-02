@@ -36,21 +36,16 @@
 
                                             <div class="col-md-8 col-lg-6">
                                                 <form:form method="get" action="" modelAttribute="detailUser">
-
-                                                    <h3 class="mb-4 text-center">User Detail
-                                                    </h3>
+                                                    <h3 class="mb-4 text-center">User Detail</h3>
                                                     <div class="card shadow-sm">
                                                         <div class="card-header bg-primary text-white">
                                                             <h5 class="mb-0">User Information</h5>
                                                         </div>
                                                         <div class="card-body">
-
                                                             <ul class="list-group list-group-flush">
                                                                 <li class="list-group-item">
-                                                                    <strong>ID:
-                                                                        <form:input type="id" path="id"
-                                                                            readonly="true" />
-                                                                    </strong>
+                                                                    <strong>ID:</strong>
+                                                                    <form:input path="id" readonly="true" />
                                                                 </li>
                                                                 <li class="list-group-item">
                                                                     <strong>Email:</strong>
@@ -61,7 +56,6 @@
                                                                     <strong>Full Name:</strong>
                                                                     <form:input type="text" class="form-control"
                                                                         id="fullName" path="fullName" readonly="true" />
-
                                                                 </li>
                                                                 <li class="list-group-item">
                                                                     <strong>Address:</strong>
@@ -71,15 +65,25 @@
                                                                 <li class="list-group-item">
                                                                     <strong>Number Phone:</strong>
                                                                     <form:input type="text" class="form-control"
-                                                                        id="address" path="phone" readonly="true" />
+                                                                        id="phone" path="phone" readonly="true" />
                                                                 </li>
-
+                                                                <li class="list-group-item">
+                                                                    <strong>Vai trò:</strong>
+                                                                    <form:input path="role.name" class="form-control"
+                                                                        id="role_id" readonly="true" />
+                                                                </li>
+                                                                <li class="list-group-item">
+                                                                    <strong>Avatar:</strong><br />
+                                                                    <img src="/uploads/avatars/${detailUser.avatar}"
+                                                                        alt="User Avatar"
+                                                                        style="max-width:120px; max-height: 120px;"
+                                                                        id="avatar" />
+                                                                </li>
                                                             </ul>
                                                         </div>
-
-
                                                     </div>
                                                 </form:form>
+
 
                                                 <div class="text-center mt-4">
                                                     <a href="/admin/list/user" class="btn btn-secondary">
@@ -109,8 +113,8 @@
                 <script src="/js/scripts.js"></script>
 
                 crossorigin="anonymous"></script>
-                <script src="/assets/demo/chart-area-demo.js"></script>
-                <script src="/assets/demo/chart-bar-demo.js"></script>
+                <script src="/js/chart-area-demo.js"></script>
+                <script src="/js/chart-bar-demo.js"></script>
 
 
             </body>

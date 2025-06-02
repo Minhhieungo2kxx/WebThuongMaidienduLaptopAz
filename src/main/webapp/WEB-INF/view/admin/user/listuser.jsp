@@ -58,6 +58,8 @@
                                                   <th>Full Name</th>
                                                   <th>Address</th>
                                                   <th>Number phone</th>
+                                                  <th>Avatar</th>
+                                                  <th>Vai tro</th>
                                                   <th>Actions</th> <%-- Đổi tên cột --%>
                                               </tr>
                                             </thead>
@@ -76,27 +78,33 @@
                                                     <td>${user.fullName}</td>
                                                     <td>${user.address}</td>
                                                     <td>${user.phone}</td>
+                                                    <td><img src="/uploads/avatars/${user.avatar}" alt="User Avatar"
+                                                        style="max-width:120px; max-height: 120px;" />
+                                                    </td>
+                                                    <td>${user.role.name}</td>
+
+
                                                     <td>
-                                                      <%-- Action buttons --%>
-                                                        <a href="/admin/user/detail/${user.id}"
-                                                          class="btn btn-info btn-sm me-1" title="View Details"> <%--
-                                                            btn-sm để button nhỏ hơn, me-1 thêm margin phải, title cho
-                                                            tooltip --%>
-                                                            View
+
+                                                      <a href="/admin/user/detail/${user.id}"
+                                                        class="btn btn-info btn-sm me-1" title="View Details"> <%--
+                                                          btn-sm để button nhỏ hơn, me-1 thêm margin phải, title cho
+                                                          tooltip --%>
+                                                          View
+                                                      </a>
+                                                      <a href="/admin/user/edit/${user.id}"
+                                                        class="btn btn-warning btn-sm me-1" title="Edit User"> <%--
+                                                          btn-sm, me-1, title --%>
+                                                          Edit
+                                                      </a>
+                                                      <%-- Delete button (often requires confirmation via JavaScript,
+                                                        but here is a direct link) --%>
+                                                        <a href="/admin/user/delete/${user.id}"
+                                                          class="btn btn-danger btn-sm"
+                                                          onclick="return confirm('Are you sure you want to delete user ${user.email}?');"
+                                                          title="Delete User">
+                                                          Delete
                                                         </a>
-                                                        <a href="/admin/user/edit/${user.id}"
-                                                          class="btn btn-warning btn-sm me-1" title="Edit User"> <%--
-                                                            btn-sm, me-1, title --%>
-                                                            Edit
-                                                        </a>
-                                                        <%-- Delete button (often requires confirmation via JavaScript,
-                                                          but here is a direct link) --%>
-                                                          <a href="/admin/user/delete/${user.id}"
-                                                            class="btn btn-danger btn-sm"
-                                                            onclick="return confirm('Are you sure you want to delete user ${user.email}?');"
-                                                            title="Delete User">
-                                                            Delete
-                                                          </a>
                                                     </td>
                                                   </tr>
                                                 </c:forEach>
@@ -128,8 +136,8 @@
             <script src="/js/scripts.js"></script>
 
             crossorigin="anonymous"></script>
-            <script src="/assets/demo/chart-area-demo.js"></script>
-            <script src="/assets/demo/chart-bar-demo.js"></script>
+            <script src="/js/chart-area-demo.js"></script>
+            <script src="/js/chart-bar-demo.js"></script>
 
           </body>
 
