@@ -68,7 +68,7 @@
                                                                         id="phone" path="phone" readonly="true" />
                                                                 </li>
                                                                 <li class="list-group-item">
-                                                                    <strong>Vai trò:</strong>
+                                                                    <strong>Role:</strong>
                                                                     <form:input path="role.name" class="form-control"
                                                                         id="role_id" readonly="true" />
                                                                 </li>

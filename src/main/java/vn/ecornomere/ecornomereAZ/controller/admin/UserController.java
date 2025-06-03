@@ -1,16 +1,16 @@
 package vn.ecornomere.ecornomereAZ.controller.admin;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.util.StringUtils;
-import org.springframework.validation.BindingResult;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,6 +21,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import vn.ecornomere.ecornomereAZ.model.User;
 import vn.ecornomere.ecornomereAZ.service.UserService;
+import vn.ecornomere.ecornomereAZ.utils.UploadFile;
 import vn.ecornomere.ecornomereAZ.service.RoleService;
 import vn.ecornomere.ecornomereAZ.model.Role;
 
@@ -36,6 +37,10 @@ public class UserController {
   private UserService userService;
   @Autowired
   RoleService roleService;
+  @Autowired
+  PasswordEncoder passwordEncoder;
+
+  UploadFile uploadFile = new UploadFile();
 
   @GetMapping("/login")
   public String getHomePage(Model model) {
@@ -85,15 +90,13 @@ public class UserController {
     existingUser.setFullName(updatedUser.getFullName());
     existingUser.setAddress(updatedUser.getAddress());
 
-    String uploadDir = "D:/Ngominhhieu/Back_end_java/spring-mvc-ecornomere-laptopaz/myapp/uploads/avatars";
-    Path uploadPath = Paths.get(uploadDir);
-    if (!Files.exists(uploadPath)) {
-      Files.createDirectories(uploadPath); // Tạo thư mục nếu chưa tồn tại
+    // Mã hóa mật khẩu trước khi lưu
+    if (updatedUser.getPassword() != null && !updatedUser.getPassword().isEmpty()) {
+      String encodedPassword = passwordEncoder.encode(updatedUser.getPassword());
+      existingUser.setPassword(encodedPassword);
     }
-    String fileName = avatarFile.getOriginalFilename();
-    Path filePath = uploadPath.resolve(fileName);
-    avatarFile.transferTo(filePath.toFile());
-    existingUser.setAvatar(fileName);
+
+    existingUser.setAvatar(uploadFile.getnameFile(avatarFile, "avatars"));
     userService.handleSaveUser(existingUser);
     return "redirect:/admin/list/user";
 
@@ -116,32 +119,33 @@ public class UserController {
   // Khi submit form Luu
 
   @PostMapping("/admin/user/create")
-  public String createUser(@Valid @ModelAttribute("newuser") User user,
+  public String createUser(@ModelAttribute("newuser") User user,
       @RequestParam(value = "avatarFile", required = false) MultipartFile avatarFile,
       @RequestParam("role_id") Long role_id) throws IllegalStateException, IOException {
 
-    // ánh xạ role từ ID
+    // Ánh xạ role từ ID
     Role role = roleService.findRoleId(role_id);
     if (role == null) {
       throw new IllegalArgumentException("Invalid role Id: " + role_id);
     }
     user.setRole(role);
 
-    String uploadDir = "D:/Ngominhhieu/Back_end_java/spring-mvc-ecornomere-laptopaz/myapp/uploads/avatars";
-    Path uploadPath = Paths.get(uploadDir);
-
-    if (!Files.exists(uploadPath)) {
-      Files.createDirectories(uploadPath); // Tạo thư mục nếu chưa tồn tại
+    // Mã hóa mật khẩu trước khi lưu
+    if (user.getPassword() != null && !user.getPassword().isEmpty()) {
+      String encodedPassword = passwordEncoder.encode(user.getPassword());
+      user.setPassword(encodedPassword);
     }
 
-    String fileName = avatarFile.getOriginalFilename();
-    Path filePath = uploadPath.resolve(fileName);
-    avatarFile.transferTo(filePath.toFile());
-
-    user.setAvatar(fileName);
+    user.setAvatar(uploadFile.getnameFile(avatarFile, "avatars"));
+    // Lưu user vào database
     userService.handleSaveUser(user);
 
-    return "redirect:/admin/list/user"; // Sau khi lưu thì chuyển về listuser.jsp
+    return "redirect:/admin/list/user"; // Sau khi lưu thì chuyển về danh sách user
   }
+
+  // // Trong service hoặc controller đăng nhập giai ma
+  // public boolean verifyPassword(String rawPassword, String encodedPassword) {
+  // return passwordEncoder.matches(rawPassword, encodedPassword);
+  // }
 
 }
