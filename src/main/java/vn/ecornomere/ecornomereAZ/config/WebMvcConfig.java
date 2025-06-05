@@ -33,11 +33,15 @@ public class WebMvcConfig implements WebMvcConfigurer {
   public void addResourceHandlers(ResourceHandlerRegistry registry) {
     registry.addResourceHandler("/css/**").addResourceLocations("/resources/css/");
     registry.addResourceHandler("/js/**").addResourceLocations("/resources/js/");
-    registry.addResourceHandler("/images/**").addResourceLocations("/resources/images/");
+    registry.addResourceHandler("/client/**").addResourceLocations("/resources/client/");
     // Thêm dòng này để truy cập ảnh upload từ "uploads/avatars/"
     registry.addResourceHandler("/uploads/avatars/**")
         .addResourceLocations(
             "file:/D:/Ngominhhieu/Back_end_java/spring-mvc-ecornomere-laptopaz/myapp/uploads/avatars/");
+
+    registry.addResourceHandler("/uploads/products/**")
+        .addResourceLocations(
+            "file:/D:/Ngominhhieu/Back_end_java/spring-mvc-ecornomere-laptopaz/myapp/uploads/products/");
 
   }
 

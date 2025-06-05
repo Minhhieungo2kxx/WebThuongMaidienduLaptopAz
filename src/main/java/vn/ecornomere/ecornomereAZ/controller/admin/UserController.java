@@ -1,11 +1,8 @@
 package vn.ecornomere.ecornomereAZ.controller.admin;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.UUID;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -23,6 +20,7 @@ import vn.ecornomere.ecornomereAZ.model.User;
 import vn.ecornomere.ecornomereAZ.service.UserService;
 import vn.ecornomere.ecornomereAZ.utils.UploadFile;
 import vn.ecornomere.ecornomereAZ.service.RoleService;
+
 import vn.ecornomere.ecornomereAZ.model.Role;
 
 @Controller
@@ -36,11 +34,11 @@ public class UserController {
   @Autowired
   private UserService userService;
   @Autowired
-  RoleService roleService;
+  private RoleService roleService;
   @Autowired
-  PasswordEncoder passwordEncoder;
+  private PasswordEncoder passwordEncoder;
 
-  UploadFile uploadFile = new UploadFile();
+  private UploadFile uploadFile = new UploadFile();
 
   @GetMapping("/login")
   public String getHomePage(Model model) {
@@ -81,22 +79,34 @@ public class UserController {
   @PostMapping("/admin/user/update")
   public String updateUser(@ModelAttribute("updatedUser") User updatedUser,
       @RequestParam(value = "avatarFile", required = false) MultipartFile avatarFile)
-      throws IllegalStateException, IOException {
+      throws IOException {
     User existingUser = userService.findUserById(updatedUser.getId())
         .orElseThrow(() -> new IllegalArgumentException("Invalid user Id:" + updatedUser.getId()));
-    existingUser.setEmail(updatedUser.getEmail());
-    existingUser.setPassword(updatedUser.getPassword());
-    existingUser.setPhone(updatedUser.getPhone());
-    existingUser.setFullName(updatedUser.getFullName());
-    existingUser.setAddress(updatedUser.getAddress());
+    ModelMapper map = new ModelMapper();
+    map.typeMap(User.class, User.class)
+        .addMappings(mapper -> mapper.skip(
+            User::setAvatar))
+        .addMappings(mapper -> mapper.skip(User::setId))
+        .addMappings(mapper -> mapper.skip(User::setPassword))
+        .addMappings(mapper -> mapper.skip(User::setRole));
+
+    map.map(updatedUser, existingUser);
 
     // Mã hóa mật khẩu trước khi lưu
     if (updatedUser.getPassword() != null && !updatedUser.getPassword().isEmpty()) {
       String encodedPassword = passwordEncoder.encode(updatedUser.getPassword());
       existingUser.setPassword(encodedPassword);
     }
+    if (!avatarFile.isEmpty()) {
+      existingUser.setAvatar(uploadFile.getnameFile(avatarFile, "avatars"));
 
-    existingUser.setAvatar(uploadFile.getnameFile(avatarFile, "avatars"));
+    } else {
+      // Người dùng không chọn ảnh mới → giữ ảnh cũ
+      User oldUser = userService.findUserById(updatedUser.getId())
+          .orElseThrow(() -> new IllegalArgumentException("Invalid user Id:" + updatedUser.getId()));
+      existingUser.setAvatar(oldUser.getAvatar());
+    }
+
     userService.handleSaveUser(existingUser);
     return "redirect:/admin/list/user";
 

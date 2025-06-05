@@ -2,6 +2,8 @@ package vn.ecornomere.ecornomereAZ.model;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -21,10 +23,13 @@ public class Product {
 
     private String name;
     private double price;
+    @JsonIgnore
     private String image;
     private String detailDesc;
     private String shortDesc;
     private long quantity;
+
+    @JsonIgnore
     private long sold;
     private String factory;
     private String target;
@@ -114,6 +119,14 @@ public class Product {
         return "Product [id=" + id + ", name=" + name + ", price=" + price + ", image=" + image + ", detailDesc="
                 + detailDesc + ", shortDesc=" + shortDesc + ", quantity=" + quantity + ", sold=" + sold + ", factory="
                 + factory + ", target=" + target + "]";
+    }
+
+    public List<OrderDetail> getOrderDetails() {
+        return orderDetails;
+    }
+
+    public void setOrderDetails(List<OrderDetail> orderDetails) {
+        this.orderDetails = orderDetails;
     }
 
 }
