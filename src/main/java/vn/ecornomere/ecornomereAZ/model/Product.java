@@ -23,13 +23,13 @@ public class Product {
 
     private String name;
     private double price;
-    @JsonIgnore
+    // @JsonIgnore
     private String image;
     private String detailDesc;
     private String shortDesc;
     private long quantity;
 
-    @JsonIgnore
+    // @JsonIgnore
     private long sold;
     private String factory;
     private String target;
