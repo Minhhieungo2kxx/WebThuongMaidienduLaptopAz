@@ -10,6 +10,11 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Digits;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "products")
@@ -21,17 +26,39 @@ public class Product {
     @OneToMany(mappedBy = "product")
     private List<OrderDetail> orderDetails;
 
+    @NotBlank(message = "Tên sản phẩm không được để trống")
+    @Size(min = 3, max = 100, message = "Tên sản phẩm phải từ 3 đến 100 ký tự")
     private String name;
+
+    @NotNull(message = "Giá sản phẩm không được để trống")
+    @Min(value = 0, message = "Giá sản phẩm không được âm")
+
     private double price;
-    // @JsonIgnore
+
+    @JsonIgnore
+    @Size(max = 255, message = "Đường dẫn ảnh không được vượt quá 255 ký tự")
     private String image;
+
+    @NotBlank(message = "Mô tả chi tiết không được để trống")
+    @Size(max = 500, message = "Mô tả chi tiết không được vượt quá 500 ký tự")
     private String detailDesc;
+
+    @NotBlank(message = "Mô tả ngắn không được để trống")
+    @Size(max = 200, message = "Mô tả ngắn không được vượt quá 200 ký tự")
     private String shortDesc;
+
+    @NotNull(message = "Số lượng sản phẩm không được để trống")
+    @Min(value = 0, message = "Số lượng sản phẩm không được âm")
     private long quantity;
 
-    // @JsonIgnore
+    @NotNull(message = "Số lượng đã bán không được để trống")
+    @Min(value = 0, message = "Số lượng đã bán không được âm")
     private long sold;
+
+    @NotBlank(message = "Nhà máy sản xuất không được để trống")
     private String factory;
+
+    @NotBlank(message = "Đối tượng sử dụng không được để trống")
     private String target;
 
     public long getId() {

@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import jakarta.validation.Valid;
 import vn.ecornomere.ecornomereAZ.model.User;
 import vn.ecornomere.ecornomereAZ.service.UserService;
 import vn.ecornomere.ecornomereAZ.utils.UploadFile;
@@ -129,9 +130,15 @@ public class UserController {
   // Khi submit form Luu
 
   @PostMapping("/admin/user/create")
-  public String createUser(@ModelAttribute("newuser") User user,
+  public String createUser(
+      @ModelAttribute("newuser") @Valid User user, BindingResult result,
       @RequestParam(value = "avatarFile", required = false) MultipartFile avatarFile,
-      @RequestParam("role_id") Long role_id) throws IllegalStateException, IOException {
+      @RequestParam("role_id") Long role_id) throws IOException {
+
+    // Kiểm tra lỗi validation
+    if (result.hasErrors()) {
+      return "admin/user/create"; // Trả về form với lỗi
+    }
 
     // Ánh xạ role từ ID
     Role role = roleService.findRoleId(role_id);

@@ -11,6 +11,9 @@
 
                 <link href="/css/styles.css" rel="stylesheet" />
                 <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+                <style>
+
+                </style>
             </head>
 
             <body class="sb-nav-fixed">
@@ -33,6 +36,7 @@
                                             <h3 class="mb-4 text-center">Create a New User</h3>
                                             <hr class="mb-4" />
 
+
                                             <!-- ✅ Form bắt đầu -->
                                             <form:form method="post" action="/admin/user/create"
                                                 modelAttribute="newuser" enctype="multipart/form-data">
@@ -41,30 +45,35 @@
                                                     <label for="email" class="form-label">Email:</label>
                                                     <form:input type="email" class="form-control" id="email"
                                                         path="email" placeholder="Enter email" />
+                                                    <form:errors path="email" cssClass="error" element="div" />
                                                 </div>
 
                                                 <div class="mb-3">
                                                     <label for="password" class="form-label">Password:</label>
                                                     <form:input type="password" class="form-control" id="password"
                                                         path="password" placeholder="Enter password" />
+                                                    <form:errors path="password" cssClass="error" element="div" />
                                                 </div>
 
                                                 <div class="mb-3">
                                                     <label for="phone" class="form-label">Phone number:</label>
                                                     <form:input type="text" class="form-control" id="phone" path="phone"
                                                         placeholder="Enter phone number" />
+                                                    <form:errors path="phone" cssClass="error" element="div" />
                                                 </div>
 
                                                 <div class="mb-3">
                                                     <label for="fullName" class="form-label">Full Name:</label>
                                                     <form:input type="text" class="form-control" id="fullName"
                                                         path="fullName" placeholder="Enter full name" />
+                                                    <form:errors path="fullName" cssClass="error" element="div" />
                                                 </div>
 
                                                 <div class="mb-3">
                                                     <label for="address" class="form-label">Address:</label>
                                                     <form:input type="text" class="form-control" id="address"
                                                         path="address" placeholder="Enter address" />
+                                                    <form:errors path="address" cssClass="error" element="div" />
                                                 </div>
 
                                                 <div class="mb-3 row">

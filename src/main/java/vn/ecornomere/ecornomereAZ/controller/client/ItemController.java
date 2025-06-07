@@ -32,9 +32,7 @@ public class ItemController {
         model.addAttribute("gamingProducts", itemService.listNameItems("Gaming"));
         model.addAttribute("officeProducts", itemService.listNameItems("Van phong"));
         model.addAttribute("designProducts", itemService.listNameItems("Thiet ke do hoa"));
-
         List<String> targets = Arrays.asList("Mong nhe", "Doanh nhan");
-
         List<Product> filtered = itemService.getBytargetIn(targets);
         model.addAttribute("personalProducts", filtered);
 

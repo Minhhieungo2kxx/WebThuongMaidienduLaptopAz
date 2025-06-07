@@ -7,6 +7,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import jakarta.validation.Valid;
 import vn.ecornomere.ecornomereAZ.model.Product;
 
 import vn.ecornomere.ecornomereAZ.service.ProductService;
@@ -36,11 +38,15 @@ public class ProductController {
 
     // Save san pham
     @PostMapping("/admin/product/create")
-    public String createnewProduct(@ModelAttribute("NewProduct") Product product,
+    public String createnewProduct(@ModelAttribute("NewProduct") @Valid Product product, BindingResult result,
             @RequestParam(value = "avatarFile", required = false) MultipartFile avatarFile,
             RedirectAttributes redirectAttributes)
             throws IllegalStateException, IOException {
 
+        // Kiểm tra lỗi validation
+        if (result.hasErrors()) {
+            return "admin/product/create_product"; // Trả về form với lỗi
+        }
         product.setImage(uploadFile.getnameFile(avatarFile, "products"));
         // Lưu user vào database
         productService.saveProduct(product);
