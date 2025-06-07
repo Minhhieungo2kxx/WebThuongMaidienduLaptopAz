@@ -5,7 +5,7 @@
             <div class="container-fluid fixed-top">
                 <div class="container px-0">
                     <nav class="navbar navbar-light bg-white navbar-expand-xl">
-                        <a href="index.html" class="navbar-brand">
+                        <a href="/" class="navbar-brand">
                             <h1 class="text-primary display-6">FPT Laptop</h1>
                             <!-- Đổi tên thương hiệu thành FPT Laptop -->
                         </a>

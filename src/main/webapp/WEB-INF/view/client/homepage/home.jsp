@@ -121,7 +121,7 @@
                                             <li class="nav-item">
                                                 <a class="d-flex m-2 py-2 bg-light rounded-pill" data-bs-toggle="pill"
                                                     href="#tab-5">
-                                                    <span class="text-dark" style="width: 150px;">Laptop Doanh nhân -
+                                                    <span class="text-dark" style="width: 150px;">Laptop Doanh nhân-
                                                         mỏng nhẹ</span>
                                                     <!-- Đổi "Meat" -->
                                                 </a>
@@ -150,7 +150,11 @@
                                                                 </div>
                                                                 <div
                                                                     class="p-4 border border-secondary border-top-0 rounded-bottom">
-                                                                    <h4>${product.name}</h4>
+                                                                    <a href="/product/detail/${product.id}"
+                                                                        title="Xem chi tiet">
+                                                                        <h4>${product.name}</h4>
+                                                                    </a>
+
                                                                     <p>${product.shortDesc}</p>
                                                                     <div
                                                                         class="d-flex justify-content-center align-items-center flex-lg-wrap">
@@ -194,7 +198,11 @@
                                                                 </div>
                                                                 <div
                                                                     class="p-4 border border-secondary border-top-0 rounded-bottom">
-                                                                    <h4>${gamming.name}</h4>
+                                                                    <a href="/product/detail/${gamming.id}"
+                                                                        title="Xem chi tiet">
+                                                                        <h4>${gamming.name}</h4>
+                                                                    </a>
+
                                                                     <p>${gamming.shortDesc}</p>
                                                                     <div
                                                                         class="d-flex justify-content-center align-items-center flex-lg-wrap">
@@ -238,7 +246,11 @@
                                                                 </div>
                                                                 <div
                                                                     class="p-4 border border-secondary border-top-0 rounded-bottom">
-                                                                    <h4>${office.name}</h4>
+                                                                    <a href="/product/detail/${office.id}"
+                                                                        title="Xem chi tiet">
+                                                                        <h4>${office.name}</h4>
+                                                                    </a>
+
                                                                     <p>${office.shortDesc}</p>
                                                                     <div
                                                                         class="d-flex justify-content-center align-items-center flex-lg-wrap">
@@ -281,7 +293,11 @@
                                                                 </div>
                                                                 <div
                                                                     class="p-4 border border-secondary border-top-0 rounded-bottom">
-                                                                    <h4>${design.name}</h4>
+                                                                    <a href="/product/detail/${design.id}"
+                                                                        title="Xem chi tiet">
+                                                                        <h4>${design.name}</h4>
+                                                                    </a>
+
                                                                     <p>${design.shortDesc}</p>
                                                                     <div
                                                                         class="d-flex justify-content-center align-items-center flex-lg-wrap">
@@ -323,7 +339,11 @@
                                                                 </div>
                                                                 <div
                                                                     class="p-4 border border-secondary border-top-0 rounded-bottom">
-                                                                    <h4>${personal.name}</h4>
+                                                                    <a href="/product/detail/${personal.id}"
+                                                                        title="Xem chi tiet">
+                                                                        <h4>${personal.name}</h4>
+                                                                    </a>
+
                                                                     <p>${personal.shortDesc}</p>
                                                                     <div
                                                                         class="d-flex justify-content-center align-items-center flex-lg-wrap">
