@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 import vn.ecornomere.ecornomereAZ.model.User;
+import vn.ecornomere.ecornomereAZ.model.dto.RegisterDTO;
 import vn.ecornomere.ecornomereAZ.repository.UserRepository;
 
 @Service
@@ -38,6 +39,19 @@ public class UserService {
 
   public User handleSaveUser(User newUser) {
     return this.userRepository.save(newUser);
+  }
+
+  public User registertoDTO(RegisterDTO registerDTO) {
+    User user = new User();
+    user.setFullName(registerDTO.getFirstName() + " " + registerDTO.getLastName());
+    user.setEmail(registerDTO.getEmail());
+    // user.setPassword(registerDTO.getPassword());
+    return user;
+  }
+
+  public boolean existsByEmail(String email) {
+    return this.userRepository.existsByEmail(email);
+
   }
 
   // public User findUserById(long id) {
