@@ -1,7 +1,5 @@
 package vn.ecornomere.ecornomereAZ.controller.client;
 
-import java.io.IOException;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -10,11 +8,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartFile;
-
 import jakarta.validation.Valid;
-import vn.ecornomere.ecornomereAZ.model.Role;
 import vn.ecornomere.ecornomereAZ.model.User;
 import vn.ecornomere.ecornomereAZ.model.dto.RegisterDTO;
 import vn.ecornomere.ecornomereAZ.service.RoleService;
@@ -51,16 +45,21 @@ public class HomeController {
             String encodedPassword = passwordEncoder.encode(registerDTO.getPassword());
             user.setPassword(encodedPassword);
         }
-        user.setRole(roleService.findRoleByName("User"));
+        user.setRole(roleService.findRoleByName("USER"));
         userService.handleSaveUser(user);
-        return "redirect:/home/login"; // Sau khi lưu thì chuyển về
+        return "redirect:/login"; // Sau khi lưu thì chuyển về
     }
 
     // Hiển thị danh sách user
-    @GetMapping("/home/login")
+    @GetMapping("/login")
     public String listUsers(Model model) {
+        return "client/authentication/login";
+    }
 
-        return "client/authentication/login"; // tạo 1 file JSP hiển thị danh sách
+    // Hiển thị danh sách user
+    @GetMapping("/denyaccess")
+    public String getDenytAccess(Model model) {
+        return "client/authentication/denyAccess";
     }
 
 }

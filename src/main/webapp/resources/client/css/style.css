@@ -587,6 +587,30 @@ body {
     background-color: #f8f9fa;
     font-family: 'Open Sans', sans-serif;
 }
+/* sua nut user dropdown va customize ben trong no */
+ /* Custom CSS for the profile avatar and dropdown header */
+ .profile-avatar {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%; /* Makes the image perfectly round */
+    object-fit: cover; /* Ensures the image covers the area without distortion */
+    border: 3px solid var(--bs-primary); /* Optional: add a border matching Bootstrap primary color */
+  }
+
+  .dropdown-profile-header {
+    min-width: 250px; /* Adjust as needed for desired width of the profile section */
+    max-width: 320px; /* Optional: set a max-width to prevent excessive stretching */
+    padding-bottom: 1rem; /* Adjust padding below image/text */
+    border-bottom: 1px solid var(--bs-border-color); /* Optional: separator for profile header */
+    margin-bottom: 1rem; /* Space below the header */
+  }
+
+  /* Optional: Adjust dropdown menu min-width if the content requires it */
+  .dropdown-menu.dropdown-menu-profile {
+    min-width: 280px; /* Ensure the menu itself is wide enough for its content */
+  }
+
+  
 
 
 

@@ -80,8 +80,8 @@
                                                     <div class="col">
                                                         <label for="role" class="form-label">Role:</label>
                                                         <select class="form-select" id="role_id" name="role_id">
-                                                            <option value="1">Admin</option>
-                                                            <option value="2">User</option>
+                                                            <option value="1">ADMIN</option>
+                                                            <option value="2">USER</option>
                                                         </select>
                                                     </div>
 

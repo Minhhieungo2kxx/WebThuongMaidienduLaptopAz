@@ -12,8 +12,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
   User save(User newUser);
 
-  List<User> findByEmail(String email);
-
   // find by email and address
   List<User> findByEmailAndAddress(String email, String address);
 
@@ -22,5 +20,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
   void delete(User user);
 
   boolean existsByEmail(String email);
+
+  User findByEmail(String email);
 
 }

@@ -29,7 +29,7 @@ public class RegisterDTO implements Serializable {
 
     @NotBlank(message = "Mật khẩu không được để trống")
     @Size(min = 8, max = 100, message = "Mật khẩu phải từ 8 đến 100 ký tự")
-    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]+$", message = "Mật khẩu phải chứa ít nhất một chữ hoa, một chữ thường, một số và một ký tự đặc biệt")
+    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[A-Za-z\\d]+$", message = "Mật khẩu phải chứa ít nhất một chữ hoa, một chữ thường và một số")
     private String password;
 
     @NotBlank(message = "Xác nhận mật khẩu không được để trống")

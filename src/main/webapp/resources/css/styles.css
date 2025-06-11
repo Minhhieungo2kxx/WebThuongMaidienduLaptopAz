@@ -11348,3 +11348,73 @@ hr {
     padding: 5px;
     background-color: #f8f9fa;
 }
+
+/* css cho 2 cai logo login google and github */
+
+
+.btn-social {
+  color: white; /* Default text color for social buttons */
+  border-radius: 50%; /* Make them round */
+  width: 45px; /* Fixed width */
+  height: 45px; /* Fixed height */
+  display: inline-flex; /* Use flexbox for centering icon */
+  align-items: center; /* Vertically center icon */
+  justify-content: center; /* Horizontally center icon */
+  font-size: 1.2rem; /* Size of the icon */
+  transition: all 0.3s ease; /* Smooth transition for hover effects */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  text-decoration: none; /* Remove underline */
+}
+
+.btn-social:hover {
+  transform: translateY(-2px); /* Slight lift effect on hover */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Stronger shadow on hover */
+}
+
+/* Google button specific styles */
+.btn-google {
+  background-color: #dd4b39; /* Google's brand red */
+  border-color: #dd4b39;
+}
+
+.btn-google:hover {
+  background-color: #c23321; /* Darker red on hover */
+  border-color: #c23321;
+}
+
+/* GitHub button specific styles */
+.btn-github {
+  background-color: #333; /* GitHub's brand dark gray */
+  border-color: #333;
+}
+
+.btn-github:hover {
+  background-color: #000; /* Black on hover */
+  border-color: #000;
+}
+
+/* Optional: Add a line separator above "Or login with" */
+.text-center.my-3 p.text-muted {
+  position: relative;
+  overflow: hidden;
+}
+
+.text-center.my-3 p.text-muted::before,
+.text-center.my-3 p.text-muted::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 40%; /* Adjust line length */
+  height: 1px;
+  background-color: #ddd;
+}
+
+.text-center.my-3 p.text-muted::before {
+  left: 0;
+  transform: translateX(10%); /* Adjust to center the line */
+}
+
+.text-center.my-3 p.text-muted::after {
+  right: 0;
+  transform: translateX(-10%); /* Adjust to center the line */
+}

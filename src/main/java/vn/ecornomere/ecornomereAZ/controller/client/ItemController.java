@@ -10,6 +10,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import vn.ecornomere.ecornomereAZ.model.Product;
 import vn.ecornomere.ecornomereAZ.service.ItemService;
 import vn.ecornomere.ecornomereAZ.service.ProductService;

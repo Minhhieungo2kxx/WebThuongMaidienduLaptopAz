@@ -41,12 +41,6 @@ public class UserController {
 
   private UploadFile uploadFile = new UploadFile();
 
-  @GetMapping("/login")
-  public String getHomePage(Model model) {
-
-    return "home";
-  }
-
   // Detail User:
 
   @GetMapping("/admin/user/detail/{id}")
