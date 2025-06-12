@@ -56,6 +56,13 @@
                                                                 data-bs-dismiss="alert" aria-label="Close"></button>
                                                         </div>
                                                     </c:if>
+                                                    <!-- Hiển thị thông báo lỗi -->
+                                                    <c:if test="${not empty successMessage}">
+                                                        <div class="alert alert-danger" role="alert">
+                                                            <i class="fas fa-exclamation-triangle me-2"></i>
+                                                            ${successMessage}
+                                                        </div>
+                                                    </c:if>
                                                     <form method="post" action="/login">
                                                         <div class="form-floating mb-3">
                                                             <input class="form-control" id="inputEmail" type="text"
@@ -77,7 +84,7 @@
                                                         <div
                                                             class="d-flex align-items-center justify-content-between mt-4 mb-3">
 
-                                                            <a class="small" href="password.html">Forgot
+                                                            <a class="small" href="/forgot-password">Forgot
                                                                 Password?</a>
 
                                                             <button type="submit"

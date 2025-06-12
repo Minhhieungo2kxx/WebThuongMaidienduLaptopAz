@@ -61,19 +61,31 @@ public class CustomSuccessHandler implements AuthenticationSuccessHandler {
         if (request == null || authentication == null) {
             return;
         }
+
         HttpSession session = request.getSession(false);
         if (session == null) {
             return;
         }
-        String emaii = authentication.getName();
-        User user = userService.getbyEmail(emaii);
+
+        String email = authentication.getName();
+        if (email == null || email.trim().isEmpty()) {
+            return;
+        }
+
+        User user = userService.getbyEmail(email);
         if (user != null) {
-            session.setAttribute("fullName", user.getFullName().trim());
-            session.setAttribute("avatar", user.getAvatar().trim());
+            String fullName = user.getFullName();
+            if (fullName != null && !fullName.trim().isEmpty()) {
+                session.setAttribute("fullName", fullName.trim());
+            }
+
+            String avatar = user.getAvatar();
+            if (avatar != null && !avatar.trim().isEmpty()) {
+                session.setAttribute("avatar", avatar.trim());
+            }
         }
 
         session.removeAttribute(WebAttributes.AUTHENTICATION_EXCEPTION);
-
     }
 
 }
