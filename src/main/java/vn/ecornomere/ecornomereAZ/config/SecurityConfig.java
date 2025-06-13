@@ -1,5 +1,6 @@
 package vn.ecornomere.ecornomereAZ.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -7,15 +8,19 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 
+import vn.ecornomere.ecornomereAZ.config.CustomOAuth2.OAuth2LoginFailureHandler;
+import vn.ecornomere.ecornomereAZ.config.CustomOAuth2.OAuth2LoginSuccessHandler;
 import vn.ecornomere.ecornomereAZ.service.CustomUserDetailsService;
 import vn.ecornomere.ecornomereAZ.service.UserService;
+import vn.ecornomere.ecornomereAZ.service.OAuth2.CustomOAuth2UserService;
 
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.session.security.web.authentication.SpringSessionRememberMeServices;
 
@@ -26,6 +31,8 @@ import jakarta.servlet.DispatcherType;
 @EnableMethodSecurity(securedEnabled = true, prePostEnabled = true)
 
 public class SecurityConfig {
+        @Autowired
+        private CustomOAuth2UserService customOAuth2UserService;
 
         @Bean
         public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -39,7 +46,8 @@ public class SecurityConfig {
                                                                 "/product/**",
                                                                 "/uploads/avatars/**",
                                                                 "/forgot-password",
-                                                                "/uploads/products/**")
+                                                                "/uploads/products/**",
+                                                                "/oauth2/**")
                                                 .permitAll()
                                                 .requestMatchers("/admin/**").hasRole("ADMIN")
                                                 .anyRequest().authenticated())
@@ -59,6 +67,13 @@ public class SecurityConfig {
                                                 .failureUrl("/login?error")
                                                 .successHandler(authenticationSuccessHandler())
                                                 .permitAll())
+                                // Thêm cấu hình OAuth2 Login
+                                .oauth2Login(oauth2 -> oauth2
+                                                .loginPage("/login")
+                                                .userInfoEndpoint(userInfo -> userInfo
+                                                                .userService(customOAuth2UserService))
+                                                .successHandler(oAuth2AuthenticationSuccessHandler())
+                                                .failureHandler(oAuth2AuthenticationFailureHandler()))
                                 .csrf(csrf -> csrf.disable())
                                 .exceptionHandling(exception -> exception
                                                 .accessDeniedPage("/denyaccess"))
@@ -73,8 +88,13 @@ public class SecurityConfig {
         }
 
         @Bean
-        public PasswordEncoder passwordEncoder() {
-                return new BCryptPasswordEncoder();
+        public AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler() {
+                return new OAuth2LoginSuccessHandler();
+        }
+
+        @Bean
+        public AuthenticationFailureHandler oAuth2AuthenticationFailureHandler() {
+                return new OAuth2LoginFailureHandler();
         }
 
         @Bean

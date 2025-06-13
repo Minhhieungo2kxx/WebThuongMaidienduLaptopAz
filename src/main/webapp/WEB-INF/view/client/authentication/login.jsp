@@ -63,6 +63,17 @@
                                                             ${successMessage}
                                                         </div>
                                                     </c:if>
+
+
+
+                                                    <c:if test="${param.oauth2_error != null}">
+                                                        <div class="error-message">
+                                                            Lỗi đăng nhập Google. Vui lòng thử lại!
+                                                        </div>
+                                                    </c:if>
+
+
+
                                                     <form method="post" action="/login">
                                                         <div class="form-floating mb-3">
                                                             <input class="form-control" id="inputEmail" type="text"
@@ -95,7 +106,8 @@
                                                         <div class="text-center my-3">
                                                             <p class="text-muted small mb-3">Or login with</p>
                                                             <div class="d-flex justify-content-center gap-3">
-                                                                <a href="#" class="btn btn-social btn-google">
+                                                                <a href="/oauth2/authorization/google"
+                                                                    class="btn btn-social btn-google">
                                                                     <i class="fab fa-google fa-lg"></i>
                                                                 </a>
                                                                 <a href="#" class="btn btn-social btn-github">

@@ -47,7 +47,7 @@
                                                     src="/uploads/avatars/${sessionScope.avatar}" alt="User Profile" />
                                                 <div class="text-center fw-bold">FPT Shop</div>
                                                 <div class="text-center text-muted small">
-                                                    <c:out value="${sessionScope.fullName}" />
+                                                    <c:out value="${sessionScope.email}" />
                                                 </div>
                                             </li>
                                             <li><a class="dropdown-item" href="#">Quản lý tài khoản</a></li>
