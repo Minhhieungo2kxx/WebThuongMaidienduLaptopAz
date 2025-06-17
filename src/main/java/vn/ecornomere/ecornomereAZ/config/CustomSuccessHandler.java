@@ -16,6 +16,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import vn.ecornomere.ecornomereAZ.model.Cart;
 import vn.ecornomere.ecornomereAZ.model.User;
 import vn.ecornomere.ecornomereAZ.service.UserService;
 
@@ -57,6 +58,7 @@ public class CustomSuccessHandler implements AuthenticationSuccessHandler {
         return "/";
     }
 
+    @SuppressWarnings("null")
     protected void clearAuthenticationAttributes(HttpServletRequest request, Authentication authentication) {
         if (request == null || authentication == null) {
             return;
@@ -74,9 +76,9 @@ public class CustomSuccessHandler implements AuthenticationSuccessHandler {
 
         User user = userService.getbyEmail(email);
         if (user != null) {
-            String fullName = user.getFullName();
+            String fullName = user.getEmail();
             if (fullName != null && !fullName.trim().isEmpty()) {
-                session.setAttribute("fullName", fullName.trim());
+                session.setAttribute("email", fullName.trim());
             }
 
             String avatar = user.getAvatar();
@@ -84,6 +86,12 @@ public class CustomSuccessHandler implements AuthenticationSuccessHandler {
                 session.setAttribute("avatar", avatar.trim());
             }
         }
+        Cart cart = user.getCart();
+        int sumcart = 0; // mặc định là 0
+        if (cart != null) {
+            sumcart = cart.getSum(); // chỉ gọi getSum() nếu cart không null
+        }
+        session.setAttribute("sum", sumcart);
 
         session.removeAttribute(WebAttributes.AUTHENTICATION_EXCEPTION);
     }

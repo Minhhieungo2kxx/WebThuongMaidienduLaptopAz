@@ -141,12 +141,23 @@
                                                                             <fmt:formatNumber value="${product.price}"
                                                                                 type="number" groupingUsed="true" /> VNĐ
                                                                         </p>
-                                                                        <a href="#"
-                                                                            class="btn border border-secondary rounded-pill px-3 text-primary">
-                                                                            <i
-                                                                                class="fa fa-shopping-cart me-2 text-primary"></i>Thêm
-                                                                            vào giỏ hàng
-                                                                        </a>
+
+                                                                        <form:form method="post"
+                                                                            action="/add-cart/${product.id}">
+                                                                            <button type="submit"
+                                                                                class="btn border border-secondary rounded-pill px-3 text-primary">
+                                                                                <i
+                                                                                    class="fa fa-shopping-cart me-2 text-primary"></i>
+                                                                                Thêm
+                                                                                vào giỏ hàng
+                                                                            </button>
+                                                                            <div>
+                                                                                <input type="hidden"
+                                                                                    name="${_csrf.parameterName}"
+                                                                                    value="${_csrf.token}" />
+                                                                            </div>
+
+                                                                        </form:form>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -189,12 +200,22 @@
                                                                             <fmt:formatNumber value="${gamming.price}"
                                                                                 type="number" groupingUsed="true" /> VNĐ
                                                                         </p>
-                                                                        <a href="#"
-                                                                            class="btn border border-secondary rounded-pill px-3 text-primary">
-                                                                            <i
-                                                                                class="fa fa-shopping-cart me-2 text-primary"></i>Thêm
-                                                                            vào giỏ hàng
-                                                                        </a>
+                                                                        <form:form method="post"
+                                                                            action="/add-cart/${product.id}">
+                                                                            <button type="submit"
+                                                                                class="btn border border-secondary rounded-pill px-3 text-primary">
+                                                                                <i
+                                                                                    class="fa fa-shopping-cart me-2 text-primary"></i>
+                                                                                Thêm
+                                                                                vào giỏ hàng
+                                                                            </button>
+                                                                            <div>
+                                                                                <input type="hidden"
+                                                                                    name="${_csrf.parameterName}"
+                                                                                    value="${_csrf.token}" />
+                                                                            </div>
+
+                                                                        </form:form>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -237,12 +258,22 @@
                                                                             <fmt:formatNumber value="${office.price}"
                                                                                 type="number" groupingUsed="true" /> VNĐ
                                                                         </p>
-                                                                        <a href="#"
-                                                                            class="btn border border-secondary rounded-pill px-3 text-primary">
-                                                                            <i
-                                                                                class="fa fa-shopping-cart me-2 text-primary"></i>Thêm
-                                                                            vào giỏ hàng
-                                                                        </a>
+                                                                        <form:form method="post"
+                                                                            action="/add-cart/${product.id}">
+                                                                            <button type="submit"
+                                                                                class="btn border border-secondary rounded-pill px-3 text-primary">
+                                                                                <i
+                                                                                    class="fa fa-shopping-cart me-2 text-primary"></i>
+                                                                                Thêm
+                                                                                vào giỏ hàng
+                                                                            </button>
+                                                                            <div>
+                                                                                <input type="hidden"
+                                                                                    name="${_csrf.parameterName}"
+                                                                                    value="${_csrf.token}" />
+                                                                            </div>
+
+                                                                        </form:form>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -284,12 +315,22 @@
                                                                             <fmt:formatNumber value="${design.price}"
                                                                                 type="number" groupingUsed="true" /> VNĐ
                                                                         </p>
-                                                                        <a href="#"
-                                                                            class="btn border border-secondary rounded-pill px-3 text-primary">
-                                                                            <i
-                                                                                class="fa fa-shopping-cart me-2 text-primary"></i>Thêm
-                                                                            vào giỏ hàng
-                                                                        </a>
+                                                                        <form:form method="post"
+                                                                            action="/add-cart/${product.id}">
+                                                                            <button type="submit"
+                                                                                class="btn border border-secondary rounded-pill px-3 text-primary">
+                                                                                <i
+                                                                                    class="fa fa-shopping-cart me-2 text-primary"></i>
+                                                                                Thêm
+                                                                                vào giỏ hàng
+                                                                            </button>
+                                                                            <div>
+                                                                                <input type="hidden"
+                                                                                    name="${_csrf.parameterName}"
+                                                                                    value="${_csrf.token}" />
+                                                                            </div>
+
+                                                                        </form:form>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -330,12 +371,22 @@
                                                                             <fmt:formatNumber value="${personal.price}"
                                                                                 type="number" groupingUsed="true" /> VNĐ
                                                                         </p>
-                                                                        <a href="#"
-                                                                            class="btn border border-secondary rounded-pill px-3 text-primary">
-                                                                            <i
-                                                                                class="fa fa-shopping-cart me-2 text-primary"></i>Thêm
-                                                                            vào giỏ hàng
-                                                                        </a>
+                                                                        <form:form method="post"
+                                                                            action="/add-cart/${product.id}">
+                                                                            <button type="submit"
+                                                                                class="btn border border-secondary rounded-pill px-3 text-primary">
+                                                                                <i
+                                                                                    class="fa fa-shopping-cart me-2 text-primary"></i>
+                                                                                Thêm
+                                                                                vào giỏ hàng
+                                                                            </button>
+                                                                            <div>
+                                                                                <input type="hidden"
+                                                                                    name="${_csrf.parameterName}"
+                                                                                    value="${_csrf.token}" />
+                                                                            </div>
+
+                                                                        </form:form>
                                                                     </div>
                                                                 </div>
                                                             </div>

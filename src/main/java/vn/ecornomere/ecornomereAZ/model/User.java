@@ -11,7 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -52,6 +52,8 @@ public class User {
     @OneToMany(mappedBy = "user")
     private List<Order> orders;
 
+    @OneToOne(mappedBy = "user")
+    private Cart cart;
     // @OneToOne(mappedBy = "user_password")
     // private PasswordResetToken passwordResetToken;
 
@@ -131,6 +133,14 @@ public class User {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public Cart getCart() {
+        return cart;
+    }
+
+    public void setCart(Cart cart) {
+        this.cart = cart;
     }
 
     // public PasswordResetToken getPasswordResetToken() {

@@ -42,7 +42,7 @@ public class EmailService {
                 "<p>Mật khẩu mới của bạn là: <strong style='color: #e74c3c; font-size: 16px;'>" + newPassword
                 + "</strong></p>" +
                 "<p>Vui lòng đăng nhập và thay đổi mật khẩu sau khi đăng nhập thành công.</p>" +
-                "<p style='color: #7f8c8d;'>Trân trọng,<br/>Đội ngũ hỗ trợ</p>" +
+                "<p style='color: #7f8c8d;'>Trân trọng,<br/>Đội ngũ hỗ trợ FPT-Shop</p>" +
                 "</body></html>";
     }
 }

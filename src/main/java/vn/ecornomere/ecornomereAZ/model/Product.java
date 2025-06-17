@@ -26,13 +26,15 @@ public class Product {
     @OneToMany(mappedBy = "product")
     private List<OrderDetail> orderDetails;
 
+    @OneToMany(mappedBy = "product")
+    private List<CartDetail> cartDetails;
+
     @NotBlank(message = "Tên sản phẩm không được để trống")
     @Size(min = 3, max = 100, message = "Tên sản phẩm phải từ 3 đến 100 ký tự")
     private String name;
 
     @NotNull(message = "Giá sản phẩm không được để trống")
     @Min(value = 0, message = "Giá sản phẩm không được âm")
-
     private double price;
 
     @JsonIgnore
@@ -154,6 +156,14 @@ public class Product {
 
     public void setOrderDetails(List<OrderDetail> orderDetails) {
         this.orderDetails = orderDetails;
+    }
+
+    public List<CartDetail> getCartDetails() {
+        return cartDetails;
+    }
+
+    public void setCartDetails(List<CartDetail> cartDetails) {
+        this.cartDetails = cartDetails;
     }
 
 }

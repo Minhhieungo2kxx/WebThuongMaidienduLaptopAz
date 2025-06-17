@@ -17,7 +17,34 @@
                     <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js"
                         crossorigin="anonymous"></script>
 
+                    <style>
+                        /* Custom styles for Google Login Button */
+                        .btn-google {
+                            color: white;
+                            background-color: #ea4335;
+                            /* Google's official red color */
+                            border-color: #ea4335;
+                            padding: 0.75rem 1.25rem;
+                            /* Adjust padding for better look */
+                            font-size: 1rem;
+                            /* Standard font size */
+                        }
+
+                        .btn-google:hover {
+                            background-color: #c5372c;
+                            /* Slightly darker red on hover */
+                            border-color: #c5372c;
+                            color: white;
+                        }
+
+                        .btn-login {
+                            border-radius: 5px;
+                            /* Slightly rounded corners */
+                        }
+                    </style>
+
                 </head>
+
 
                 <body class="bg-primary">
                     <div id="layoutAuthentication">
@@ -104,15 +131,15 @@
 
 
                                                         <div class="text-center my-3">
-                                                            <p class="text-muted small mb-3">Or login with</p>
-                                                            <div class="d-flex justify-content-center gap-3">
-                                                                <a href="/oauth2/authorization/google"
-                                                                    class="btn btn-social btn-google">
-                                                                    <i class="fab fa-google fa-lg"></i>
-                                                                </a>
-                                                                <a href="#" class="btn btn-social btn-github">
-                                                                    <i class="fab fa-github fa-lg"></i>
-                                                                </a>
+                                                            <p style="font-size:18px;" class="text-muted small mb-3">Or
+                                                                log in with</p>
+                                                            <div class="d-grid">
+
+                                                                <a class="btn btn-google btn-login text-uppercase fw-bold"
+                                                                    href="/oauth2/authorization/google">
+                                                                    <span class="fa-lg"><i
+                                                                            class="fab fa-google me-2"></i></span> Sign
+                                                                    in with Google </a>
                                                             </div>
                                                         </div>
                                                     </form>

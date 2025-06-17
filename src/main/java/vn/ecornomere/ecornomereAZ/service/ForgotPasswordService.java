@@ -32,7 +32,6 @@ public class ForgotPasswordService {
                 return false;
             }
 
-            // Xóa token cũ nếu có
             tokenRepository.deleteByUser(user);
 
             // Tạo mật khẩu mới

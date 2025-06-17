@@ -74,6 +74,9 @@ public class SecurityConfig {
                                                                 .userService(customOAuth2UserService))
                                                 .successHandler(oAuth2AuthenticationSuccessHandler())
                                                 .failureHandler(oAuth2AuthenticationFailureHandler()))
+                                // cai nay cau hinh ngan chan tan cong web gia mao nhung cai nhu post,put,delete
+                                // neu muon bat xoa cai nay di la xong .csrf(csrf -> csrf.disable()) va
+                                // phai co(thường là _csrf hidden field)
                                 .csrf(csrf -> csrf.disable())
                                 .exceptionHandling(exception -> exception
                                                 .accessDeniedPage("/denyaccess"))

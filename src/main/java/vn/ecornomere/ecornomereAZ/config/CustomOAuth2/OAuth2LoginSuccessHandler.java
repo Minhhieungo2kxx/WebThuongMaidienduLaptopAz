@@ -20,7 +20,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-
+import vn.ecornomere.ecornomereAZ.model.Cart;
 import vn.ecornomere.ecornomereAZ.model.User;
 import vn.ecornomere.ecornomereAZ.service.RoleService;
 import vn.ecornomere.ecornomereAZ.service.UserService;
@@ -31,12 +31,11 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
     @Autowired
     private UserService userService;
     @Autowired
-    private PasswordEncoder passwordEncoder;
-    @Autowired
     RoleService roleService;
 
     private RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
 
+    @SuppressWarnings("null")
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
             Authentication authentication) throws IOException, ServletException {
@@ -65,6 +64,14 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
             }
             session.setAttribute("fullName", name);
             session.setAttribute("email", email);
+
+            Cart cart = existingUser.getCart();
+            int sumcart = 0; // mặc định là 0
+            if (cart != null) {
+                sumcart = cart.getSum(); // chỉ gọi getSum() nếu cart không null
+            }
+            session.setAttribute("sum", sumcart);
+
         }
 
         String targetUrl = determineTargetUrl(authentication);
