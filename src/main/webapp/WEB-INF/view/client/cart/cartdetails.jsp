@@ -204,32 +204,32 @@
                                                     </p>
                                                 </td>
                                                 <td>
-                                                    <div class="input-group quantity" style="width: 130px;">
+
+                                                    <form action="/cart/update" method="post">
+                                                        <input type="hidden" name="${_csrf.parameterName}"
+                                                            value="${_csrf.token}" />
+                                                        <input type="hidden" name="cartDetailId"
+                                                            value="${cartdetail.id}" />
+
                                                         <div class="input-group quantity" style="width: 130px;">
                                                             <div class="input-group-btn">
-
-                                                                <button type="button"
-                                                                    class="btn btn-sm btn-minus rounded-circle bg-light border change-quantity"
-                                                                    data-type="minus">
-
+                                                                <button type="submit" name="action" value="decrease"
+                                                                    class="btn btn-sm btn-minus rounded-circle bg-light border">
                                                                     <i class="fa fa-minus"></i>
                                                                 </button>
-
-
                                                             </div>
-                                                            <input type="text"
-                                                                class="form-control form-control-sm text-center border-0 quantity-input"
-                                                                data-id="${cartdetail.id}"
-                                                                data-price="${cartdetail.price}"
-                                                                value="${cartdetail.quantity}">
+                                                            <input type="text" name="quantity"
+                                                                class="form-control form-control-sm text-center border-0"
+                                                                value="${cartdetail.quantity}" readonly>
                                                             <div class="input-group-btn">
-                                                                <button type="button"
-                                                                    class="btn btn-sm btn-plus rounded-circle bg-light border change-quantity"
-                                                                    data-type="plus">
+                                                                <button type="submit" name="action" value="increase"
+                                                                    class="btn btn-sm btn-plus rounded-circle bg-light border">
                                                                     <i class="fa fa-plus"></i>
                                                                 </button>
                                                             </div>
                                                         </div>
+                                                    </form>
+
                                                 </td>
                                                 <td>
                                                     <p class="mb-0 text-dark fw-bold product-total"
@@ -297,10 +297,7 @@
                                                 </p>
                                             </div>
 
-                                            <p class="text-end text-muted small mb-4" style="font-size:large;">Vận
-                                                chuyển
-                                                đến theo yêu cầu khách hàng
-                                            </p>
+
 
                                             <div class="d-flex justify-content-between mb-4">
                                                 <h4 class="mb-0 text-dark">Tổng tiền:</h4>
@@ -311,10 +308,10 @@
                                                 </p>
                                             </div>
 
-                                            <button
-                                                class="btn btn-primary btn-block rounded-pill py-3 px-5 text-uppercase fw-bold w-100"
-                                                type="button">Tiến
-                                                hành Thanh toán</button>
+
+                                            <a href="/check-out"
+                                                class="btn btn-primary btn-block rounded-pill py-3 px-5 text-uppercase fw-bold w-100">
+                                                Tiến hành Thanh toán </a>
                                         </div>
 
                                     </c:if>

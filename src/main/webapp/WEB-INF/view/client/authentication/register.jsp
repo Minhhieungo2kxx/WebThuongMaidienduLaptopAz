@@ -97,6 +97,8 @@
                                                                     class="btn btn-primary mt-3">Create Account</button>
                                                             </div>
                                                         </div>
+                                                        <input type="hidden" name="${_csrf.parameterName}"
+                                                            value="${_csrf.token}" />
 
                                                     </form:form>
                                                 </div>

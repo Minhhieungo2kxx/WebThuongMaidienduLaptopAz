@@ -18,10 +18,11 @@
                                 <a href="/" class="nav-item nav-link active">Trang Chủ</a>
                                 <!-- Việt hóa "Trang trủ" thành "Trang Chủ" -->
                                 <a href="#" class="nav-item nav-link">Sản Phẩm</a> <!-- Việt hóa "Sản phẩm" -->
-                                <a href="#" class="nav-item nav-link">Tin Tức & Ưu Đãi</a>
+                                <a href="/news" class="nav-item nav-link">Tin Tức & Ưu Đãi</a>
                                 <!-- Đổi "Bài Viết" thành "Tin Tức & Ưu Đãi" -->
-                                <a href="#" class="nav-item nav-link">Liên Hệ</a> <!-- Giữ nguyên "Liên hệ" -->
-                                <a href="#" class="nav-item nav-link">Về Chúng Tôi</a> <!-- Thêm mục "Về Chúng Tôi" -->
+                                <a href="/contact" class="nav-item nav-link">Liên Hệ</a> <!-- Giữ nguyên "Liên hệ" -->
+                                <a href="/review" class="nav-item nav-link">Về Chúng Tôi</a>
+                                <!-- Thêm mục "Về Chúng Tôi" -->
                             </div>
                             <div class="d-flex m-3 me-0">
                                 <c:if test="${not empty pageContext.request.userPrincipal}">
@@ -50,7 +51,7 @@
                                                     <c:out value="${sessionScope.email}" />
                                                 </div>
                                             </li>
-                                            <li><a class="dropdown-item" href="#">Quản lý tài khoản</a></li>
+                                            <li><a class="dropdown-item" href="/update-user">Quản lý tài khoản</a></li>
                                             <li><a class="dropdown-item" href="#">Lịch sử mua hàng</a></li>
                                             <li>
                                                 <hr class="dropdown-divider" />

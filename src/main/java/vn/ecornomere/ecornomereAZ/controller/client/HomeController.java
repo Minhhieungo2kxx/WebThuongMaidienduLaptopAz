@@ -1,5 +1,9 @@
 package vn.ecornomere.ecornomereAZ.controller.client;
 
+import java.io.IOException;
+import java.net.http.HttpRequest;
+
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -8,15 +12,22 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
+import vn.ecornomere.ecornomereAZ.model.Role;
 import vn.ecornomere.ecornomereAZ.model.User;
 import vn.ecornomere.ecornomereAZ.model.dto.ForgotPasswordDTO;
 import vn.ecornomere.ecornomereAZ.model.dto.RegisterDTO;
+import vn.ecornomere.ecornomereAZ.model.dto.Userupdate;
 import vn.ecornomere.ecornomereAZ.service.ForgotPasswordService;
 import vn.ecornomere.ecornomereAZ.service.RoleService;
 import vn.ecornomere.ecornomereAZ.service.UserService;
+import vn.ecornomere.ecornomereAZ.utils.UploadFile;
 
 @Controller
 public class HomeController {
@@ -28,6 +39,7 @@ public class HomeController {
     private RoleService roleService;
     @Autowired
     private ForgotPasswordService forgotPasswordService;
+    private UploadFile uploadFile = new UploadFile();
 
     @GetMapping("/register")
     public String ShowRegister(Model model) {
@@ -96,6 +108,77 @@ public class HomeController {
             model.addAttribute("errorMessage", "Email không tồn tại trong hệ thống.");
             return "client/authentication/forgot-password";
         }
+    }
+
+    @GetMapping("/news")
+    public String showNews(Model model) {
+
+        return "client/homepage/news";
+    }
+
+    @GetMapping("/contact")
+    public String showContact(Model model) {
+        return "client/homepage/contact";
+    }
+
+    @GetMapping("/review")
+    public String showReview(Model model) {
+        return "client/homepage/review";
+    }
+
+    @GetMapping("/update-user")
+    public String showUserupdate(Model model, HttpServletRequest request) {
+        // Set thông tin vào session
+        HttpSession session = request.getSession();
+        String email = (String) session.getAttribute("email");
+        User olduser = userService.getbyEmail(email);
+        Userupdate userupdate = new Userupdate();
+        userupdate.setId(olduser.getId());
+        userupdate.setFullName(olduser.getFullName());
+        userupdate.setEmail(olduser.getEmail());
+        userupdate.setPassword(olduser.getPassword());
+        userupdate.setAddress(olduser.getAddress());
+        userupdate.setPhone(olduser.getPhone());
+        userupdate.setAvatar(olduser.getAvatar());
+        model.addAttribute("Userupdate", userupdate);
+        return "client/authentication/updateuser";
+    }
+
+    @PostMapping("/setting-user")
+    public String SettingUser(
+            @ModelAttribute("Userupdate") @Valid Userupdate userupdate, BindingResult result,
+            @RequestParam(value = "avatarFile", required = false) MultipartFile avatarFile,
+            HttpServletRequest request) throws IOException {
+
+        // Kiểm tra lỗi validation
+        if (result.hasErrors()) {
+            return "client/authentication/updateuser"; // Trả về form với lỗi
+        }
+        User newUser = userService.getbyEmail(userupdate.getEmail().trim());
+        newUser.setFullName(userupdate.getFullName());
+        newUser.setAddress(userupdate.getAddress());
+        newUser.setPhone(userupdate.getPhone());
+
+        // Mã hóa mật khẩu trước khi lưu
+        if (userupdate.getPassword() != null && !userupdate.getPassword().isEmpty()) {
+            String encodedPassword = passwordEncoder.encode(userupdate.getPassword());
+            newUser.setPassword(encodedPassword);
+        }
+        if (!avatarFile.isEmpty()) {
+            newUser.setAvatar(uploadFile.getnameFile(avatarFile, "avatars"));
+
+        } else {
+            // Người dùng không chọn ảnh mới → giữ ảnh cũ
+            User oldUser = userService.findUserById(userupdate.getId())
+                    .orElseThrow(() -> new IllegalArgumentException("Invalid user Id:" + userupdate.getId()));
+            newUser.setAvatar(oldUser.getAvatar());
+        }
+
+        userService.handleSaveUser(newUser);
+        HttpSession session = request.getSession(false);
+        session.setAttribute("avatar", newUser.getAvatar().trim());
+
+        return "redirect:/"; // Sau khi lưu thì chuyển về danh sách user
     }
 
 }

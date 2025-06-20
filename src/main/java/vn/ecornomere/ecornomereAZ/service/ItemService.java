@@ -10,11 +10,16 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.transaction.Transactional;
 import vn.ecornomere.ecornomereAZ.model.Cart;
 import vn.ecornomere.ecornomereAZ.model.CartDetail;
+import vn.ecornomere.ecornomereAZ.model.Order;
+import vn.ecornomere.ecornomereAZ.model.OrderDetail;
 import vn.ecornomere.ecornomereAZ.model.User;
+import vn.ecornomere.ecornomereAZ.model.dto.PaymentDefault;
 import vn.ecornomere.ecornomereAZ.model.Product;
 import vn.ecornomere.ecornomereAZ.repository.CartDetailRepository;
 import vn.ecornomere.ecornomereAZ.repository.CartRepository;
 import vn.ecornomere.ecornomereAZ.repository.ItemRepository;
+import vn.ecornomere.ecornomereAZ.repository.OrderDetailRepository;
+import vn.ecornomere.ecornomereAZ.repository.OrderRepository;
 
 @Service
 public class ItemService {
@@ -26,10 +31,13 @@ public class ItemService {
     @Autowired
     private ProductService productService;
     @Autowired
-    CartRepository cartRepository;
-
+    private CartRepository cartRepository;
     @Autowired
-    CartDetailRepository cartDetailRepository;
+    private CartDetailRepository cartDetailRepository;
+    @Autowired
+    private OrderRepository orderRepository;
+    @Autowired
+    private OrderDetailRepository orderDetailRepository;
 
     public ItemService(ItemRepository itemRepository) {
         this.itemRepository = itemRepository;
@@ -128,6 +136,93 @@ public class ItemService {
 
         }
 
+    }
+
+    @Transactional
+    public CartDetail updateQuantity(Long cartDetailId, int newQuantity) {
+        if (newQuantity < 0) {
+            throw new IllegalArgumentException("Quantity must be non-negative");
+        }
+
+        Optional<CartDetail> optional = cartDetailRepository.findById(cartDetailId);
+        if (optional.isPresent()) {
+            CartDetail cartDetail = optional.get();
+            if (newQuantity < 1) {
+                newQuantity = 1; // không cho giảm về 0
+            }
+            cartDetail.setQuantity(newQuantity);
+            cartDetail.setTotalPrice(newQuantity * cartDetail.getPrice());
+            return cartDetailRepository.save(cartDetail);
+        }
+
+        return null; // Hoặc có thể ném một Exception tùy vào cách xử lý lỗi của bạn.
+    }
+
+    @Transactional
+    public void SavePlaceOrder(String email, PaymentDefault paymentDefault, HttpSession session) {
+        User user = userService.getbyEmail(email);
+        if (user == null) {
+            return; // hoặc throw new IllegalArgumentException("User not found");
+        }
+
+        Cart cart = cartRepository.findByUser(user);
+        if (cart == null) {
+            return; // Không có giỏ hàng, không cần tiếp tục
+        }
+
+        List<CartDetail> cartDetails = cartDetailRepository.findByCart(cart);
+        if (cartDetails == null || cartDetails.isEmpty()) {
+            return; // Không có sản phẩm để đặt hàng
+        }
+
+        double shippingFee = 50000;
+        double totalPrice = 0;
+
+        for (CartDetail cd : cartDetails) {
+            totalPrice += cd.getPrice() * cd.getQuantity();
+        }
+
+        Order order = new Order();
+        order.setUser(user);
+        order.setReceiverName(paymentDefault.getReceiverName());
+        order.setReceiverAddress(paymentDefault.getReceiverAddress());
+        order.setReceiverPhone(paymentDefault.getReceiverPhone());
+        order.setTotalPrice(totalPrice);
+        order.setTotalPriceaddShip(totalPrice + shippingFee);
+        order.setStatus("Pending");
+
+        Order savedOrder = orderRepository.save(order);
+
+        for (CartDetail cd : cartDetails) {
+            OrderDetail orderDetail = new OrderDetail();
+            orderDetail.setOrder(savedOrder);
+            orderDetail.setProduct(cd.getProduct());
+            orderDetail.setPrice(cd.getPrice());
+            orderDetail.setQuantity(cd.getQuantity());
+            orderDetail.setTotalPrice(cd.getPrice() * cd.getQuantity());
+
+            orderDetailRepository.save(orderDetail);
+
+            // Xoá từng CartDetail sau khi chuyển sang OrderDetail
+            cartDetailRepository.deleteById(cd.getId());
+        }
+
+        // Xoá giỏ hàng
+        cartRepository.deleteById(cart.getId());
+
+        // Reset số lượng hàng trong session
+        session.setAttribute("sum", 0);
+    }
+
+    public List<Order> getAllOrder() {
+        return orderRepository.findAll();
+
+    }
+
+    public List<OrderDetail> getAllOrderdetail(Long id) {
+        Optional<Order> order = orderRepository.findById(id);
+        Order neworder = order.get();
+        return orderDetailRepository.findByOrder(neworder);
     }
 
 }

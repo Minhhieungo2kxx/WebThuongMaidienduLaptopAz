@@ -8,17 +8,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
-
+import jakarta.validation.Valid;
 import vn.ecornomere.ecornomereAZ.model.CartDetail;
 import vn.ecornomere.ecornomereAZ.model.Product;
-
+import vn.ecornomere.ecornomereAZ.model.dto.PaymentDefault;
+import vn.ecornomere.ecornomereAZ.model.dto.Userupdate;
 import vn.ecornomere.ecornomereAZ.service.ItemService;
 import vn.ecornomere.ecornomereAZ.service.ProductService;
 import vn.ecornomere.ecornomereAZ.service.UserService;
@@ -107,6 +112,55 @@ public class ItemController {
         }
         itemService.deleteCartDetail(id, session);
         return "redirect:/cart";
+    }
+
+    @GetMapping("/check-out")
+    public String ShowCheckout(Model model, HttpServletRequest request) {
+        HttpSession session = request.getSession();
+        String email = (String) session.getAttribute("email");
+
+        if (email == null || email.isEmpty()) {
+            return "redirect:/login";
+        }
+
+        List<CartDetail> list = itemService.getbyCartDetails(email);
+        if (list == null) {
+            list = new ArrayList<>();
+
+        }
+        // Tính tổng tiền
+        double totalPrice = 0.0;
+        for (CartDetail detail : list) {
+            totalPrice += detail.getTotalPrice();
+        }
+        model.addAttribute("sumPrice", totalPrice); // Gửi tổng tiền xuống view
+        model.addAttribute("listCartDetails", list);
+        model.addAttribute("PaymentDefault", new PaymentDefault()); // hoặc đối tượng thật từ DB
+        return "client/cart/checkout";
+    }
+
+    @GetMapping("/payment-success")
+    public String ShowPaymentSuccess(Model model, HttpServletRequest request) {
+
+        return "client/cart/payment-success";
+    }
+
+    @PostMapping("/cart/update")
+    public String updateCartQuantity(@RequestParam("cartDetailId") Long cartDetailId,
+            @RequestParam("quantity") int quantity) {
+        // Cập nhật lại trong database
+        itemService.updateQuantity(cartDetailId, quantity);
+        return "redirect:/cart"; // redirect lại trang giỏ hàng
+    }
+
+    @PostMapping("/place-order")
+    public String SavePlaceOrder(@ModelAttribute("PaymentDefault") PaymentDefault paymentDefault,
+            HttpServletRequest request) {
+        HttpSession session = request.getSession();
+        String email = (String) session.getAttribute("email");
+
+        itemService.SavePlaceOrder(email, paymentDefault, session);
+        return "redirect:/payment-success"; // redirect lại trang giỏ hàng
     }
 
 }

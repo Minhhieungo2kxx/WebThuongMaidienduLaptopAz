@@ -25,6 +25,8 @@ public class CartDetail {
     @Min(value = 0, message = "Giá sản phẩm không được âm")
     private double price;
 
+    private double totalPrice;
+
     @ManyToOne
     @JoinColumn(name = "cart_id")
     private Cart cart;
@@ -71,6 +73,14 @@ public class CartDetail {
 
     public void setProduct(Product product) {
         this.product = product;
+    }
+
+    public double getTotalPrice() {
+        return totalPrice;
+    }
+
+    public void setTotalPrice(double totalPrice) {
+        this.totalPrice = totalPrice;
     }
 
 }

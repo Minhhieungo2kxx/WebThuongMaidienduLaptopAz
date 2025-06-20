@@ -201,7 +201,7 @@
                                                                                 type="number" groupingUsed="true" /> VNĐ
                                                                         </p>
                                                                         <form:form method="post"
-                                                                            action="/add-cart/${product.id}">
+                                                                            action="/add-cart/${gamming.id}">
                                                                             <button type="submit"
                                                                                 class="btn border border-secondary rounded-pill px-3 text-primary">
                                                                                 <i
@@ -259,7 +259,7 @@
                                                                                 type="number" groupingUsed="true" /> VNĐ
                                                                         </p>
                                                                         <form:form method="post"
-                                                                            action="/add-cart/${product.id}">
+                                                                            action="/add-cart/${office.id}">
                                                                             <button type="submit"
                                                                                 class="btn border border-secondary rounded-pill px-3 text-primary">
                                                                                 <i
@@ -316,7 +316,7 @@
                                                                                 type="number" groupingUsed="true" /> VNĐ
                                                                         </p>
                                                                         <form:form method="post"
-                                                                            action="/add-cart/${product.id}">
+                                                                            action="/add-cart/${design.id}">
                                                                             <button type="submit"
                                                                                 class="btn border border-secondary rounded-pill px-3 text-primary">
                                                                                 <i
@@ -372,7 +372,7 @@
                                                                                 type="number" groupingUsed="true" /> VNĐ
                                                                         </p>
                                                                         <form:form method="post"
-                                                                            action="/add-cart/${product.id}">
+                                                                            action="/add-cart/${personal.id}">
                                                                             <button type="submit"
                                                                                 class="btn border border-secondary rounded-pill px-3 text-primary">
                                                                                 <i
