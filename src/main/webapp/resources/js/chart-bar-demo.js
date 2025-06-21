@@ -1,10 +1,10 @@
 // Set new default font family and font color to mimic Bootstrap's default styling
-Chart.defaults.global.defaultFontFamily = '-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif';
-Chart.defaults.global.defaultFontColor = '#292b2c';
+Chart.defaults.font.family = '-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif';
+Chart.defaults.color = '#292b2c';
 
 // Bar Chart Example
 var ctx = document.getElementById("myBarChart");
-var myLineChart = new Chart(ctx, {
+var myBarChart = new Chart(ctx, {
   type: 'bar',
   data: {
     labels: ["January", "February", "March", "April", "May", "June"],
@@ -16,31 +16,31 @@ var myLineChart = new Chart(ctx, {
     }],
   },
   options: {
+    responsive: true,
     scales: {
-      xAxes: [{
-        time: {
-          unit: 'month'
-        },
-        gridLines: {
+      x: {
+        grid: {
           display: false
         },
         ticks: {
           maxTicksLimit: 6
         }
-      }],
-      yAxes: [{
+      },
+      y: {
+        min: 0,
+        max: 15000,
         ticks: {
-          min: 0,
-          max: 15000,
           maxTicksLimit: 5
         },
-        gridLines: {
+        grid: {
           display: true
         }
-      }],
+      }
     },
-    legend: {
-      display: false
+    plugins: {
+      legend: {
+        display: false
+      }
     }
   }
 });

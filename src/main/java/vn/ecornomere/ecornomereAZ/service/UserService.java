@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import vn.ecornomere.ecornomereAZ.model.Role;
 import vn.ecornomere.ecornomereAZ.model.User;
 import vn.ecornomere.ecornomereAZ.model.dto.RegisterDTO;
+import vn.ecornomere.ecornomereAZ.repository.OrderRepository;
+import vn.ecornomere.ecornomereAZ.repository.ProductRepository;
 import vn.ecornomere.ecornomereAZ.repository.UserRepository;
 
 @Service
@@ -20,6 +22,10 @@ public class UserService {
   PasswordEncoder passwordEncoder;
   @Autowired
   RoleService roleService;
+  @Autowired
+  private ProductRepository productRepository;
+  @Autowired
+  private OrderRepository orderRepository;
 
   public UserService(UserRepository userRepository) {
     this.userRepository = userRepository;
@@ -107,6 +113,18 @@ public class UserService {
     }
 
     return existingUser;
+  }
+
+  public Long getCountUser() {
+    return this.userRepository.count();
+  }
+
+  public Long getCountProduct() {
+    return productRepository.count();
+  }
+
+  public Long getCountOrder() {
+    return orderRepository.count();
   }
 
 }

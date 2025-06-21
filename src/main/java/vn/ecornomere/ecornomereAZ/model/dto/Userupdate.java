@@ -14,9 +14,11 @@ public class Userupdate implements Serializable {
       @Email(message = "Email không đúng định dạng")
       private String email;
 
-      @NotBlank(message = "Mật khẩu không được để trống")
       @Size(min = 6, max = 100, message = "Mật khẩu phải từ 6 đến 100 ký tự")
       private String password;
+
+      @Size(min = 6, max = 100, message = "Mật khẩu phải từ 6 đến 100 ký tự")
+      private String passwordnew;
 
       @NotBlank(message = "Họ tên không được để trống")
       @Size(max = 100, message = "Họ tên không được vượt quá 100 ký tự")
@@ -83,6 +85,14 @@ public class Userupdate implements Serializable {
 
       public void setAvatar(String avatar) {
             this.avatar = avatar;
+      }
+
+      public String getPasswordnew() {
+            return passwordnew;
+      }
+
+      public void setPasswordnew(String passwordnew) {
+            this.passwordnew = passwordnew;
       }
 
 }

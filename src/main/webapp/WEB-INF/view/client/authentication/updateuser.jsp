@@ -108,10 +108,21 @@
                                                                         <div class="mb-3">
                                                                               <label for="password"
                                                                                     class="form-label">Mật khẩu
-                                                                                    mới</label>
+                                                                                    cũ</label>
                                                                               <form:input type="password"
                                                                                     class="form-control" id="password"
                                                                                     path="password"
+                                                                                    placeholder="Để trống nếu không muốn thay đổi" />
+                                                                              <form:errors path="password"
+                                                                                    cssClass="error" element="div" />
+                                                                        </div>
+                                                                        <div class="mb-3">
+                                                                              <label for="password"
+                                                                                    class="form-label">Mật khẩu
+                                                                                    mới</label>
+                                                                              <form:input type="password"
+                                                                                    class="form-control"
+                                                                                    id="passwordnew" path="passwordnew"
                                                                                     placeholder="Để trống nếu không muốn thay đổi" />
                                                                               <form:errors path="password"
                                                                                     cssClass="error" element="div" />

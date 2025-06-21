@@ -2,6 +2,8 @@ package vn.ecornomere.ecornomereAZ.controller.client;
 
 import java.io.IOException;
 import java.net.http.HttpRequest;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,12 +21,15 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
+import vn.ecornomere.ecornomereAZ.model.Order;
+import vn.ecornomere.ecornomereAZ.model.OrderDetail;
 import vn.ecornomere.ecornomereAZ.model.Role;
 import vn.ecornomere.ecornomereAZ.model.User;
 import vn.ecornomere.ecornomereAZ.model.dto.ForgotPasswordDTO;
 import vn.ecornomere.ecornomereAZ.model.dto.RegisterDTO;
 import vn.ecornomere.ecornomereAZ.model.dto.Userupdate;
 import vn.ecornomere.ecornomereAZ.service.ForgotPasswordService;
+import vn.ecornomere.ecornomereAZ.service.ItemService;
 import vn.ecornomere.ecornomereAZ.service.RoleService;
 import vn.ecornomere.ecornomereAZ.service.UserService;
 import vn.ecornomere.ecornomereAZ.utils.UploadFile;
@@ -37,6 +42,8 @@ public class HomeController {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private RoleService roleService;
+    @Autowired
+    private ItemService itemService;
     @Autowired
     private ForgotPasswordService forgotPasswordService;
     private UploadFile uploadFile = new UploadFile();
@@ -160,8 +167,8 @@ public class HomeController {
         newUser.setPhone(userupdate.getPhone());
 
         // Mã hóa mật khẩu trước khi lưu
-        if (userupdate.getPassword() != null && !userupdate.getPassword().isEmpty()) {
-            String encodedPassword = passwordEncoder.encode(userupdate.getPassword());
+        if (userupdate.getPasswordnew() != null && !userupdate.getPasswordnew().isEmpty()) {
+            String encodedPassword = passwordEncoder.encode(userupdate.getPasswordnew());
             newUser.setPassword(encodedPassword);
         }
         if (!avatarFile.isEmpty()) {
@@ -179,6 +186,17 @@ public class HomeController {
         session.setAttribute("avatar", newUser.getAvatar().trim());
 
         return "redirect:/"; // Sau khi lưu thì chuyển về danh sách user
+    }
+
+    @GetMapping("/order-history")
+    public String showOrderHistory(Model model, HttpServletRequest request) {
+        // Set thông tin vào session
+        HttpSession session = request.getSession();
+        String email = (String) session.getAttribute("email");
+        User user = userService.getbyEmail(email);
+        List<Order> listOrder = user.getOrders();
+        model.addAttribute("listOrderbyUser", listOrder);
+        return "client/cart/orderhistory";
     }
 
 }

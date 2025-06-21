@@ -52,7 +52,7 @@
                                                 </div>
                                             </li>
                                             <li><a class="dropdown-item" href="/update-user">Quản lý tài khoản</a></li>
-                                            <li><a class="dropdown-item" href="#">Lịch sử mua hàng</a></li>
+                                            <li><a class="dropdown-item" href="/order-history">Lịch sử mua hàng</a></li>
                                             <li>
                                                 <hr class="dropdown-divider" />
                                             </li>
