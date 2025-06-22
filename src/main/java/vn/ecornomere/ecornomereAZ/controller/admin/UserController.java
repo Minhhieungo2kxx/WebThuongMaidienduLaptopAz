@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -109,8 +110,21 @@ public class UserController {
 
   // Hiển thị danh sách user
   @GetMapping("/admin/list/user")
-  public String listUsers(Model model) {
-    model.addAttribute("users", userService.findAllUsers());
+  public String listUsers(@RequestParam(name = "page", defaultValue = "0") String pageParam, Model model) {
+    int page = 0;
+    int pageSize = 5;
+    try {
+      page = Integer.parseInt(pageParam);
+      if (page < 0)
+        page = 0;
+    } catch (NumberFormatException e) {
+      // Nếu người dùng nhập sai, mặc định về trang đầu
+      page = 0;
+    }
+    Page<User> userPage = userService.getUserPaginated(page, pageSize);
+    model.addAttribute("users", userPage.getContent());
+    model.addAttribute("currentPage", page);
+    model.addAttribute("totalPages", userPage.getTotalPages());
     return "admin/user/listuser"; // tạo 1 file JSP hiển thị danh sách
   }
 

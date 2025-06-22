@@ -4,6 +4,9 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import jakarta.servlet.http.HttpSession;
@@ -48,14 +51,29 @@ public class ItemService {
 
     }
 
+    public Page<Product> pagelistNameItems(String name, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return this.itemRepository.findByTarget(name, pageable);
+    }
+
     public List<Product> getAllItems() {
         return this.itemRepository.findAll();
 
     }
 
+    public Page<Product> getAllItemsPaginated(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return itemRepository.findAll(pageable);
+    }
+
     public List<Product> getBytargetIn(List<String> listtarget) {
         return this.itemRepository.findByTargetIn(listtarget);
 
+    }
+
+    public Page<Product> getBytargetInPaginated(List<String> listtarget, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return this.itemRepository.findByTargetIn(listtarget, pageable);
     }
 
     public void addCartItem(Long id, String email, HttpSession session) {
@@ -217,6 +235,11 @@ public class ItemService {
     public List<Order> getAllOrder() {
         return orderRepository.findAll();
 
+    }
+
+    public Page<Order> getOrderPaginated(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return orderRepository.findAll(pageable);
     }
 
     public List<OrderDetail> getAllOrderdetail(Long id) {

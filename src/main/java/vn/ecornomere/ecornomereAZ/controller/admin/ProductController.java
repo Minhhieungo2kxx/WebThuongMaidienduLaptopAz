@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.modelmapper.ModelMapper;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -57,10 +58,27 @@ public class ProductController {
 
     // Hiển thị danh sách
     @GetMapping("/admin/product")
-    public String listUsers(Model model) {
-        model.addAttribute("Listproduct", productService.getlistProduct());
-        return "admin/product/product_index"; // tạo 1 file JSP hiển thị danh sách
+    public String listProducts(@RequestParam(name = "page", defaultValue = "0") String pageParam, Model model) {
+        int page = 0;
+        int pageSize = 5;
+
+        try {
+            page = Integer.parseInt(pageParam);
+            if (page < 0)
+                page = 0;
+        } catch (NumberFormatException e) {
+            // Nếu người dùng nhập sai, mặc định về trang đầu
+            page = 0;
+        }
+
+        Page<Product> productPage = productService.getProductsPaginated(page, pageSize);
+        model.addAttribute("Listproduct", productPage.getContent());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", productPage.getTotalPages());
+
+        return "admin/product/product_index";
     }
+
     // Detail :
 
     @GetMapping("/admin/product/detail/{id}")

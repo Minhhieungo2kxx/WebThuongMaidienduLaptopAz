@@ -10,6 +10,7 @@ import java.util.List;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
+  @SuppressWarnings("null")
   User save(User newUser);
 
   // find by email and address
@@ -17,6 +18,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
   User findById(long id);
 
+  @SuppressWarnings("null")
   void delete(User user);
 
   boolean existsByEmail(String email);

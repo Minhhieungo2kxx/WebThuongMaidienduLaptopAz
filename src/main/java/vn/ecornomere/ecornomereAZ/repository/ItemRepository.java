@@ -2,6 +2,8 @@ package vn.ecornomere.ecornomereAZ.repository;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -18,5 +20,10 @@ public interface ItemRepository extends JpaRepository<Product, Long> {
     List<Product> findByTarget(String target); // ➕ thêm dòng này
 
     List<Product> findByTargetIn(List<String> targets);
+
+    Page<Product> findByTargetIn(List<String> targets, Pageable pageable);
+
+    // loc danh sach dieu kien nao do ... + phan trang
+    Page<Product> findByTarget(String target, Pageable pageable);
 
 }

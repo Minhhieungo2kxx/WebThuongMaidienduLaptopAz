@@ -5,6 +5,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -125,6 +128,11 @@ public class UserService {
 
   public Long getCountOrder() {
     return orderRepository.count();
+  }
+
+  public Page<User> getUserPaginated(int page, int size) {
+    Pageable pageable = PageRequest.of(page, size);
+    return userRepository.findAll(pageable);
   }
 
 }

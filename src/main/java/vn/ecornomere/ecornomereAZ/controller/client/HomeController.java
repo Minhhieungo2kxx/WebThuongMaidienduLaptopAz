@@ -1,11 +1,9 @@
 package vn.ecornomere.ecornomereAZ.controller.client;
 
 import java.io.IOException;
-import java.net.http.HttpRequest;
-import java.util.ArrayList;
+
 import java.util.List;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -22,14 +20,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import vn.ecornomere.ecornomereAZ.model.Order;
-import vn.ecornomere.ecornomereAZ.model.OrderDetail;
-import vn.ecornomere.ecornomereAZ.model.Role;
+
 import vn.ecornomere.ecornomereAZ.model.User;
 import vn.ecornomere.ecornomereAZ.model.dto.ForgotPasswordDTO;
 import vn.ecornomere.ecornomereAZ.model.dto.RegisterDTO;
 import vn.ecornomere.ecornomereAZ.model.dto.Userupdate;
 import vn.ecornomere.ecornomereAZ.service.ForgotPasswordService;
-import vn.ecornomere.ecornomereAZ.service.ItemService;
+
 import vn.ecornomere.ecornomereAZ.service.RoleService;
 import vn.ecornomere.ecornomereAZ.service.UserService;
 import vn.ecornomere.ecornomereAZ.utils.UploadFile;
@@ -42,8 +39,7 @@ public class HomeController {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private RoleService roleService;
-    @Autowired
-    private ItemService itemService;
+
     @Autowired
     private ForgotPasswordService forgotPasswordService;
     private UploadFile uploadFile = new UploadFile();

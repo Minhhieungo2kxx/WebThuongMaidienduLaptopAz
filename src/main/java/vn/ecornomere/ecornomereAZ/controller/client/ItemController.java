@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 
@@ -23,10 +23,9 @@ import jakarta.servlet.http.HttpSession;
 import vn.ecornomere.ecornomereAZ.model.CartDetail;
 import vn.ecornomere.ecornomereAZ.model.Product;
 import vn.ecornomere.ecornomereAZ.model.dto.PaymentDefault;
-import vn.ecornomere.ecornomereAZ.repository.CartDetailRepository;
+
 import vn.ecornomere.ecornomereAZ.service.ItemService;
 import vn.ecornomere.ecornomereAZ.service.ProductService;
-import vn.ecornomere.ecornomereAZ.service.UserService;
 
 @Controller
 public class ItemController {
@@ -34,12 +33,6 @@ public class ItemController {
     private ItemService itemService;
     @Autowired
     private ProductService productService;
-
-    @Autowired
-    private UserService userService;
-
-    @Autowired
-    private CartDetailRepository cartDetailRepository;
 
     @GetMapping("/product/detail/{id}")
     public String ShowDetailItem(@PathVariable Long id, Model model, HttpServletRequest request) {
@@ -50,20 +43,58 @@ public class ItemController {
     }
 
     @GetMapping("/")
-    public String showHomePage(Model model) {
-        // Lấy tất cả sản phẩm
-        List<Product> allProducts = itemService.getAllItems();
-        model.addAttribute("allProducts", allProducts);
-        // Lấy sản phẩm theo từng loại
+    public String showHomePage(@RequestParam(name = "page", defaultValue = "0") String pageParam, Model model) {
+        int page = 0;
+        int pageSize = 8;
+
+        try {
+            page = Integer.parseInt(pageParam);
+            if (page < 0)
+                page = 0;
+        } catch (NumberFormatException e) {
+            // Nếu người dùng nhập sai, mặc định về trang đầu
+            page = 0;
+        }
+        List<String> targets = Arrays.asList("Mong nhe", "Doanh nhan");
+        model.addAttribute("allProducts", itemService.getAllItems());
         model.addAttribute("gamingProducts", itemService.listNameItems("Gaming"));
         model.addAttribute("officeProducts", itemService.listNameItems("Van phong"));
         model.addAttribute("designProducts", itemService.listNameItems("Thiet ke do hoa"));
-        List<String> targets = Arrays.asList("Mong nhe", "Doanh nhan");
-        List<Product> filtered = itemService.getBytargetIn(targets);
-        model.addAttribute("personalProducts", filtered);
+        model.addAttribute("personalProducts", itemService.getBytargetIn(targets));
+        // Lấy tất cả sản phẩm
+        Page<Product> productPage = itemService.getAllItemsPaginated(page, pageSize);
+        model.addAttribute("allProducts", productPage.getContent());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", productPage.getTotalPages());
+        // Lấy sản phẩm theo từng loại
+        Page<Product> productPageGamming = itemService.pagelistNameItems("Gaming", page, pageSize);
+        model.addAttribute("gamingProducts", productPageGamming.getContent());
+        model.addAttribute("currentPage1", page);
+        model.addAttribute("totalPages1", productPageGamming.getTotalPages());
+
+        // Lấy sản phẩm theo từng loại
+        Page<Product> productPageOffice = itemService.pagelistNameItems("Van phong", page, pageSize);
+        model.addAttribute("officeProducts", productPageOffice.getContent());
+        model.addAttribute("currentPage2", page);
+        model.addAttribute("totalPages2", productPageOffice.getTotalPages());
+
+        // Lấy sản phẩm theo từng loại
+        Page<Product> productPagedesign = itemService.pagelistNameItems("Thiet ke do hoa", page, pageSize);
+        model.addAttribute("designProducts", productPagedesign.getContent());
+        model.addAttribute("currentPage3", page);
+        model.addAttribute("totalPages3", productPageOffice.getTotalPages());
+
+        // Lấy sản phẩm theo từng loại + phan trang
+
+        Page<Product> productPersonal = itemService.getBytargetInPaginated(targets, page, pageSize);
+        model.addAttribute("personalProducts", productPersonal.getContent());
+        model.addAttribute("currentPage4", page);
+        model.addAttribute("totalPages4", productPageOffice.getTotalPages());
 
         return "client/homepage/home";
     }
+
+    // Hiển thị danh sách
 
     @PostMapping("/add-cart/{id}")
     public String AddCartItem(@PathVariable Long id, HttpServletRequest request) {

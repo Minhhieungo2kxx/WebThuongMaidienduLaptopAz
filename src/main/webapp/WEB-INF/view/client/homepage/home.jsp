@@ -33,6 +33,31 @@
 
                     <!-- Template Stylesheet -->
                     <link href="/client/css/style.css" rel="stylesheet">
+
+                    <style>
+                        /* Đảm bảo các mục phân trang nằm trên một hàng */
+                        .pagination {
+                            display: flex;
+                            /* Sử dụng flexbox */
+                            flex-wrap: wrap;
+                            /* Cho phép xuống dòng nếu quá dài */
+                            padding-left: 0;
+                            list-style: none;
+                            border-radius: 0.3rem;
+                            /* Theo Bootstrap */
+                        }
+
+                        .page-item {
+                            display: list-item;
+                            /* Mặc định của li, nhưng để đảm bảo */
+                        }
+
+                        /* Đảm bảo link và span trong page-item hiển thị đúng */
+                        .page-link {
+                            display: block;
+                            /* Hoặc inline-block nếu cần */
+                        }
+                    </style>
                 </head>
 
                 <body>
@@ -68,38 +93,38 @@
                                     <div class="col-lg-8 text-end">
                                         <ul class="nav nav-pills d-inline-flex text-center mb-5">
                                             <li class="nav-item">
-                                                <a class="d-flex m-2 py-2 bg-light rounded-pill active"
+                                                <a class="nav-link d-flex m-2 py-2 bg-light rounded-pill active"
                                                     data-bs-toggle="pill" href="#tab-1">
                                                     <span class="text-dark" style="width: 150px;">Tất Cả Laptop</span>
                                                     <!-- Đổi "All Products" -->
                                                 </a>
                                             </li>
                                             <li class="nav-item">
-                                                <a class="d-flex py-2 m-2 bg-light rounded-pill" data-bs-toggle="pill"
-                                                    href="#tab-2">
+                                                <a class="nav-link d-flex py-2 m-2 bg-light rounded-pill"
+                                                    data-bs-toggle="pill" href="#tab-2">
                                                     <span class="text-dark" style="width: 150px;">Laptop Gaming</span>
                                                     <!-- Đổi "Vegetables" -->
                                                 </a>
                                             </li>
                                             <li class="nav-item">
-                                                <a class="d-flex m-2 py-2 bg-light rounded-pill" data-bs-toggle="pill"
-                                                    href="#tab-3">
+                                                <a class="nav-link d-flex m-2 py-2 bg-light rounded-pill"
+                                                    data-bs-toggle="pill" href="#tab-3">
                                                     <span class="text-dark" style="width: 150px;">Laptop Văn Phòng
                                                     </span>
                                                     <!-- Đổi "Fruits" -->
                                                 </a>
                                             </li>
                                             <li class="nav-item">
-                                                <a class="d-flex m-2 py-2 bg-light rounded-pill" data-bs-toggle="pill"
-                                                    href="#tab-4">
+                                                <a class="nav-link d-flex m-2 py-2 bg-light rounded-pill"
+                                                    data-bs-toggle="pill" href="#tab-4">
                                                     <span class="text-dark" style="width: 150px;">Laptop Thiết kế đồ
                                                         họa</span>
                                                     <!-- Đổi "Bread" -->
                                                 </a>
                                             </li>
                                             <li class="nav-item">
-                                                <a class="d-flex m-2 py-2 bg-light rounded-pill" data-bs-toggle="pill"
-                                                    href="#tab-5">
+                                                <a class="nav-link d-flex m-2 py-2 bg-light rounded-pill"
+                                                    data-bs-toggle="pill" href="#tab-5">
                                                     <span class="text-dark" style="width: 150px;">Laptop Doanh nhân-
                                                         mỏng nhẹ</span>
                                                     <!-- Đổi "Meat" -->
@@ -168,6 +193,39 @@
                                                 </div>
                                             </div>
                                         </div>
+                                        <nav aria-label="Page navigation" class="mt-4 justify-content-center">
+                                            <ul class="pagination justify-content-center mt-4">
+
+                                                <!-- Nút Previous -->
+                                                <c:if test="${currentPage > 0}">
+                                                    <li class="page-item">
+                                                        <a class="page-link" href="?page=${currentPage - 1}"
+                                                            aria-label="Previous">
+                                                            <span aria-hidden="true">«</span>
+                                                        </a>
+                                                    </li>
+                                                </c:if>
+
+                                                <!-- Duyệt qua số trang -->
+                                                <c:forEach var="i" begin="0" end="${totalPages - 1}">
+                                                    <li class="page-item ${i == currentPage ? 'active' : ''}">
+                                                        <a class="page-link" href="?page=${i}">${i + 1}</a>
+                                                    </li>
+                                                </c:forEach>
+
+                                                <!-- Nút Next -->
+                                                <c:if test="${currentPage < totalPages - 1}">
+                                                    <li class="page-item">
+                                                        <a class="page-link" href="?page=${currentPage + 1}"
+                                                            aria-label="Next">
+                                                            <span aria-hidden="true">»</span>
+                                                        </a>
+                                                    </li>
+                                                </c:if>
+
+                                            </ul>
+                                        </nav>
+
                                     </div>
                                     <!-- Tab for Laptop Gaming -->
                                     <div id="tab-2" class="tab-pane fade show p-0">
@@ -225,6 +283,38 @@
                                                 </div>
                                             </div>
                                         </div>
+                                        <nav aria-label="Page navigation" class="mt-4 justify-content-center">
+                                            <ul class="pagination justify-content-center mt-4">
+
+                                                <!-- Nút Previous -->
+                                                <c:if test="${currentPage1 > 0}">
+                                                    <li class="page-item">
+                                                        <a class="page-link" href="?page=${currentPage1 - 1}"
+                                                            aria-label="Previous">
+                                                            <span aria-hidden="true">«</span>
+                                                        </a>
+                                                    </li>
+                                                </c:if>
+
+                                                <!-- Duyệt qua số trang -->
+                                                <c:forEach var="i" begin="0" end="${totalPages1 - 1}">
+                                                    <li class="page-item ${i == currentPage1 ? 'active' : ''}">
+                                                        <a class="page-link" href="?page=${i}">${i + 1}</a>
+                                                    </li>
+                                                </c:forEach>
+
+                                                <!-- Nút Next -->
+                                                <c:if test="${currentPage1 < totalPages1 - 1}">
+                                                    <li class="page-item">
+                                                        <a class="page-link" href="?page=${currentPage1 + 1}"
+                                                            aria-label="Next">
+                                                            <span aria-hidden="true">»</span>
+                                                        </a>
+                                                    </li>
+                                                </c:if>
+
+                                            </ul>
+                                        </nav>
                                     </div>
                                     <!-- Tab for Laptop Văn Phòng -->
                                     <div id="tab-3" class="tab-pane fade show p-0">
@@ -283,6 +373,38 @@
                                                 </div>
                                             </div>
                                         </div>
+                                        <nav aria-label="Page navigation" class="mt-4 justify-content-center">
+                                            <ul class="pagination justify-content-center mt-4">
+
+                                                <!-- Nút Previous -->
+                                                <c:if test="${currentPage2 > 0}">
+                                                    <li class="page-item">
+                                                        <a class="page-link" href="?page=${currentPage2 - 1}"
+                                                            aria-label="Previous">
+                                                            <span aria-hidden="true">«</span>
+                                                        </a>
+                                                    </li>
+                                                </c:if>
+
+                                                <!-- Duyệt qua số trang -->
+                                                <c:forEach var="i" begin="0" end="${totalPages2 - 1}">
+                                                    <li class="page-item ${i == currentPage2 ? 'active' : ''}">
+                                                        <a class="page-link" href="?page=${i}">${i + 1}</a>
+                                                    </li>
+                                                </c:forEach>
+
+                                                <!-- Nút Next -->
+                                                <c:if test="${currentPage2 < totalPages2 - 1}">
+                                                    <li class="page-item">
+                                                        <a class="page-link" href="?page=${currentPage2 + 1}"
+                                                            aria-label="Next">
+                                                            <span aria-hidden="true">»</span>
+                                                        </a>
+                                                    </li>
+                                                </c:if>
+
+                                            </ul>
+                                        </nav>
                                     </div>
                                     <!-- Tab for Laptop Cao Cấp -->
                                     <div id="tab-4" class="tab-pane fade show p-0">
@@ -339,6 +461,38 @@
                                                 </div>
                                             </div>
                                         </div>
+                                        <nav aria-label="Page navigation" class="mt-4 justify-content-center">
+                                            <ul class="pagination justify-content-center mt-4">
+
+                                                <!-- Nút Previous -->
+                                                <c:if test="${currentPage3 > 0}">
+                                                    <li class="page-item">
+                                                        <a class="page-link" href="?page=${currentPage3 - 1}"
+                                                            aria-label="Previous">
+                                                            <span aria-hidden="true">«</span>
+                                                        </a>
+                                                    </li>
+                                                </c:if>
+
+                                                <!-- Duyệt qua số trang -->
+                                                <c:forEach var="i" begin="0" end="${totalPages3 - 1}">
+                                                    <li class="page-item ${i == currentPage3 ? 'active' : ''}">
+                                                        <a class="page-link" href="?page=${i}">${i + 1}</a>
+                                                    </li>
+                                                </c:forEach>
+
+                                                <!-- Nút Next -->
+                                                <c:if test="${currentPage3 < totalPages3 - 1}">
+                                                    <li class="page-item">
+                                                        <a class="page-link" href="?page=${currentPage3 + 1}"
+                                                            aria-label="Next">
+                                                            <span aria-hidden="true">»</span>
+                                                        </a>
+                                                    </li>
+                                                </c:if>
+
+                                            </ul>
+                                        </nav>
                                     </div>
                                     <!-- Tab for Phụ Kiện Laptop (tab-5) -->
                                     <div id="tab-5" class="tab-pane fade show p-0">
@@ -395,12 +549,52 @@
                                                 </div>
                                             </div>
                                         </div>
+                                        <nav aria-label="Page navigation" class="mt-4 justify-content-center">
+                                            <ul class="pagination justify-content-center mt-4">
+
+                                                <!-- Nút Previous -->
+                                                <c:if test="${currentPage4 > 0}">
+                                                    <li class="page-item">
+                                                        <a class="page-link" href="?page=${currentPage4 - 1}"
+                                                            aria-label="Previous">
+                                                            <span aria-hidden="true">«</span>
+                                                        </a>
+                                                    </li>
+                                                </c:if>
+
+                                                <!-- Duyệt qua số trang -->
+                                                <c:forEach var="i" begin="0" end="${totalPages4 - 1}">
+                                                    <li class="page-item ${i == currentPage4 ? 'active' : ''}">
+                                                        <a class="page-link" href="?page=${i}">${i + 1}</a>
+                                                    </li>
+                                                </c:forEach>
+
+                                                <!-- Nút Next -->
+                                                <c:if test="${currentPage4 < totalPages4 - 1}">
+                                                    <li class="page-item">
+                                                        <a class="page-link" href="?page=${currentPage4 + 1}"
+                                                            aria-label="Next">
+                                                            <span aria-hidden="true">»</span>
+                                                        </a>
+                                                    </li>
+                                                </c:if>
+
+                                            </ul>
+                                        </nav>
                                     </div>
                                     <!-- Laptop doanh nhan -->
 
                                 </div>
+
+
                             </div>
+
+
+
+
                         </div>
+
+
                     </div>
                     <!-- Fruits Shop End-->
 
@@ -418,6 +612,26 @@
 
                     <!-- Template Javascript -->
                     <script src="/client/js/main.js"></script>
+                    <script>
+                        // Ghi nhớ tab được chọn
+                        document.querySelectorAll('.nav-link').forEach(function (tab) {
+                            tab.addEventListener('click', function () {
+                                const target = this.getAttribute('href');
+                                localStorage.setItem('activeTab', target);
+                            });
+                        });
+
+                        // Kích hoạt lại tab đã lưu khi load trang
+                        window.addEventListener('DOMContentLoaded', function () {
+                            const lastTab = localStorage.getItem('activeTab');
+                            if (lastTab) {
+                                const triggerTab = document.querySelector('.nav-link[href="' + lastTab + '"]');
+                                if (triggerTab) {
+                                    new bootstrap.Tab(triggerTab).show();
+                                }
+                            }
+                        });
+                    </script>
                 </body>
 
                 </html>
