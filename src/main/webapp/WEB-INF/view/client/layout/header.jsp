@@ -17,7 +17,7 @@
                             <div class="navbar-nav mx-auto">
                                 <a href="/" class="nav-item nav-link active">Trang Chủ</a>
                                 <!-- Việt hóa "Trang trủ" thành "Trang Chủ" -->
-                                <a href="#" class="nav-item nav-link">Sản Phẩm</a> <!-- Việt hóa "Sản phẩm" -->
+                                <a href="/products" class="nav-item nav-link">Sản Phẩm</a> <!-- Việt hóa "Sản phẩm" -->
                                 <a href="/news" class="nav-item nav-link">Tin Tức & Ưu Đãi</a>
                                 <!-- Đổi "Bài Viết" thành "Tin Tức & Ưu Đãi" -->
                                 <a href="/contact" class="nav-item nav-link">Liên Hệ</a> <!-- Giữ nguyên "Liên hệ" -->

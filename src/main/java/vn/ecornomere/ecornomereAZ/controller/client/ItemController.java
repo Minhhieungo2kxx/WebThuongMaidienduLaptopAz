@@ -90,7 +90,6 @@ public class ItemController {
         model.addAttribute("personalProducts", productPersonal.getContent());
         model.addAttribute("currentPage4", page);
         model.addAttribute("totalPages4", productPageOffice.getTotalPages());
-
         return "client/homepage/home";
     }
 

@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import jakarta.servlet.http.HttpSession;
@@ -63,6 +64,27 @@ public class ItemService {
 
     public Page<Product> getAllItemsPaginated(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
+        return itemRepository.findAll(pageable);
+    }
+
+    public Page<Product> getAllItemsPaginatedSorted(int page, int size, String sortOption) {
+        Sort sort;
+
+        switch (sortOption) {
+            case "price-asc":
+                sort = Sort.by("price").ascending();
+                break;
+            case "price-desc":
+                sort = Sort.by("price").descending();
+                break;
+            case "name-asc":
+                sort = Sort.by("name").ascending();
+                break;
+            default:
+                sort = Sort.unsorted();
+        }
+
+        Pageable pageable = PageRequest.of(page, size, sort);
         return itemRepository.findAll(pageable);
     }
 
