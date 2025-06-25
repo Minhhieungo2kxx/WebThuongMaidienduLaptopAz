@@ -64,6 +64,7 @@ public class ProductService {
                 double min = Double.parseDouble(parts[0]);
                 double max = Double.parseDouble(parts[1]);
                 priceSpec = priceSpec.or((root, query, cb) -> cb.between(root.get("price"), min, max));
+
             }
             spec = spec.and(priceSpec);
         }

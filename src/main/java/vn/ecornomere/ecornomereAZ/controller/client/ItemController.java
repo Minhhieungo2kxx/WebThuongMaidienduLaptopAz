@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,7 +19,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
-
+import jakarta.validation.Valid;
 import vn.ecornomere.ecornomereAZ.model.CartDetail;
 import vn.ecornomere.ecornomereAZ.model.Product;
 import vn.ecornomere.ecornomereAZ.model.dto.PaymentDefault;
@@ -164,7 +164,7 @@ public class ItemController {
         // Tính tổng tiền
         double totalPrice = 0.0;
         for (CartDetail detail : list) {
-            totalPrice += detail.getTotalPrice();
+            totalPrice += detail.getQuantity() * detail.getPrice();
         }
         model.addAttribute("sumPrice", totalPrice); // Gửi tổng tiền xuống view
         model.addAttribute("listCartDetails", list);
@@ -187,11 +187,33 @@ public class ItemController {
     }
 
     @PostMapping("/place-order")
-    public String SavePlaceOrder(@ModelAttribute("PaymentDefault") PaymentDefault paymentDefault,
+    public String SavePlaceOrder(@Valid @ModelAttribute("PaymentDefault") PaymentDefault paymentDefault,
+            BindingResult result,
             HttpServletRequest request) {
+        // Kiểm tra lỗi validation
+        if (result.hasErrors()) {
+
+            // Gán lại dữ liệu như bên GET va gui lai du lieu ve form thong bao loi
+            HttpSession session = request.getSession();
+            String email = (String) session.getAttribute("email");
+
+            List<CartDetail> list = itemService.getbyCartDetails(email);
+            if (list == null) {
+                list = new ArrayList<>();
+            }
+
+            double totalPrice = 0.0;
+            for (CartDetail detail : list) {
+                totalPrice += detail.getQuantity() * detail.getPrice();
+            }
+
+            request.setAttribute("listCartDetails", list);
+            request.setAttribute("sumPrice", totalPrice);
+            return "client/cart/checkout"; // ❗Không redirect!
+        }
         HttpSession session = request.getSession();
         String email = (String) session.getAttribute("email");
-
+        double sumtien = paymentDefault.getSummoney();
         itemService.SavePlaceOrder(email, paymentDefault, session);
         return "redirect:/payment-success"; // redirect lại trang giỏ hàng
     }

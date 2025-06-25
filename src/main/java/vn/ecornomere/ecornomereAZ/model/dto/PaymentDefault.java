@@ -19,6 +19,8 @@ public class PaymentDefault implements Serializable {
       @Pattern(regexp = "^\\d{10}$", message = "Số điện thoại phải là 10 chữ số")
       private String receiverPhone;
 
+      private Double summoney;
+
       public String getReceiverName() {
             return receiverName;
       }
@@ -41,6 +43,14 @@ public class PaymentDefault implements Serializable {
 
       public void setReceiverPhone(String receiverPhone) {
             this.receiverPhone = receiverPhone;
+      }
+
+      public Double getSummoney() {
+            return summoney;
+      }
+
+      public void setSummoney(Double summoney) {
+            this.summoney = summoney;
       }
 
 }

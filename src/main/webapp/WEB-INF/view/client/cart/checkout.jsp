@@ -169,6 +169,12 @@
                                     .border-top {
                                           border-color: #dee2e6 !important;
                                     }
+
+                                    .error {
+                                          color: #dc3545;
+                                          font-size: 0.9rem;
+                                          margin-top: 5px;
+                                    }
                               </style>
                         </head>
 
@@ -276,6 +282,7 @@
                                                 <div class="col-lg-5">
                                                       <form:form method="post" action="/place-order"
                                                             modelAttribute="PaymentDefault">
+
                                                             <div class="info-section mb-4">
                                                                   <h2 class="text-center">Thông tin người nhận</h2>
                                                                   <div class="form-item mb-3">
@@ -285,6 +292,8 @@
                                                                         <form:input type="text" class="form-control"
                                                                               id="receiverName" path="receiverName"
                                                                               placeholder="Nhập tên người nhận" />
+                                                                        <form:errors path="receiverName"
+                                                                              cssClass="error" element="div" />
                                                                   </div>
                                                                   <div class="form-item mb-4">
                                                                         <label for="receiverAddress"
@@ -294,6 +303,8 @@
                                                                               id="receiverAddress"
                                                                               path="receiverAddress"
                                                                               placeholder="Nhập địa chỉ" />
+                                                                        <form:errors path="receiverAddress"
+                                                                              cssClass="error" element="div" />
                                                                   </div>
                                                                   <div class="form-item mb-4">
                                                                         <label for="receiverPhone"
@@ -302,6 +313,8 @@
                                                                         <form:input type="text" class="form-control"
                                                                               id="receiverPhone" path="receiverPhone"
                                                                               placeholder="Nhập số điện thoại" />
+                                                                        <form:errors path="receiverPhone"
+                                                                              cssClass="error" element="div" />
                                                                   </div>
                                                                   <div class="text-center mt-3">
                                                                         <a href="/cart"
@@ -328,6 +341,8 @@
                                                                         <c:set var="shippingFee" value="50000" />
                                                                         <c:set var="sumship"
                                                                               value="${sumPrice + shippingFee}" />
+                                                                        <input type="hidden" name="summoney"
+                                                                              value="${sumPrice + shippingFee}" />
 
                                                                         <div
                                                                               class="d-flex justify-content-between mb-2">
@@ -352,6 +367,7 @@
                                                                                           groupingUsed="true" />
                                                                                     VNĐ
                                                                               </p>
+
                                                                         </div>
 
                                                                         <div
