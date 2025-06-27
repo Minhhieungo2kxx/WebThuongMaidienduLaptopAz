@@ -367,16 +367,52 @@
                                                                                           groupingUsed="true" />
                                                                                     VNĐ
                                                                               </p>
-
                                                                         </div>
 
-                                                                        <div
-                                                                              class="d-flex justify-content-between align-items-center mb-4">
-                                                                              <h5 class="mb-0 text-dark">Hình thức vận
-                                                                                    chuyển:</h5>
-                                                                              <p class="text-end text-muted small mb-0"
-                                                                                    style="font-size:1.05rem;">Thanh
-                                                                                    toán khi nhận hàng</p>
+                                                                        <!-- Phần chọn phương thức thanh toán -->
+                                                                        <div class="payment-method-section mb-4">
+                                                                              <h5 class="mb-3 text-dark">Phương thức
+                                                                                    thanh toán:</h5>
+
+                                                                              <div class="form-check mb-2">
+                                                                                    <!-- <input class="form-check-input"
+                                                                                          type="radio"
+                                                                                          name="paymentMethod" id="cod"
+                                                                                          value="cod" checked> -->
+                                                                                    <form:radiobutton
+                                                                                          path="paymentMethod"
+                                                                                          value="cod"
+                                                                                          cssClass="form-check-input"
+                                                                                          id="cod" />
+                                                                                    <label class="form-check-label"
+                                                                                          style="font-size: 1.2em;"
+                                                                                          for="cod">
+                                                                                          <i class="fas fa-truck"></i>
+                                                                                          Thanh toán khi nhận hàng (COD)
+                                                                                    </label>
+                                                                              </div>
+
+                                                                              <div class="form-check mb-3">
+                                                                                    <!-- <input class="form-check-input"
+                                                                                          type="radio"
+                                                                                          name="paymentMethod"
+                                                                                          id="vnpay" value="vnpay"> -->
+                                                                                    <form:radiobutton
+                                                                                          path="paymentMethod"
+                                                                                          value="vnpay"
+                                                                                          cssClass="form-check-input"
+                                                                                          id="vnpay" />
+                                                                                    <label class="form-check-label"
+                                                                                          style="font-size:1.2em;"
+                                                                                          for="vnpay">
+                                                                                          <i
+                                                                                                class="fas fa-credit-card"></i>
+                                                                                          Thanh toán qua VNPay
+                                                                                          <img src="/uploads/products/vnpaylogo.png"
+                                                                                                alt="VNPay"
+                                                                                                style="height: 50px; margin-left: 10px;">
+                                                                                    </label>
+                                                                              </div>
                                                                         </div>
 
                                                                         <div
@@ -393,7 +429,8 @@
 
                                                                         <button type="submit"
                                                                               class="btn btn-primary btn-block w-100">
-                                                                              Xác nhận Thanh toán
+                                                                              <span id="payment-text">Xác nhận Thanh
+                                                                                    toán</span>
                                                                         </button>
                                                                   </c:if>
                                                             </div>
@@ -417,6 +454,23 @@
                               <script src="/client/lib/owlcarousel/owl.carousel.min.js"></script>
 
                               <script src="/client/js/main.js"></script>
+                              <script>
+                                    // JavaScript để thay đổi text button khi chọn phương thức thanh toán
+                                    document.addEventListener('DOMContentLoaded', function () {
+                                          const paymentMethods = document.querySelectorAll('input[name="paymentMethod"]');
+                                          const paymentText = document.getElementById('payment-text');
+
+                                          paymentMethods.forEach(method => {
+                                                method.addEventListener('change', function () {
+                                                      if (this.value === 'vnpay') {
+                                                            paymentText.textContent = 'Thanh toán qua VNPay';
+                                                      } else {
+                                                            paymentText.textContent = 'Xác nhận Thanh toán';
+                                                      }
+                                                });
+                                          });
+                                    });
+                              </script>
                         </body>
 
                         </html>

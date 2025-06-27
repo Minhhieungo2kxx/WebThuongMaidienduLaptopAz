@@ -49,10 +49,15 @@
                                                                                     <label for="email"
                                                                                           class="form-label">Full
                                                                                           Name</label>
-                                                                                    <form:input type="text"
+                                                                                    <!-- <form:input type="text"
                                                                                           class="form-control" id="name"
                                                                                           path="receiverName"
                                                                                           placeholder="Name"
+                                                                                          readonly="true" /> -->
+                                                                                    <input type="text"
+                                                                                          class="form-control" id="name"
+                                                                                          name="receiverName"
+                                                                                          value="${order.receiverName}"
                                                                                           readonly="true" />
                                                                               </div>
 

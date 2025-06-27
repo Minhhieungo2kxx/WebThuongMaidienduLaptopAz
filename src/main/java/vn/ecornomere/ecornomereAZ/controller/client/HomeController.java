@@ -191,6 +191,7 @@ public class HomeController {
         String email = (String) session.getAttribute("email");
         User user = userService.getbyEmail(email);
         List<Order> listOrder = user.getOrders();
+
         model.addAttribute("listOrderbyUser", listOrder);
         return "client/cart/orderhistory";
     }

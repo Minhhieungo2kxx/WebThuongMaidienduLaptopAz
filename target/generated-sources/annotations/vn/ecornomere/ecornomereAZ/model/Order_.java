@@ -42,6 +42,11 @@ public abstract class Order_ {
 	public static volatile SingularAttribute<Order, Long> id;
 	
 	/**
+	 * @see vn.ecornomere.ecornomereAZ.model.Order#paymentTime
+	 **/
+	public static volatile SingularAttribute<Order, String> paymentTime;
+	
+	/**
 	 * @see vn.ecornomere.ecornomereAZ.model.Order
 	 **/
 	public static volatile EntityType<Order> class_;
@@ -67,6 +72,7 @@ public abstract class Order_ {
 	public static final String TOTAL_PRICE = "totalPrice";
 	public static final String RECEIVER_NAME = "receiverName";
 	public static final String ID = "id";
+	public static final String PAYMENT_TIME = "paymentTime";
 	public static final String TOTAL_PRICEADD_SHIP = "totalPriceaddShip";
 	public static final String USER = "user";
 	public static final String STATUS = "status";

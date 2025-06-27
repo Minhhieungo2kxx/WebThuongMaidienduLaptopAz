@@ -26,6 +26,7 @@ import vn.ecornomere.ecornomereAZ.model.dto.PaymentDefault;
 
 import vn.ecornomere.ecornomereAZ.service.ItemService;
 import vn.ecornomere.ecornomereAZ.service.ProductService;
+import vn.ecornomere.ecornomereAZ.service.VnPay.VNPayService;
 
 @Controller
 public class ItemController {
@@ -33,6 +34,8 @@ public class ItemController {
     private ItemService itemService;
     @Autowired
     private ProductService productService;
+    @Autowired
+    private VNPayService vnPayService;
 
     @GetMapping("/product/detail/{id}")
     public String ShowDetailItem(@PathVariable Long id, Model model, HttpServletRequest request) {
@@ -214,8 +217,63 @@ public class ItemController {
         HttpSession session = request.getSession();
         String email = (String) session.getAttribute("email");
         double sumtien = paymentDefault.getSummoney();
-        itemService.SavePlaceOrder(email, paymentDefault, session);
-        return "redirect:/payment-success"; // redirect lại trang giỏ hàng
+        if (paymentDefault.getPaymentMethod().equals("cod")) {
+            // double sumtien = paymentDefault.getSummoney();
+            itemService.SavePlaceOrder(email, paymentDefault, session);
+            return "redirect:/payment-success"; // redirect lại trang giỏ hàng
+
+        }
+        // Lưu thông tin đơn hàng tạm thời vào session trước khi chuyển đến VNPay
+        session.setAttribute("tempPaymentDefault", paymentDefault);
+        session.setAttribute("tempEmail", email);
+        // Tạo URL thanh toán VNPay
+        String orderInfo = "Thanh toan don hang tai FPT Shop";
+        String paymentUrl = vnPayService.createOrder(request, (int) sumtien, orderInfo, "");
+
+        return "redirect:" + paymentUrl;
+
+    }
+
+    @GetMapping("/vnpay-payment-return")
+    public String paymentCompleted(HttpServletRequest request, Model model) {
+        int paymentStatus = vnPayService.orderReturn(request);
+
+        String orderInfo = request.getParameter("vnp_OrderInfo");
+        String paymentTime = request.getParameter("vnp_PayDate");
+        String transactionId = request.getParameter("vnp_TransactionNo");
+        String totalPrice = request.getParameter("vnp_Amount");
+
+        HttpSession session = request.getSession();
+
+        if (paymentStatus == 1) {
+            // Thanh toán thành công - Lưu đơn hàng vào database
+            PaymentDefault paymentDefault = (PaymentDefault) session.getAttribute("tempPaymentDefault");
+            String email = (String) session.getAttribute("tempEmail");
+            session.setAttribute("paymentTime", paymentTime);
+
+            if (paymentDefault != null && email != null) {
+                itemService.SavePlaceOrder(email, paymentDefault, session);
+
+                // Xóa dữ liệu tạm thời
+                session.removeAttribute("tempPaymentDefault");
+                session.removeAttribute("tempEmail");
+                // Sau khi sử dụng paymentTime
+                session.removeAttribute("paymentTime");
+
+                model.addAttribute("orderInfo", orderInfo);
+                model.addAttribute("totalPrice", totalPrice);
+                model.addAttribute("paymentTime", paymentTime);
+                model.addAttribute("transactionId", transactionId);
+
+                return "client/vnpaynotification/succesful";
+            }
+        } else {
+            // Thanh toán thất bại
+            model.addAttribute("message", "Thanh toán thất bại");
+            return "client/vnpaynotification/failpayment";
+        }
+
+        return "redirect:/cart";
     }
 
 }

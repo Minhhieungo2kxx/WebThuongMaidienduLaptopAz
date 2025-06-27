@@ -24,6 +24,7 @@ public class Order {
     private String receiverAddress;
     private String receiverPhone;
     private String status;
+    private String paymentTime;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -102,6 +103,14 @@ public class Order {
 
     public void setTotalPriceaddShip(double totalPriceaddShip) {
         this.totalPriceaddShip = totalPriceaddShip;
+    }
+
+    public String getPaymentTime() {
+        return paymentTime;
+    }
+
+    public void setPaymentTime(String paymentTime) {
+        this.paymentTime = paymentTime;
     }
 
 }

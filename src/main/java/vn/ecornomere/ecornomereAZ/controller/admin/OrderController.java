@@ -71,7 +71,7 @@ public class OrderController {
         Optional<Order> orderid = orderRepository.findById(id);
         Order order = orderid.get();
         // Danh sách trạng thái
-        List<String> statusList = List.of("Pending", "Shipping", "Cancel", "Complete");
+        List<String> statusList = List.of("Pending", "Shipping", "Cancelled", "Completed");
         model.addAttribute("order", order);
         model.addAttribute("statusList", statusList);
         return "admin/order/order_edit";

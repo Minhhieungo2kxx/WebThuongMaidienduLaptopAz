@@ -21,6 +21,8 @@ public class PaymentDefault implements Serializable {
 
       private Double summoney;
 
+      private String paymentMethod;
+
       public String getReceiverName() {
             return receiverName;
       }
@@ -51,6 +53,14 @@ public class PaymentDefault implements Serializable {
 
       public void setSummoney(Double summoney) {
             this.summoney = summoney;
+      }
+
+      public String getPaymentMethod() {
+            return paymentMethod;
+      }
+
+      public void setPaymentMethod(String paymentMethod) {
+            this.paymentMethod = paymentMethod;
       }
 
 }

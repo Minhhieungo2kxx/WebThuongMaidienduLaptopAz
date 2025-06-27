@@ -1,5 +1,7 @@
 package vn.ecornomere.ecornomereAZ.service;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
@@ -215,7 +217,7 @@ public class ItemService {
             return; // Không có sản phẩm để đặt hàng
         }
 
-        double shippingFee = 50000;
+        // double shippingFee = 50000;
         double totalPrice = 0;
 
         for (CartDetail cd : cartDetails) {
@@ -228,10 +230,21 @@ public class ItemService {
         order.setReceiverAddress(paymentDefault.getReceiverAddress());
         order.setReceiverPhone(paymentDefault.getReceiverPhone());
         order.setTotalPrice(totalPrice);
-        order.setTotalPriceaddShip(totalPrice + shippingFee);
+        order.setTotalPriceaddShip(paymentDefault.getSummoney());
         order.setStatus("Pending");
 
+        String Time_payment = (String) session.getAttribute("paymentTime");
+        DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+        DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss"); // giữ nguyên định dạng
+        if (Time_payment != null && !Time_payment.isEmpty()) {
+            LocalDateTime paymentTime = LocalDateTime.parse(Time_payment, inputFormatter);
+            order.setPaymentTime(paymentTime.format(outputFormatter)); // Chuỗi đúng định dạng JSP parse
+        } else {
+            order.setPaymentTime(LocalDateTime.now().format(outputFormatter));
+        }
+
         Order savedOrder = orderRepository.save(order);
+        session.removeAttribute("paymentTime");
 
         for (CartDetail cd : cartDetails) {
             OrderDetail orderDetail = new OrderDetail();
