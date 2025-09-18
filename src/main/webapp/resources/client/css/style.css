@@ -610,7 +610,37 @@ body {
     min-width: 280px; /* Ensure the menu itself is wide enough for its content */
   }
 
-  
+    /* Lớp phủ toàn màn hình */
+.search-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5); /* Lớp mờ */
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+}
+
+    /* Hộp tìm kiếm căn giữa */
+.search-box {
+        background: white;
+        padding: 40px;
+        border-radius: 10px;
+        max-width: 500px;
+        width: 100%;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+        text-align: center;
+}
+
+    /* Ẩn mặc định */
+ .d-none {
+        display: none !important;
+  }
+
+
 
 
 

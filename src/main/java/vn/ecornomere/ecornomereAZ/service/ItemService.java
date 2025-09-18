@@ -182,48 +182,56 @@ public class ItemService {
 
     @Transactional
     public CartDetail updateQuantity(Long cartDetailId, int newQuantity) {
-        if (newQuantity < 0) {
-            throw new IllegalArgumentException("Quantity must be non-negative");
+        if (newQuantity < 1) {
+            newQuantity = 1; // Không cho phép nhỏ hơn 1
         }
 
         Optional<CartDetail> optional = cartDetailRepository.findById(cartDetailId);
-        if (optional.isPresent()) {
-            CartDetail cartDetail = optional.get();
-            if (newQuantity < 1) {
-                newQuantity = 1; // không cho giảm về 0
-            }
-            cartDetail.setQuantity(newQuantity);
-            cartDetail.setTotalPrice(newQuantity * cartDetail.getPrice());
-            return cartDetailRepository.save(cartDetail);
+        if (optional.isEmpty()) {
+            throw new IllegalArgumentException("CartDetail not found with ID: " + cartDetailId);
         }
 
-        return null; // Hoặc có thể ném một Exception tùy vào cách xử lý lỗi của bạn.
+        CartDetail cartDetail = optional.get();
+        Product product = cartDetail.getProduct();
+
+        long stockQuantity = product.getQuantity();
+        if ((long) newQuantity > stockQuantity) {
+            newQuantity = (int) stockQuantity;
+        }
+
+        cartDetail.setQuantity(newQuantity);
+        cartDetail.setTotalPrice(newQuantity * cartDetail.getPrice());
+
+        return cartDetailRepository.save(cartDetail);
     }
 
     @Transactional
     public void SavePlaceOrder(String email, PaymentDefault paymentDefault, HttpSession session) {
+        // Lấy user từ email
         User user = userService.getbyEmail(email);
         if (user == null) {
             return; // hoặc throw new IllegalArgumentException("User not found");
         }
 
+        // Lấy giỏ hàng của người dùng
         Cart cart = cartRepository.findByUser(user);
         if (cart == null) {
             return; // Không có giỏ hàng, không cần tiếp tục
         }
 
+        // Lấy chi tiết giỏ hàng
         List<CartDetail> cartDetails = cartDetailRepository.findByCart(cart);
         if (cartDetails == null || cartDetails.isEmpty()) {
             return; // Không có sản phẩm để đặt hàng
         }
 
-        // double shippingFee = 50000;
+        // Tính tổng giá trị đơn hàng
         double totalPrice = 0;
-
         for (CartDetail cd : cartDetails) {
             totalPrice += cd.getPrice() * cd.getQuantity();
         }
 
+        // Tạo đơn hàng mới
         Order order = new Order();
         order.setUser(user);
         order.setReceiverName(paymentDefault.getReceiverName());
@@ -233,6 +241,7 @@ public class ItemService {
         order.setTotalPriceaddShip(paymentDefault.getSummoney());
         order.setStatus("Pending");
 
+        // Lưu thông tin thanh toán vào đơn hàng
         String Time_payment = (String) session.getAttribute("paymentTime");
         DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
         DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss"); // giữ nguyên định dạng
@@ -243,10 +252,23 @@ public class ItemService {
             order.setPaymentTime(LocalDateTime.now().format(outputFormatter));
         }
 
+        // Lưu đơn hàng vào cơ sở dữ liệu
         Order savedOrder = orderRepository.save(order);
         session.removeAttribute("paymentTime");
 
+        // Lặp qua từng CartDetail và chuyển nó thành OrderDetail
         for (CartDetail cd : cartDetails) {
+            // Kiểm tra tồn kho sản phẩm
+            Product product = cd.getProduct();
+            if (product.getQuantity() < cd.getQuantity()) {
+                throw new IllegalArgumentException("Sản phẩm " + product.getName() + " không đủ số lượng trong kho.");
+            }
+
+            // Giảm số lượng tồn kho sau khi mua
+            product.setQuantity(product.getQuantity() - cd.getQuantity());
+            productService.saveProduct(product);
+
+            // Tạo OrderDetail và lưu vào cơ sở dữ liệu
             OrderDetail orderDetail = new OrderDetail();
             orderDetail.setOrder(savedOrder);
             orderDetail.setProduct(cd.getProduct());
@@ -256,14 +278,14 @@ public class ItemService {
 
             orderDetailRepository.save(orderDetail);
 
-            // Xoá từng CartDetail sau khi chuyển sang OrderDetail
+            // Xoá CartDetail sau khi đã chuyển sang OrderDetail
             cartDetailRepository.deleteById(cd.getId());
         }
 
-        // Xoá giỏ hàng
+        // Xoá giỏ hàng sau khi đã đặt hàng
         cartRepository.deleteById(cart.getId());
 
-        // Reset số lượng hàng trong session
+        // Reset số lượng trong session
         session.setAttribute("sum", 0);
     }
 

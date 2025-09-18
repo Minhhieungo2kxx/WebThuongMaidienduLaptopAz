@@ -15,41 +15,9 @@ import jakarta.servlet.http.HttpServletRequest;
 public class VNPayConfig {
       public static String vnp_PayUrl = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
       public static String vnp_ReturnUrl = "http://localhost:8081/vnpay-payment-return";
-      public static String vnp_TmnCode = ""; // Mã website tại VNPAY
-      public static String vnp_HashSecret = ""; // Chuỗi bí mật
+      public static String vnp_TmnCode = "GSIQMJSF"; // Mã website tại VNPAY
+      public static String vnp_HashSecret = "40WG3OMYWXSZ93PFQZBVRG21A00KYZT4"; // Chuỗi bí mật
       public static String vnp_ApiUrl = "https://sandbox.vnpayment.vn/merchant_webapi/api/transaction";
-
-      public static String md5(String message) {
-            String digest = null;
-            try {
-                  java.security.MessageDigest md = java.security.MessageDigest.getInstance("MD5");
-                  byte[] hash = md.digest(message.getBytes("UTF-8"));
-                  StringBuilder sb = new StringBuilder(2 * hash.length);
-                  for (byte b : hash) {
-                        sb.append(String.format("%02x", b & 0xff));
-                  }
-                  digest = sb.toString();
-            } catch (Exception ex) {
-                  digest = "";
-            }
-            return digest;
-      }
-
-      public static String sha256(String message) {
-            String digest = null;
-            try {
-                  java.security.MessageDigest md = java.security.MessageDigest.getInstance("SHA-256");
-                  byte[] hash = md.digest(message.getBytes("UTF-8"));
-                  StringBuilder sb = new StringBuilder(2 * hash.length);
-                  for (byte b : hash) {
-                        sb.append(String.format("%02x", b & 0xff));
-                  }
-                  digest = sb.toString();
-            } catch (Exception ex) {
-                  digest = "";
-            }
-            return digest;
-      }
 
       public static String hashAllFields(Map<String, String> fields) {
             List<String> fieldNames = new ArrayList<>(fields.keySet());

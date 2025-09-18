@@ -43,11 +43,11 @@ public class SecurityConfig {
                                                                 DispatcherType.INCLUDE)
                                                 .permitAll()
                                                 .requestMatchers("/", "/login", "/client/**", "/css/**", "/js/**",
-                                                                "/product/**", "/register",
+                                                                "/product/**", "/register/**",
                                                                 "/uploads/avatars/**",
                                                                 "/forgot-password",
                                                                 "/uploads/products/**",
-                                                                "/oauth2/**")
+                                                                "/oauth2/**", "/products")
                                                 .permitAll()
                                                 .requestMatchers("/admin/**").hasRole("ADMIN")
                                                 .anyRequest().authenticated())

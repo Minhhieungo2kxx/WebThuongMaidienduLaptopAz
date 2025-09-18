@@ -25,9 +25,13 @@
                                 <!-- Thêm mục "Về Chúng Tôi" -->
                             </div>
                             <div class="d-flex m-3 me-0">
+
+                                <a href="javascript:void(0);" class="me-4 my-auto" id="search-icon">
+                                    <i class="fas fa-search fa-2x"></i>
+                                </a>
+
+
                                 <c:if test="${not empty pageContext.request.userPrincipal}">
-
-
 
                                     <a href="/cart" class="position-relative me-4 my-auto">
                                         <i class="fa fa-shopping-cart fa-2x"></i>

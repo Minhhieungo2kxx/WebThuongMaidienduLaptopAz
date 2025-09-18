@@ -656,6 +656,12 @@
                                                                                                 ${product.factory}</p>
                                                                                           <p class="product-desc">
                                                                                                 ${product.target}</p>
+                                                                                          <p
+                                                                                                style="font-size: 16px; color: #555;">
+                                                                                                Số lượng
+                                                                                                còn:
+                                                                                                ${product.quantity}</p>
+
                                                                                           <div class="mt-auto">
                                                                                                 <div
                                                                                                       class="product-price mb-3">
@@ -665,20 +671,36 @@
                                                                                                             groupingUsed="true" />
                                                                                                       VNĐ
                                                                                                 </div>
-                                                                                                <form:form method="post"
-                                                                                                      action="/add-cart/${product.id}">
-                                                                                                      <button
-                                                                                                            type="submit"
-                                                                                                            class="add-to-cart-btn">
-                                                                                                            <i
-                                                                                                                  class="fas fa-shopping-cart me-2"></i>
-                                                                                                            Thêm vào giỏ
-                                                                                                            hàng
-                                                                                                      </button>
-                                                                                                      <input type="hidden"
-                                                                                                            name="${_csrf.parameterName}"
-                                                                                                            value="${_csrf.token}" />
-                                                                                                </form:form>
+
+                                                                                                <c:choose>
+                                                                                                      <c:when
+                                                                                                            test="${product.quantity > 0}">
+                                                                                                            <!-- Chỉ hiển thị nếu còn hàng -->
+                                                                                                            <form:form
+                                                                                                                  method="post"
+                                                                                                                  action="/add-cart-filter/${product.id}">
+                                                                                                                  <button
+                                                                                                                        type="submit"
+                                                                                                                        class="btn border border-secondary rounded-pill px-3 text-primary">
+                                                                                                                        <i
+                                                                                                                              class="fa fa-shopping-cart me-2 text-primary"></i>
+                                                                                                                        Thêm
+                                                                                                                        vào
+                                                                                                                        giỏ
+                                                                                                                        hàng
+                                                                                                                  </button>
+                                                                                                                  <input type="hidden"
+                                                                                                                        name="${_csrf.parameterName}"
+                                                                                                                        value="${_csrf.token}" />
+                                                                                                            </form:form>
+                                                                                                      </c:when>
+                                                                                                      <c:otherwise>
+                                                                                                            <!-- Hiển thị khi hết hàng -->
+                                                                                                            <span
+                                                                                                                  class="text-danger fw-bold">Hết
+                                                                                                                  hàng</span>
+                                                                                                      </c:otherwise>
+                                                                                                </c:choose>
                                                                                           </div>
                                                                                     </div>
                                                                               </div>

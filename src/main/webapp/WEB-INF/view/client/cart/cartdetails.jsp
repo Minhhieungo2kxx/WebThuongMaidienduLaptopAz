@@ -194,6 +194,9 @@
                                                     <a href="/product/detail/${cartdetail.product.id}">
                                                         <p class="mb-0">${cartdetail.product.name}</p>
                                                     </a>
+                                                    <p class="text-muted">Còn lại: ${cartdetail.product.quantity}
+                                                        sản phẩm</p>
+
 
                                                 </td>
                                                 <td>
@@ -223,9 +226,12 @@
                                                                 value="${cartdetail.quantity}" readonly>
                                                             <div class="input-group-btn">
                                                                 <button type="submit" name="action" value="increase"
-                                                                    class="btn btn-sm btn-plus rounded-circle bg-light border">
+                                                                    class="btn btn-sm btn-plus rounded-circle bg-light border"
+                                                                    ${cartdetail.quantity>=cartdetail.product.quantity ?
+                                                                    'disabled' : ''}>
                                                                     <i class="fa fa-plus"></i>
                                                                 </button>
+
                                                             </div>
                                                         </div>
                                                     </form>

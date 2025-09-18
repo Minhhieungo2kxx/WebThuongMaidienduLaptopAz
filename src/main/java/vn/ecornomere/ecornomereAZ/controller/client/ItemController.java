@@ -113,6 +113,21 @@ public class ItemController {
         return "redirect:/"; // Sau khi lưu thì chuyển về
     }
 
+    @PostMapping("/add-cart-filter/{id}")
+    public String AddCartItemFilter(@PathVariable Long id, HttpServletRequest request) {
+        // Set thông tin vào session
+        HttpSession session = request.getSession();
+        String email = (String) session.getAttribute("email");
+        if (email == null || email.isEmpty()) {
+            return "redirect:/login"; // Nếu chưa đăng nhập thì chuyển đến trang đăng nhập
+        } else {
+            // Gọi service để thêm sản phẩm vào giỏ hàng
+            itemService.addCartItem(id, email, session);
+        }
+
+        return "redirect:/products"; // Sau khi lưu thì chuyển về
+    }
+
     @GetMapping("/cart")
     public String ShowCartDetail(Model model, HttpServletRequest request) {
         HttpSession session = request.getSession();
@@ -183,9 +198,10 @@ public class ItemController {
 
     @PostMapping("/cart/update")
     public String updateCartQuantity(@RequestParam("cartDetailId") Long cartDetailId,
-            @RequestParam("quantity") int quantity) {
+            @RequestParam("quantity") int quantity, RedirectAttributes redirectAttributes) {
         // Cập nhật lại trong database
         itemService.updateQuantity(cartDetailId, quantity);
+
         return "redirect:/cart"; // redirect lại trang giỏ hàng
     }
 

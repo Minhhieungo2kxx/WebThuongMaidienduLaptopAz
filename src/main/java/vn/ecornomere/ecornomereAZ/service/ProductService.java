@@ -13,6 +13,7 @@ import org.springframework.data.jpa.domain.Specification;
 
 import vn.ecornomere.ecornomereAZ.repository.ProductRepository;
 import vn.ecornomere.ecornomereAZ.model.Product;
+import vn.ecornomere.ecornomereAZ.model.dto.ProductSearchRequest;
 
 @Service
 public class ProductService {
@@ -84,6 +85,14 @@ public class ProductService {
 
         Pageable pageable = PageRequest.of(page, size, sort);
         return productRepository.findAll(spec, pageable);
+    }
+
+    public Page<Product> searchProducts(ProductSearchRequest request) {
+        Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
+        // Gọi phương thức tìm kiếm từ repository
+        Page<Product> products = productRepository.searchProducts(request.getSearchTerm(), pageable);
+        return products;
+
     }
 
 }
