@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -63,12 +64,37 @@ public class Product {
     @NotBlank(message = "Đối tượng sử dụng không được để trống")
     private String target;
 
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<StockDetail> stockdetails;
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductSpec> productSpecs;
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Review> reviews;
+
     public long getId() {
         return id;
     }
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public List<OrderDetail> getOrderDetails() {
+        return orderDetails;
+    }
+
+    public void setOrderDetails(List<OrderDetail> orderDetails) {
+        this.orderDetails = orderDetails;
+    }
+
+    public List<CartDetail> getCartDetails() {
+        return cartDetails;
+    }
+
+    public void setCartDetails(List<CartDetail> cartDetails) {
+        this.cartDetails = cartDetails;
     }
 
     public String getName() {
@@ -143,20 +169,28 @@ public class Product {
         this.target = target;
     }
 
-    public List<OrderDetail> getOrderDetails() {
-        return orderDetails;
+    public List<StockDetail> getStockdetails() {
+        return stockdetails;
     }
 
-    public void setOrderDetails(List<OrderDetail> orderDetails) {
-        this.orderDetails = orderDetails;
+    public void setStockdetails(List<StockDetail> stockdetails) {
+        this.stockdetails = stockdetails;
     }
 
-    public List<CartDetail> getCartDetails() {
-        return cartDetails;
+    public List<ProductSpec> getProductSpecs() {
+        return productSpecs;
     }
 
-    public void setCartDetails(List<CartDetail> cartDetails) {
-        this.cartDetails = cartDetails;
+    public void setProductSpecs(List<ProductSpec> productSpecs) {
+        this.productSpecs = productSpecs;
+    }
+
+    public List<Review> getReviews() {
+        return reviews;
+    }
+
+    public void setReviews(List<Review> reviews) {
+        this.reviews = reviews;
     }
 
 }

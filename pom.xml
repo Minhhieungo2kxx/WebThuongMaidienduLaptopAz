@@ -115,12 +115,12 @@
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.hibernate/hibernate-jpamodelgen -->
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-jpamodelgen</artifactId>
 			<version>6.4.1.Final</version>
 			<scope>provided</scope>
-		</dependency>
+		</dependency> -->
 		
 		<!-- https://mvnrepository.com/artifact/io.github.cdimascio/java-dotenv -->
 		<dependency>
@@ -128,6 +128,11 @@
 			<artifactId>java-dotenv</artifactId>
 			<version>5.2.0</version>
 		</dependency>
+		<!-- <dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<scope>provided</scope>
+        	</dependency> -->
 		
 
 

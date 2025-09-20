@@ -1,1 +1,55 @@
 .env
+# === Maven ===
+/target/
+!.mvn/wrapper/maven-wrapper.jar
+.mvn/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+
+# === Java ===
+*.class
+*.jar
+*.war
+*.ear
+
+# === Spring Boot specific ===
+/bin/
+/logs/
+*.log
+*.tmp
+*.h2.db
+*.mv.db
+*.db
+*.sqlite
+
+# === IDEs ===
+
+## IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+out/
+
+## Eclipse
+.project
+.classpath
+.settings/
+.loadpath
+.factorypath
+
+## VSCode
+.vscode/
+
+# === OS-specific files ===
+.DS_Store
+Thumbs.db
+
+# === Others ===
+*.swp
+*.bak
+*.old
+.env
+*.env
