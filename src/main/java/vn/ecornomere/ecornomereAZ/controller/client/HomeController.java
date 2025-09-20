@@ -2,9 +2,8 @@ package vn.ecornomere.ecornomereAZ.controller.client;
 
 import java.io.IOException;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -185,15 +184,30 @@ public class HomeController {
     }
 
     @GetMapping("/order-history")
-    public String showOrderHistory(Model model, HttpServletRequest request) {
+    public String showOrderHistory(@RequestParam(name = "page", defaultValue = "0") String pageParam, Model model,
+            HttpServletRequest request) {
+        int page = 0;
+        int pageSize = 6;
+
+        try {
+            page = Integer.parseInt(pageParam);
+            if (page < 0)
+                page = 0;
+        } catch (NumberFormatException e) {
+            // Nếu người dùng nhập sai, mặc định về trang đầu
+            page = 0;
+        }
         // Set thông tin vào session
         HttpSession session = request.getSession();
         String email = (String) session.getAttribute("email");
         User user = userService.getbyEmail(email);
-        List<Order> listOrder = user.getOrders();
 
-        model.addAttribute("listOrderbyUser", listOrder);
+        Page<Order> orderlistPage = userService.getlistHistory(user, page, pageSize);
+        model.addAttribute("listOrderbyUser", orderlistPage.getContent());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", orderlistPage.getTotalPages());
         return "client/cart/orderhistory";
+
     }
 
 }

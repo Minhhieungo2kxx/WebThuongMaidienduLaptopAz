@@ -12,6 +12,16 @@ public abstract class Order_ {
 
 	
 	/**
+	 * @see vn.ecornomere.ecornomereAZ.model.Order#totalPrice
+	 **/
+	public static volatile SingularAttribute<Order, Double> totalPrice;
+	
+	/**
+	 * @see vn.ecornomere.ecornomereAZ.model.Order#receiverName
+	 **/
+	public static volatile SingularAttribute<Order, String> receiverName;
+	
+	/**
 	 * @see vn.ecornomere.ecornomereAZ.model.Order#receiverAddress
 	 **/
 	public static volatile SingularAttribute<Order, String> receiverAddress;
@@ -27,14 +37,9 @@ public abstract class Order_ {
 	public static volatile SingularAttribute<Order, String> receiverPhone;
 	
 	/**
-	 * @see vn.ecornomere.ecornomereAZ.model.Order#totalPrice
+	 * @see vn.ecornomere.ecornomereAZ.model.Order#paymentMethod
 	 **/
-	public static volatile SingularAttribute<Order, Double> totalPrice;
-	
-	/**
-	 * @see vn.ecornomere.ecornomereAZ.model.Order#receiverName
-	 **/
-	public static volatile SingularAttribute<Order, String> receiverName;
+	public static volatile SingularAttribute<Order, String> paymentMethod;
 	
 	/**
 	 * @see vn.ecornomere.ecornomereAZ.model.Order#id
@@ -62,19 +67,26 @@ public abstract class Order_ {
 	public static volatile SingularAttribute<Order, User> user;
 	
 	/**
+	 * @see vn.ecornomere.ecornomereAZ.model.Order#paymentStatus
+	 **/
+	public static volatile SingularAttribute<Order, String> paymentStatus;
+	
+	/**
 	 * @see vn.ecornomere.ecornomereAZ.model.Order#status
 	 **/
 	public static volatile SingularAttribute<Order, String> status;
 
+	public static final String TOTAL_PRICE = "totalPrice";
+	public static final String RECEIVER_NAME = "receiverName";
 	public static final String RECEIVER_ADDRESS = "receiverAddress";
 	public static final String ORDER_DETAILS = "orderDetails";
 	public static final String RECEIVER_PHONE = "receiverPhone";
-	public static final String TOTAL_PRICE = "totalPrice";
-	public static final String RECEIVER_NAME = "receiverName";
+	public static final String PAYMENT_METHOD = "paymentMethod";
 	public static final String ID = "id";
 	public static final String PAYMENT_TIME = "paymentTime";
 	public static final String TOTAL_PRICEADD_SHIP = "totalPriceaddShip";
 	public static final String USER = "user";
+	public static final String PAYMENT_STATUS = "paymentStatus";
 	public static final String STATUS = "status";
 
 }

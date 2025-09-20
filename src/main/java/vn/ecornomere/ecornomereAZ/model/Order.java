@@ -26,6 +26,10 @@ public class Order {
     private String status;
     private String paymentTime;
 
+    private String paymentStatus; // Ví dụ: "Paid", "Unpaid"
+
+    private String paymentMethod; // Ví dụ: "Online", "COD"
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
@@ -111,6 +115,22 @@ public class Order {
 
     public void setPaymentTime(String paymentTime) {
         this.paymentTime = paymentTime;
+    }
+
+    public String getPaymentStatus() {
+        return paymentStatus;
+    }
+
+    public void setPaymentStatus(String paymentStatus) {
+        this.paymentStatus = paymentStatus;
+    }
+
+    public String getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public void setPaymentMethod(String paymentMethod) {
+        this.paymentMethod = paymentMethod;
     }
 
 }

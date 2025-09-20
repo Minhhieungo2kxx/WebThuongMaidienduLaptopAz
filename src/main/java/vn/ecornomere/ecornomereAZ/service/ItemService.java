@@ -2,7 +2,9 @@ package vn.ecornomere.ecornomereAZ.service;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+
 import java.util.List;
+
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +28,7 @@ import vn.ecornomere.ecornomereAZ.repository.CartRepository;
 import vn.ecornomere.ecornomereAZ.repository.ItemRepository;
 import vn.ecornomere.ecornomereAZ.repository.OrderDetailRepository;
 import vn.ecornomere.ecornomereAZ.repository.OrderRepository;
+import vn.ecornomere.ecornomereAZ.service.SendEmail.ApplicationEmailService;
 
 @Service
 public class ItemService {
@@ -44,6 +47,9 @@ public class ItemService {
     private OrderRepository orderRepository;
     @Autowired
     private OrderDetailRepository orderDetailRepository;
+
+    @Autowired
+    private ApplicationEmailService applicationEmailService;
 
     public ItemService(ItemRepository itemRepository) {
         this.itemRepository = itemRepository;
@@ -225,11 +231,11 @@ public class ItemService {
             return; // Không có sản phẩm để đặt hàng
         }
 
-        // Tính tổng giá trị đơn hàng
-        double totalPrice = 0;
-        for (CartDetail cd : cartDetails) {
-            totalPrice += cd.getPrice() * cd.getQuantity();
-        }
+        // // Tính tổng giá trị đơn hàng
+        // double totalPrice = 0;
+        // for (CartDetail cd : cartDetails) {
+        // totalPrice += cd.getPrice() * cd.getQuantity();
+        // }
 
         // Tạo đơn hàng mới
         Order order = new Order();
@@ -237,9 +243,11 @@ public class ItemService {
         order.setReceiverName(paymentDefault.getReceiverName());
         order.setReceiverAddress(paymentDefault.getReceiverAddress());
         order.setReceiverPhone(paymentDefault.getReceiverPhone());
-        order.setTotalPrice(totalPrice);
+        order.setTotalPrice(paymentDefault.getSummoney() - 50000);
         order.setTotalPriceaddShip(paymentDefault.getSummoney());
         order.setStatus("Pending");
+        order.setPaymentMethod(paymentDefault.getPaymentMethod().equals("cod") ? "COD" : "Online");
+        order.setPaymentStatus(paymentDefault.getPaymentMethod().equals("cod") ? "Unpaid" : "Paid");
 
         // Lưu thông tin thanh toán vào đơn hàng
         String Time_payment = (String) session.getAttribute("paymentTime");
@@ -287,6 +295,13 @@ public class ItemService {
 
         // Reset số lượng trong session
         session.setAttribute("sum", 0);
+        // GỬI EMAIL XÁC NHẬN ĐƠN HÀNG
+
+        // Lấy danh sách sản phẩm đã đặt để đưa vào email
+        List<OrderDetail> orderDetails = orderDetailRepository.findByOrder(savedOrder);
+
+        // Gọi phương thức gửi email
+        applicationEmailService.sendOrder(email, savedOrder, orderDetails);
     }
 
     public List<Order> getAllOrder() {
@@ -303,11 +318,6 @@ public class ItemService {
         Optional<Order> order = orderRepository.findById(id);
         Order neworder = order.get();
         return orderDetailRepository.findByOrder(neworder);
-    }
-
-    public List<Order> getAllOrderbyUser(User user) {
-        return orderRepository.findByUser(user);
-
     }
 
 }

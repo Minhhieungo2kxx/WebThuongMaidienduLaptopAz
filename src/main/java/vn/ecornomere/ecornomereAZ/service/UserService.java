@@ -7,16 +7,18 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import vn.ecornomere.ecornomereAZ.model.Order;
 import vn.ecornomere.ecornomereAZ.model.Role;
 import vn.ecornomere.ecornomereAZ.model.User;
 import vn.ecornomere.ecornomereAZ.model.dto.RegisterDTO;
 import vn.ecornomere.ecornomereAZ.repository.OrderRepository;
 import vn.ecornomere.ecornomereAZ.repository.ProductRepository;
 import vn.ecornomere.ecornomereAZ.repository.UserRepository;
+import org.springframework.data.domain.Pageable;
 
 @Service
 public class UserService {
@@ -133,6 +135,11 @@ public class UserService {
   public Page<User> getUserPaginated(int page, int size) {
     Pageable pageable = PageRequest.of(page, size);
     return userRepository.findAll(pageable);
+  }
+
+  public Page<Order> getlistHistory(User user, int page, int size) {
+    Pageable pageable = PageRequest.of(page, size);
+    return this.orderRepository.findByUser(user, pageable);
   }
 
 }

@@ -72,8 +72,10 @@ public class OrderController {
         Order order = orderid.get();
         // Danh sách trạng thái
         List<String> statusList = List.of("Pending", "Shipping", "Cancelled", "Completed");
+        List<String> statuspaymentsList = List.of("Unpaid", "Paid");
         model.addAttribute("order", order);
         model.addAttribute("statusList", statusList);
+        model.addAttribute("statuspaymentList", statuspaymentsList);
         return "admin/order/order_edit";
     }
 
@@ -85,6 +87,7 @@ public class OrderController {
         Optional<Order> orderid = orderRepository.findById(order.getId());
         Order newoOrder = orderid.get();
         newoOrder.setStatus(order.getStatus());
+        newoOrder.setPaymentStatus(order.getPaymentStatus());
         orderRepository.save(newoOrder);
         redirectAttributes.addFlashAttribute("successMessage", "Edit status thành công!");
         return "redirect:/admin/order"; // Sau khi lưu thì chuyển về danh sách Product

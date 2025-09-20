@@ -121,7 +121,31 @@
                                                 border-top: 2px solid #e9ecef;
                                                 margin: 1.5rem 0;
                                           }
+
+                                          /* Đảm bảo các mục phân trang nằm trên một hàng */
+                                          .pagination {
+                                                display: flex;
+                                                /* Sử dụng flexbox */
+                                                flex-wrap: wrap;
+                                                /* Cho phép xuống dòng nếu quá dài */
+                                                padding-left: 0;
+                                                list-style: none;
+                                                border-radius: 0.3rem;
+                                                /* Theo Bootstrap */
+                                          }
+
+                                          .page-item {
+                                                display: list-item;
+                                                /* Mặc định của li, nhưng để đảm bảo */
+                                          }
+
+                                          /* Đảm bảo link và span trong page-item hiển thị đúng */
+                                          .page-link {
+                                                display: block;
+                                                /* Hoặc inline-block nếu cần */
+                                          }
                                     </style>
+
                               </head>
 
                               <body>
@@ -182,8 +206,12 @@
                                                                                                       <th>Ngày thanh
                                                                                                             toán</th>
                                                                                                       <th>Trạng thái đơn
-                                                                                                            hàng
+                                                                                                            hàng:</th>
+                                                                                                      <th>Trạng thái
+                                                                                                            thanh toán:
                                                                                                       </th>
+                                                                                                      <th>Loại thanh
+                                                                                                            toán:</th>
                                                                                                 </tr>
                                                                                           </thead>
                                                                                           <tbody>
@@ -237,6 +265,20 @@
                                                                                                                         ${order.status}
                                                                                                                   </span>
                                                                                                             </td>
+                                                                                                            <td
+                                                                                                                  style="color:red;font-size:1.2em;">
+                                                                                                                  <span
+                                                                                                                        class="status-badge status-${order.status.toLowerCase()}">
+                                                                                                                        ${order.paymentStatus}
+                                                                                                                  </span>
+                                                                                                            </td>
+                                                                                                            <td
+                                                                                                                  style="color:red;font-size:1.2em;">
+                                                                                                                  <span
+                                                                                                                        class="status-badge status-${order.status.toLowerCase()}">
+                                                                                                                        ${order.paymentMethod}
+                                                                                                                  </span>
+                                                                                                            </td>
                                                                                                       </tr>
                                                                                                       <c:forEach
                                                                                                             items="${order.orderDetails}"
@@ -278,6 +320,38 @@
                                                       </div>
                                                 </div>
                                           </div>
+                                          <nav aria-label="Page navigation" class="mt-4 justify-content-center">
+                                                <ul class="pagination justify-content-center mt-4">
+
+                                                      <!-- Nút Previous -->
+                                                      <c:if test="${currentPage > 0}">
+                                                            <li class="page-item">
+                                                                  <a class="page-link" href="?page=${currentPage - 1}"
+                                                                        aria-label="Previous">
+                                                                        <span aria-hidden="true">«</span>
+                                                                  </a>
+                                                            </li>
+                                                      </c:if>
+
+                                                      <!-- Duyệt qua số trang -->
+                                                      <c:forEach var="i" begin="0" end="${totalPages - 1}">
+                                                            <li class="page-item ${i == currentPage ? 'active' : ''}">
+                                                                  <a class="page-link" href="?page=${i}">${i + 1}</a>
+                                                            </li>
+                                                      </c:forEach>
+
+                                                      <!-- Nút Next -->
+                                                      <c:if test="${currentPage < totalPages - 1}">
+                                                            <li class="page-item">
+                                                                  <a class="page-link" href="?page=${currentPage + 1}"
+                                                                        aria-label="Next">
+                                                                        <span aria-hidden="true">»</span>
+                                                                  </a>
+                                                            </li>
+                                                      </c:if>
+
+                                                </ul>
+                                          </nav>
                                     </div>
 
                                     <jsp:include page="../layout/footer.jsp" />

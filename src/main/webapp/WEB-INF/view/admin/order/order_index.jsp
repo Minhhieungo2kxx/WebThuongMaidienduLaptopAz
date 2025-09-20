@@ -63,7 +63,9 @@
                                                                                     <th>Địa chỉ</th>
                                                                                     <th>Số điện thoại</th>
                                                                                     <th>Ngày thanh toán</th>
-                                                                                    <th>Status</th>
+                                                                                    <th>Trạng thái đơn hàng:</th>
+                                                                                    <th>Trạng thái thanh toán:</th>
+                                                                                    <th>Loại thanh toán:</th>
                                                                                     <th>Actions</th> <%-- Đổi tên cột
                                                                                         --%>
                                                                             </tr>
@@ -118,11 +120,10 @@
                                                                                                 value="${parsedDate}"
                                                                                                 pattern="dd/MM/yyyy HH:mm:ss" />
 
-
-
                                                                                         </td>
                                                                                         <td>${order.status}</td>
-
+                                                                                        <td>${order.paymentStatus}</td>
+                                                                                        <td>${order.paymentMethod}</td>
 
                                                                                         <td>
 

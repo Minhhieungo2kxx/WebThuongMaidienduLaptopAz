@@ -98,6 +98,19 @@
                                                                                     </form:select>
 
                                                                               </div>
+                                                                              <div class="mb-3">
+                                                                                    <label for="status"
+                                                                                          class="form-label">Trạng thái
+                                                                                          Thanh toán:</label>
+                                                                                    <!-- truyen tu controller data sang view -->
+                                                                                    <form:select path="paymentStatus"
+                                                                                          class="form-select"
+                                                                                          id="status">
+                                                                                          <form:options
+                                                                                                items="${statuspaymentList}" />
+                                                                                    </form:select>
+
+                                                                              </div>
 
                                                                               <div class="text-center">
                                                                                     <button type="submit"
