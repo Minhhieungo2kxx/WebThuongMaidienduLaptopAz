@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 
 import vn.ecornomere.ecornomereAZ.model.Order;
 import vn.ecornomere.ecornomereAZ.model.OrderDetail;
-import vn.ecornomere.ecornomereAZ.service.EmailService;
 
 @Service
 public class ApplicationEmailService {

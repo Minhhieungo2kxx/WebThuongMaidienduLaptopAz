@@ -4,14 +4,20 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 
+import vn.ecornomere.ecornomereAZ.repository.CartDetailRepository;
+import vn.ecornomere.ecornomereAZ.repository.OrderDetailRepository;
 import vn.ecornomere.ecornomereAZ.repository.ProductRepository;
+import vn.ecornomere.ecornomereAZ.model.CartDetail;
+import vn.ecornomere.ecornomereAZ.model.OrderDetail;
 import vn.ecornomere.ecornomereAZ.model.Product;
 import vn.ecornomere.ecornomereAZ.model.dto.ProductSearchRequest;
 
@@ -19,7 +25,14 @@ import vn.ecornomere.ecornomereAZ.model.dto.ProductSearchRequest;
 public class ProductService {
     private final ProductRepository productRepository;
 
+    @Autowired
+    private OrderDetailRepository orderDetailRepository;
+
+    @Autowired
+    private CartDetailRepository cartDetailRepository;
+
     public ProductService(ProductRepository productRepository) {
+
         this.productRepository = productRepository;
     }
 
@@ -36,8 +49,34 @@ public class ProductService {
         return this.productRepository.findById(id);
     }
 
-    public void deleteProductbyId(Product product) {
-        this.productRepository.delete(product);
+    @Transactional
+    public void deleteProductById(Product product) {
+        if (product == null) {
+            throw new IllegalArgumentException("Product không hợp lệ");
+        }
+
+        Long productId = product.getId();
+
+        // Xử lý các OrderDetail liên quan
+        List<OrderDetail> orderDetails = orderDetailRepository.findByProductId(productId);
+        if (!orderDetails.isEmpty()) {
+            for (OrderDetail od : orderDetails) {
+                od.setProduct(null);
+            }
+            orderDetailRepository.saveAll(orderDetails);
+        }
+
+        // Xử lý các CartDetail liên quan
+        List<CartDetail> cartDetails = cartDetailRepository.findByProductId(productId);
+        if (!cartDetails.isEmpty()) {
+            for (CartDetail cd : cartDetails) {
+                cd.setProduct(null);
+            }
+            cartDetailRepository.saveAll(cartDetails);
+        }
+
+        // Cuối cùng mới xóa product
+        productRepository.delete(product);
     }
 
     public Page<Product> getProductsPaginated(int page, int size) {

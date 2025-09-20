@@ -1,4 +1,4 @@
-package vn.ecornomere.ecornomereAZ.service;
+package vn.ecornomere.ecornomereAZ.service.SendEmail;
 
 import java.text.NumberFormat;
 import java.time.LocalDateTime;

@@ -134,7 +134,7 @@ public class ProductController {
 
     @GetMapping("/admin/product/delete/{id}")
     public String deleteProduct(@PathVariable Long id, RedirectAttributes redirectAttributes) {
-        productService.getProductbyId(id).ifPresent(productService::deleteProductbyId);
+        productService.getProductbyId(id).ifPresent(productService::deleteProductById);
         redirectAttributes.addFlashAttribute("successMessage", "Xóa Product  thành công!");
         return "redirect:/admin/product";
 

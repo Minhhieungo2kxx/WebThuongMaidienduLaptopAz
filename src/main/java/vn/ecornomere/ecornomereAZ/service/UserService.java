@@ -10,11 +10,14 @@ import org.springframework.data.domain.PageRequest;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import vn.ecornomere.ecornomereAZ.model.Cart;
 import vn.ecornomere.ecornomereAZ.model.Order;
 import vn.ecornomere.ecornomereAZ.model.Role;
 import vn.ecornomere.ecornomereAZ.model.User;
 import vn.ecornomere.ecornomereAZ.model.dto.RegisterDTO;
+import vn.ecornomere.ecornomereAZ.repository.CartRepository;
 import vn.ecornomere.ecornomereAZ.repository.OrderRepository;
 import vn.ecornomere.ecornomereAZ.repository.ProductRepository;
 import vn.ecornomere.ecornomereAZ.repository.UserRepository;
@@ -31,6 +34,8 @@ public class UserService {
   private ProductRepository productRepository;
   @Autowired
   private OrderRepository orderRepository;
+  @Autowired
+  private CartRepository cartRepository;
 
   public UserService(UserRepository userRepository) {
     this.userRepository = userRepository;
@@ -40,8 +45,30 @@ public class UserService {
     return this.userRepository.findById(id);
   }
 
+  @Transactional
   public void deleteUser(User user) {
-    this.userRepository.delete(user);
+    if (user == null) {
+      throw new IllegalArgumentException("User không hợp lệ.");
+    }
+
+    // Xử lý Order liên quan
+    List<Order> orders = orderRepository.findByUserId(user.getId());
+    if (!orders.isEmpty()) {
+      for (Order order : orders) {
+        order.setUser(null);
+      }
+      orderRepository.saveAll(orders);
+    }
+
+    // Xử lý Cart nếu có
+    Cart cart = cartRepository.findByUser(user);
+    if (cart != null) {
+      cart.setUser(null);
+      cartRepository.save(cart);
+    }
+
+    // Xóa user
+    userRepository.delete(user);
   }
 
   public List<User> findAllUsers() {

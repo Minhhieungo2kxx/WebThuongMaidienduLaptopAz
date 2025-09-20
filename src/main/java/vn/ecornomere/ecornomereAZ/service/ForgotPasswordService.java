@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import vn.ecornomere.ecornomereAZ.model.User;
 import vn.ecornomere.ecornomereAZ.repository.PasswordResetTokenRepository;
+import vn.ecornomere.ecornomereAZ.service.SendEmail.EmailService;
 
 @Service
 public class ForgotPasswordService {
