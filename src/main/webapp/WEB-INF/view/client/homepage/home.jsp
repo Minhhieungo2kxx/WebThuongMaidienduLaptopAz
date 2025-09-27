@@ -657,9 +657,11 @@
 
 
                     </div>
-                    <!-- Fruits Shop End-->
 
 
+
+
+                    <jsp:include page="../layout/chatbox.jsp" />
 
                     <jsp:include page="../layout/footer.jsp" />
 
@@ -673,6 +675,8 @@
 
                     <!-- Template Javascript -->
                     <script src="/client/js/main.js"></script>
+                    <script src="/client/js/chatbox.js"></script>
+
                     <script>
                         // Ghi nhớ tab được chọn
                         document.querySelectorAll('.nav-link').forEach(function (tab) {
@@ -720,6 +724,28 @@
                                 searchOverlay.classList.add("d-none");
                             }
                         });
+                    </script>
+
+                    <script>
+                        // Hiển thị/ẩn vùng nhắn khi nhấn vào biểu tượng tin nhắn
+                        document.getElementById('message-icon').addEventListener('click', function () {
+                            const messageBox = document.getElementById('message-box');
+                            // Kiểm tra nếu vùng nhắn đang ẩn, hiển thị nó
+                            if (messageBox.style.display === 'none') {
+                                messageBox.style.display = 'block'; // Hiển thị vùng nhắn
+                                messageBox.style.right = '20px'; // Đảm bảo vị trí bên phải
+                            } else {
+                                // Nếu vùng nhắn đang hiển thị, ẩn nó
+                                messageBox.style.display = 'none';
+                            }
+                        });
+
+                        // Đóng vùng nhắn khi nhấn vào nút đóng
+                        document.getElementById('close-message-box').addEventListener('click', function () {
+                            const messageBox = document.getElementById('message-box');
+                            messageBox.style.display = 'none'; // Ẩn vùng nhắn
+                        });
+
                     </script>
 
                 </body>

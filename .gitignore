@@ -1,4 +1,5 @@
-.env
+
+
 # === Maven ===
 /target/
 !.mvn/wrapper/maven-wrapper.jar
@@ -53,3 +54,14 @@ Thumbs.db
 *.old
 .env
 *.env
+
+# Ignore all .json files (general, if bạn không dùng .json cho data khác)
+*.json
+
+#  Google Cloud:
+service-account-key.json
+
+# Ignore các file cấu hình riêng tư
+application-local.properties
+application-secret.properties
+

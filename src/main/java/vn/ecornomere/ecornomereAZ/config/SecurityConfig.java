@@ -1,5 +1,7 @@
 package vn.ecornomere.ecornomereAZ.config;
 
+import java.util.Arrays;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,6 +25,9 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.session.security.web.authentication.SpringSessionRememberMeServices;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import jakarta.servlet.DispatcherType;
 
@@ -44,10 +49,9 @@ public class SecurityConfig {
                                                 .permitAll()
                                                 .requestMatchers("/", "/login", "/client/**", "/css/**", "/js/**",
                                                                 "/product/**", "/register/**",
-                                                                "/uploads/avatars/**",
-                                                                "/forgot-password",
-                                                                "/uploads/products/**",
-                                                                "/oauth2/**", "/products")
+                                                                "/uploads/avatars/**", "/forgot-password",
+                                                                "/uploads/products/**", "/oauth2/**", "/products",
+                                                                "/api/chat/**")
                                                 .permitAll()
                                                 .requestMatchers("/admin/**").hasRole("ADMIN")
                                                 .anyRequest().authenticated())
@@ -77,12 +81,31 @@ public class SecurityConfig {
                                 // cai nay cau hinh ngan chan tan cong web gia mao nhung cai nhu post,put,delete
                                 // neu muon bat xoa cai nay di la xong .csrf(csrf -> csrf.disable()) va
                                 // phai co(thường là _csrf hidden field)
-                                .csrf(csrf -> csrf.disable())
+                                .csrf(csrf -> csrf
+                                                .ignoringRequestMatchers("/api/chat/**") // Bỏ qua CSRF cho API chat
+                                                .disable()) // Hoặc disable hoàn toàn nếu cần
                                 .exceptionHandling(exception -> exception
                                                 .accessDeniedPage("/denyaccess"))
 
                 ;
                 return http.build();
+        }
+
+        /**
+         * Cấu hình CORS cho phép AJAX request
+         */
+        @Bean
+        public CorsConfigurationSource corsConfigurationSource() {
+                CorsConfiguration configuration = new CorsConfiguration();
+                configuration.setAllowedOriginPatterns(Arrays.asList("*"));
+                configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+                configuration.setAllowedHeaders(Arrays.asList("*"));
+                configuration.setAllowCredentials(true);
+                configuration.setMaxAge(3600L);
+
+                UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+                source.registerCorsConfiguration("/api/**", configuration);
+                return source;
         }
 
         @Bean

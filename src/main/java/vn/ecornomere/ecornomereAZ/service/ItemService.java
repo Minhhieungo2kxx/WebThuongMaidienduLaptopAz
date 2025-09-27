@@ -106,6 +106,7 @@ public class ItemService {
         return this.itemRepository.findByTargetIn(listtarget, pageable);
     }
 
+    @Transactional
     public void addCartItem(Long id, String email, HttpSession session) {
 
         // 1. Lấy user từ email
@@ -231,12 +232,6 @@ public class ItemService {
             return; // Không có sản phẩm để đặt hàng
         }
 
-        // // Tính tổng giá trị đơn hàng
-        // double totalPrice = 0;
-        // for (CartDetail cd : cartDetails) {
-        // totalPrice += cd.getPrice() * cd.getQuantity();
-        // }
-
         // Tạo đơn hàng mới
         Order order = new Order();
         order.setUser(user);
@@ -274,6 +269,7 @@ public class ItemService {
 
             // Giảm số lượng tồn kho sau khi mua
             product.setQuantity(product.getQuantity() - cd.getQuantity());
+            product.setSold(cd.getQuantity());
             productService.saveProduct(product);
 
             // Tạo OrderDetail và lưu vào cơ sở dữ liệu

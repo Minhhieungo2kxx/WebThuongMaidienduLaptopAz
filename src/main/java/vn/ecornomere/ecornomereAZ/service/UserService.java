@@ -100,6 +100,7 @@ public class UserService {
     return this.userRepository.findByEmail(email);
   }
 
+  @Transactional
   public User createOAuth2User(String email, String fullName, String avatar) {
     User newUser = new User();
     newUser.setEmail(email);
@@ -127,6 +128,7 @@ public class UserService {
 
   }
 
+  @Transactional
   public User updateOAuth2User(User existingUser, String fullName, String avatar) {
     boolean needUpdate = false;
 

@@ -1,5 +1,6 @@
 package vn.ecornomere.ecornomereAZ.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -20,12 +21,18 @@ public class ProductSpec {
       @JoinColumn(name = "product_id")
       private Product product;
 
+      @Column(columnDefinition = "MEDIUMTEXT")
       private String screenSize; // Kích thước màn hình
+
+      @Column(columnDefinition = "MEDIUMTEXT")
       private String cpu; // Bộ vi xử lý
       private String ram; // Dung lượng RAM
       private String storage; // Dung lượng ổ cứng
       private String graphicsCard; // Card đồ họa
+      @Column(columnDefinition = "MEDIUMTEXT")
       private String battery; // Thông tin pin
+
+      @Column(columnDefinition = "MEDIUMTEXT")
       private String operatingSystem; // Hệ điều hành
 
       public long getId() {

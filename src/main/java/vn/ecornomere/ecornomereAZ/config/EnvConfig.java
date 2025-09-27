@@ -20,6 +20,7 @@ public class EnvConfig {
                         dotenv.get("SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_ID"));
             System.setProperty("SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET",
                         dotenv.get("SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET"));
+            System.setProperty("gemini.api.key", dotenv.get("gemini.api.key"));
       }
 
 }
