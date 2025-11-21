@@ -144,6 +144,39 @@
                                                 display: block;
                                                 /* Hoặc inline-block nếu cần */
                                           }
+
+                                          .fade-out {
+                                                animation: fadeOut 0.6s forwards;
+                                          }
+
+                                          @keyframes fadeOut {
+                                                from {
+                                                      opacity: 1;
+                                                      transform: translateX(0);
+                                                }
+
+                                                to {
+                                                      opacity: 0;
+                                                      transform: translateX(20px);
+                                                }
+                                          }
+
+                                          .order-block-fade-out {
+                                                animation: fadeOutOrder 0.6s forwards;
+                                          }
+
+                                          @keyframes fadeOutOrder {
+                                                from {
+                                                      opacity: 1;
+                                                }
+
+                                                to {
+                                                      opacity: 0;
+                                                      height: 0;
+                                                      margin: 0;
+                                                      padding: 0;
+                                                }
+                                          }
                                     </style>
 
                               </head>
@@ -212,52 +245,64 @@
                                                                                                       </th>
                                                                                                       <th>Loại thanh
                                                                                                             toán:</th>
+                                                                                                      <th>Thao tác</th>
                                                                                                 </tr>
                                                                                           </thead>
                                                                                           <tbody>
                                                                                                 <c:forEach
                                                                                                       items="${listOrderbyUser}"
                                                                                                       var="order">
-                                                                                                      <tr>
+
+                                                                                                      <tr
+                                                                                                            id="order-block-${order.id}">
                                                                                                             <td
                                                                                                                   class="order-id">
                                                                                                                   Đơn
                                                                                                                   hàng
-                                                                                                                  #${order.id}
+                                                                                                                  ${order.id}
                                                                                                             </td>
+
                                                                                                             <td></td>
+
                                                                                                             <td>
-                                                                                                                  <fmt:formatNumber
-                                                                                                                        value="${order.totalPrice}"
-                                                                                                                        type="number"
-                                                                                                                        groupingUsed="true" />
+                                                                                                                  <span
+                                                                                                                        id="total-price-${order.id}">
+                                                                                                                        <fmt:formatNumber
+                                                                                                                              value="${order.totalPrice}"
+                                                                                                                              type="number"
+                                                                                                                              groupingUsed="true" />
+                                                                                                                  </span>
                                                                                                                   VNĐ
                                                                                                             </td>
+
+
                                                                                                             <td></td>
+
                                                                                                             <td
                                                                                                                   style="color:red;font-size:1em;">
-                                                                                                                  <fmt:formatNumber
-                                                                                                                        value="${order.totalPriceaddShip}"
-                                                                                                                        type="number"
-                                                                                                                        groupingUsed="true" />
+                                                                                                                  <span
+                                                                                                                        id="total-price-ship-${order.id}">
+                                                                                                                        <fmt:formatNumber
+                                                                                                                              value="${order.totalPriceaddShip}"
+                                                                                                                              type="number"
+                                                                                                                              groupingUsed="true" />
+                                                                                                                  </span>
                                                                                                                   VNĐ
                                                                                                             </td>
+
+
                                                                                                             <td
                                                                                                                   style="color:red;font-size:1em;">
-
-
                                                                                                                   <fmt:parseDate
                                                                                                                         value="${order.paymentTime}"
                                                                                                                         var="parsedDate"
                                                                                                                         pattern="yyyyMMddHHmmss" />
+
                                                                                                                   <fmt:formatDate
                                                                                                                         value="${parsedDate}"
                                                                                                                         pattern="dd/MM/yyyy HH:mm:ss" />
-
-
-
-
                                                                                                             </td>
+
                                                                                                             <td
                                                                                                                   style="color:red;font-size:1.2em;">
                                                                                                                   <span
@@ -283,13 +328,21 @@
                                                                                                       <c:forEach
                                                                                                             items="${order.orderDetails}"
                                                                                                             var="orderdetail">
-                                                                                                            <tr>
-                                                                                                                  <td><img src="/uploads/products/${orderdetail.product.image}"
+
+
+                                                                                                            <tr
+                                                                                                                  id="order-detail-row-${orderdetail.id}">
+
+
+                                                                                                                  <td>
+                                                                                                                        <img src="/uploads/products/${orderdetail.product.image}"
                                                                                                                               alt="Product Avatar"
                                                                                                                               class="product-image" />
                                                                                                                   </td>
+
                                                                                                                   <td>${orderdetail.product.name}
                                                                                                                   </td>
+
                                                                                                                   <td>
                                                                                                                         <fmt:formatNumber
                                                                                                                               value="${orderdetail.price}"
@@ -297,8 +350,10 @@
                                                                                                                               groupingUsed="true" />
                                                                                                                         VNĐ
                                                                                                                   </td>
+
                                                                                                                   <td>${orderdetail.quantity}
                                                                                                                   </td>
+
                                                                                                                   <td>
                                                                                                                         <fmt:formatNumber
                                                                                                                               value="${orderdetail.totalPrice}"
@@ -308,8 +363,75 @@
                                                                                                                   </td>
                                                                                                                   <td>
                                                                                                                   </td>
+                                                                                                                  <td>
+                                                                                                                  </td>
+                                                                                                                  <td>
+                                                                                                                  </td>
+                                                                                                                  <td>
+                                                                                                                  </td>
+
+                                                                                                                  <td>
+                                                                                                                        <!-- Biến kiểm tra cho phép hủy -->
+                                                                                                                        <c:set var="allowCancel"
+                                                                                                                              value="false" />
+
+                                                                                                                        <c:choose>
+
+
+                                                                                                                              <c:when
+                                                                                                                                    test="${order.paymentMethod == 'COD'}">
+                                                                                                                                    <c:if
+                                                                                                                                          test="${order.status == 'Pending'}">
+                                                                                                                                          <c:set var="allowCancel"
+                                                                                                                                                value="true" />
+                                                                                                                                    </c:if>
+                                                                                                                              </c:when>
+
+
+
+                                                                                                                              <c:otherwise>
+
+
+                                                                                                                                    <c:if
+                                                                                                                                          test="${order.paymentStatus == 'Unpaid'}">
+                                                                                                                                          <c:set var="allowCancel"
+                                                                                                                                                value="true" />
+                                                                                                                                    </c:if>
+
+
+                                                                                                                                    <c:if
+                                                                                                                                          test="${order.paymentStatus == 'Paid' && order.status == 'Pending'}">
+                                                                                                                                          <c:set var="allowCancel"
+                                                                                                                                                value="true" />
+                                                                                                                                    </c:if>
+
+                                                                                                                              </c:otherwise>
+
+                                                                                                                        </c:choose>
+
+
+
+                                                                                                                        <!-- Nút Hủy -->
+                                                                                                                        <c:if
+                                                                                                                              test="${allowCancel}">
+                                                                                                                              <button
+                                                                                                                                    class="btn btn-danger btn-sm btn-cancel-order-detail"
+                                                                                                                                    data-id="${orderdetail.id}"
+                                                                                                                                    data-order-id="${order.id}">
+                                                                                                                                    <span
+                                                                                                                                          class="btn-text">Hủy</span>
+                                                                                                                                    <span class="spinner-border spinner-border-sm d-none"
+                                                                                                                                          role="status"></span>
+                                                                                                                              </button>
+                                                                                                                        </c:if>
+
+                                                                                                                  </td>
+
                                                                                                             </tr>
+
+
                                                                                                       </c:forEach>
+
                                                                                                 </c:forEach>
                                                                                           </tbody>
                                                                                     </table>
@@ -365,6 +487,72 @@
                                     <script src="/client/lib/lightbox/js/lightbox.min.js"></script>
                                     <script src="/client/lib/owlcarousel/owl.carousel.min.js"></script>
                                     <script src="/client/js/main.js"></script>
+                                    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+                                    <script>
+                                          $(document).on("click", ".btn-cancel-order-detail", function () {
+
+                                                let btn = $(this);
+                                                let id = btn.data("id");
+                                                let orderId = btn.data("order-id");
+
+                                                if (!confirm("Bạn có chắc muốn hủy sản phẩm này?")) return;
+
+                                                // Hiện spinner
+                                                btn.find(".btn-text").addClass("d-none");
+                                                btn.find(".spinner-border").removeClass("d-none");
+                                                btn.prop("disabled", true);
+
+                                                $.ajax({
+                                                      url: "/api/order-detail/cancel/" + id,
+                                                      method: "POST",
+                                                      success: function (resp) {
+
+                                                            // 1️ Animation fade-out cho dòng OrderDetail
+                                                            $("#order-detail-row-" + id)
+                                                                  .addClass("fade-out")
+                                                                  .delay(600)
+                                                                  .queue(function (next) {
+                                                                        $(this).remove();
+                                                                        next();
+                                                                  });
+
+                                                            // 2️ Nếu Order bị xóa hoàn toàn
+                                                            if (resp.orderDeleted) {
+                                                                  $("#order-block-" + orderId)
+                                                                        .addClass("order-block-fade-out")
+                                                                        .delay(600)
+                                                                        .queue(function (next) {
+                                                                              $(this).remove();
+                                                                              next();
+                                                                        });
+                                                                  return;
+                                                            }
+
+                                                            // 3️ Cập nhật tổng tiền
+                                                            $("#total-price-" + orderId)
+                                                                  .text(resp.newTotal.toLocaleString());
+
+                                                            $("#total-price-ship-" + orderId)
+                                                                  .text(resp.newTotalShip.toLocaleString());
+                                                      },
+
+                                                      error: function (xhr) {
+                                                            alert(xhr.responseJSON.error);
+                                                      },
+
+                                                      complete: function () {
+                                                            // Tắt spinner, bật lại nút
+                                                            btn.find(".spinner-border").addClass("d-none");
+                                                            btn.find(".btn-text").removeClass("d-none");
+                                                            btn.prop("disabled", false);
+                                                      }
+                                                });
+
+                                          });
+                                    </script>
+
+
                               </body>
 
                               </html>

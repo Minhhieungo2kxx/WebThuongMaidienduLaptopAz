@@ -21,6 +21,8 @@ public class EnvConfig {
             System.setProperty("SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET",
                         dotenv.get("SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET"));
             System.setProperty("gemini.api.key", dotenv.get("gemini.api.key"));
+            System.setProperty("VNP_TMN_CODE", dotenv.get("VNP_TMN_CODE"));
+            System.setProperty("VNP_HASH_SECRET", dotenv.get("VNP_HASH_SECRET"));
       }
 
 }

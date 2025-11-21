@@ -19,6 +19,8 @@ public class OrderDetail {
   private double price;
   private double totalPrice;
 
+  private String status; // NEW: "ACTIVE", "CANCELED"
+
   @ManyToOne
   @JoinColumn(name = "order_id")
   private Order order;
@@ -79,6 +81,14 @@ public class OrderDetail {
   public String toString() {
     return "OrderDetail [id=" + id + ", quantity=" + quantity + ", price=" + price + ", order=" + order + ", product="
         + product + "]";
+  }
+
+  public String getStatus() {
+    return status;
+  }
+
+  public void setStatus(String status) {
+    this.status = status;
   }
 
 }

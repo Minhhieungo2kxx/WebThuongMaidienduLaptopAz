@@ -169,6 +169,14 @@ public class User {
         this.cart = cart;
     }
 
+    public List<ChatMessage> getChatMessages() {
+        return chatMessages;
+    }
+
+    public void setChatMessages(List<ChatMessage> chatMessages) {
+        this.chatMessages = chatMessages;
+    }
+
     // public PasswordResetToken getPasswordResetToken() {
     // return passwordResetToken;
     // }

@@ -84,6 +84,10 @@ public class UserController {
             User::setAvatar))
         .addMappings(mapper -> mapper.skip(User::setId))
         .addMappings(mapper -> mapper.skip(User::setPassword))
+        .addMappings(mapper -> mapper.skip(User::setReviews))
+        .addMappings(mapper -> mapper.skip(User::setStocks))
+        .addMappings(mapper -> mapper.skip(User::setPassword))
+        .addMappings(mapper -> mapper.skip(User::setChatMessages))
         .addMappings(mapper -> mapper.skip(User::setRole));
 
     map.map(updatedUser, existingUser);

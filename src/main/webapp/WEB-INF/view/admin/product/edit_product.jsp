@@ -78,26 +78,17 @@
                                                 <div class="mb-3 row">
                                                     <div class="col">
                                                         <label for="role" class="form-label">Factory:</label>
-                                                        <select class="form-select" id="factory" name="factory">
-                                                            <option value="Apple">Apple (Macbook)</option>
-                                                            <option value="Asus">Asus</option>
-                                                            <option value="Lenovo">Lenovo</option>
-                                                            <option value="Dell">Dell</option>
-                                                            <option value="LG">LG</option>
-                                                            <option value="Acer">Acer</option>
-                                                            <option value="HP">HP</option>
-                                                        </select>
+                                                        <form:select path="factory" class="form-select">
+                                                            <form:options items="${factoryList}" />
+                                                        </form:select>
+
                                                     </div>
                                                     <div class="col">
                                                         <label for="role" class="form-label">Target:</label>
-                                                        <select class="form-select" id="target" name="target">
-                                                            <option value="Gaming">Gamming</option>
-                                                            <option value="Van phong">Sinh viên- Văn phòng</option>
-                                                            <option value="Thiet ke do hoa">Thiết kế đồ họa</option>
-                                                            <option value="Mong nhe">Mỏng nhẹ</option>
-                                                            <option value="Doanh nhan">Doanh nhân</option>
+                                                        <form:select path="target" class="form-select">
+                                                            <form:options items="${targetList}" />
+                                                        </form:select>
 
-                                                        </select>
                                                     </div>
 
 

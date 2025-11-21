@@ -5,6 +5,7 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -42,12 +43,14 @@ public class Product {
     @Size(max = 255, message = "Đường dẫn ảnh không được vượt quá 255 ký tự")
     private String image;
 
+    // Mô tả chi tiết
     @NotBlank(message = "Mô tả chi tiết không được để trống")
-    @Size(max = 500, message = "Mô tả chi tiết không được vượt quá 500 ký tự")
+    @Column(columnDefinition = "MEDIUMTEXT")
     private String detailDesc;
 
+    // Mô tả ngắn
     @NotBlank(message = "Mô tả ngắn không được để trống")
-    @Size(max = 200, message = "Mô tả ngắn không được vượt quá 200 ký tự")
+    @Column(columnDefinition = "MEDIUMTEXT")
     private String shortDesc;
 
     @NotNull(message = "Số lượng sản phẩm không được để trống")

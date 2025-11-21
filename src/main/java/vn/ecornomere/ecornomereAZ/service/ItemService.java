@@ -212,27 +212,118 @@ public class ItemService {
         return cartDetailRepository.save(cartDetail);
     }
 
+    // @Transactional
+    // public void SavePlaceOrder(String email, PaymentDefault paymentDefault,
+    // HttpSession session) {
+    // // Lấy user từ email
+    // User user = userService.getbyEmail(email);
+    // if (user == null) {
+    // return; // hoặc throw new IllegalArgumentException("User not found");
+    // }
+
+    // // Lấy giỏ hàng của người dùng
+    // Cart cart = cartRepository.findByUser(user);
+    // if (cart == null) {
+    // return; // Không có giỏ hàng, không cần tiếp tục
+    // }
+
+    // // Lấy chi tiết giỏ hàng
+    // List<CartDetail> cartDetails = cartDetailRepository.findByCart(cart);
+    // if (cartDetails == null || cartDetails.isEmpty()) {
+    // return; // Không có sản phẩm để đặt hàng
+    // }
+
+    // // Tạo đơn hàng mới
+    // Order order = new Order();
+    // order.setUser(user);
+    // order.setReceiverName(paymentDefault.getReceiverName());
+    // order.setReceiverAddress(paymentDefault.getReceiverAddress());
+    // order.setReceiverPhone(paymentDefault.getReceiverPhone());
+    // order.setTotalPrice(paymentDefault.getSummoney() - 50000);
+    // order.setTotalPriceaddShip(paymentDefault.getSummoney());
+    // order.setStatus("Pending");
+    // order.setPaymentMethod(paymentDefault.getPaymentMethod().equals("cod") ?
+    // "COD" : "Online");
+    // order.setPaymentStatus(paymentDefault.getPaymentMethod().equals("cod") ?
+    // "Unpaid" : "Paid");
+
+    // // Lưu thông tin thanh toán vào đơn hàng
+    // String Time_payment = (String) session.getAttribute("paymentTime");
+    // DateTimeFormatter inputFormatter =
+    // DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+    // DateTimeFormatter outputFormatter =
+    // DateTimeFormatter.ofPattern("yyyyMMddHHmmss"); // giữ nguyên định dạng
+    // if (Time_payment != null && !Time_payment.isEmpty()) {
+    // LocalDateTime paymentTime = LocalDateTime.parse(Time_payment,
+    // inputFormatter);
+    // order.setPaymentTime(paymentTime.format(outputFormatter)); // Chuỗi đúng định
+    // dạng JSP parse
+    // } else {
+    // order.setPaymentTime(LocalDateTime.now().format(outputFormatter));
+    // }
+
+    // // Lưu đơn hàng vào cơ sở dữ liệu
+    // Order savedOrder = orderRepository.save(order);
+    // session.removeAttribute("paymentTime");
+
+    // // Lặp qua từng CartDetail và chuyển nó thành OrderDetail
+    // for (CartDetail cd : cartDetails) {
+    // // Kiểm tra tồn kho sản phẩm
+    // Product product = cd.getProduct();
+    // if (product.getQuantity() < cd.getQuantity()) {
+    // throw new IllegalArgumentException("Sản phẩm " + product.getName() + " không
+    // đủ số lượng trong kho.");
+    // }
+
+    // // Giảm số lượng tồn kho sau khi mua
+    // product.setQuantity(product.getQuantity() - cd.getQuantity());
+    // product.setSold(cd.getQuantity());
+    // productService.saveProduct(product);
+
+    // // Tạo OrderDetail và lưu vào cơ sở dữ liệu
+    // OrderDetail orderDetail = new OrderDetail();
+    // orderDetail.setOrder(savedOrder);
+    // orderDetail.setProduct(cd.getProduct());
+    // orderDetail.setPrice(cd.getPrice());
+    // orderDetail.setQuantity(cd.getQuantity());
+    // orderDetail.setTotalPrice(cd.getPrice() * cd.getQuantity());
+
+    // orderDetailRepository.save(orderDetail);
+
+    // // Xoá CartDetail sau khi đã chuyển sang OrderDetail
+    // cartDetailRepository.deleteById(cd.getId());
+    // }
+
+    // // Xoá giỏ hàng sau khi đã đặt hàng
+    // cartRepository.deleteById(cart.getId());
+
+    // // Reset số lượng trong session
+    // session.setAttribute("sum", 0);
+    // // GỬI EMAIL XÁC NHẬN ĐƠN HÀNG
+
+    // // Lấy danh sách sản phẩm đã đặt để đưa vào email
+    // List<OrderDetail> orderDetails =
+    // orderDetailRepository.findByOrder(savedOrder);
+
+    // // Gọi phương thức gửi email
+    // applicationEmailService.sendOrder(email, savedOrder, orderDetails);
+    // }
     @Transactional
     public void SavePlaceOrder(String email, PaymentDefault paymentDefault, HttpSession session) {
-        // Lấy user từ email
+
         User user = userService.getbyEmail(email);
-        if (user == null) {
-            return; // hoặc throw new IllegalArgumentException("User not found");
-        }
+        if (user == null)
+            return;
 
-        // Lấy giỏ hàng của người dùng
         Cart cart = cartRepository.findByUser(user);
-        if (cart == null) {
-            return; // Không có giỏ hàng, không cần tiếp tục
-        }
+        if (cart == null)
+            return;
 
-        // Lấy chi tiết giỏ hàng
         List<CartDetail> cartDetails = cartDetailRepository.findByCart(cart);
-        if (cartDetails == null || cartDetails.isEmpty()) {
-            return; // Không có sản phẩm để đặt hàng
-        }
+        if (cartDetails == null || cartDetails.isEmpty())
+            return;
 
-        // Tạo đơn hàng mới
+        // ====== Tạo đơn hàng ======
         Order order = new Order();
         order.setUser(user);
         order.setReceiverName(paymentDefault.getReceiverName());
@@ -240,63 +331,82 @@ public class ItemService {
         order.setReceiverPhone(paymentDefault.getReceiverPhone());
         order.setTotalPrice(paymentDefault.getSummoney() - 50000);
         order.setTotalPriceaddShip(paymentDefault.getSummoney());
-        order.setStatus("Pending");
-        order.setPaymentMethod(paymentDefault.getPaymentMethod().equals("cod") ? "COD" : "Online");
-        order.setPaymentStatus(paymentDefault.getPaymentMethod().equals("cod") ? "Unpaid" : "Paid");
+        order.setStatus("Pending"); // trạng thái mặc định
 
-        // Lưu thông tin thanh toán vào đơn hàng
-        String Time_payment = (String) session.getAttribute("paymentTime");
-        DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
-        DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss"); // giữ nguyên định dạng
-        if (Time_payment != null && !Time_payment.isEmpty()) {
-            LocalDateTime paymentTime = LocalDateTime.parse(Time_payment, inputFormatter);
-            order.setPaymentTime(paymentTime.format(outputFormatter)); // Chuỗi đúng định dạng JSP parse
+        /*
+         * ================================
+         * XỬ LÝ PHƯƠNG THỨC THANH TOÁN
+         * ================================
+         */
+        String method = paymentDefault.getPaymentMethod(); // "cod", "vnpay", "momo", "zalopay"
+        method = method.toUpperCase(); // chuẩn hóa tên
+
+        order.setPaymentMethod(method); // Lưu đúng tên cổng thanh toán
+
+        String paymentTimeSession = (String) session.getAttribute("paymentTime");
+
+        // COD → luôn Unpaid
+        if (method.equals("COD")) {
+            order.setPaymentStatus("Unpaid");
+
         } else {
-            order.setPaymentTime(LocalDateTime.now().format(outputFormatter));
+            // CÁC CỔNG ONLINE: VNPay, MoMo, ZaloPay, ...
+            if (paymentTimeSession != null) {
+                order.setPaymentStatus("Paid"); // thanh toán thành công
+            } else {
+                order.setPaymentStatus("Unpaid"); // thất bại hoặc chưa thanh toán
+            }
         }
 
-        // Lưu đơn hàng vào cơ sở dữ liệu
+        // ====== Lưu paymentTime ======
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+
+        if (paymentTimeSession != null) {
+            LocalDateTime paymentTime = LocalDateTime.parse(paymentTimeSession, formatter);
+            order.setPaymentTime(paymentTime.format(formatter));
+        } else {
+            order.setPaymentTime(LocalDateTime.now().format(formatter));
+        }
+
+        // ====== Lưu đơn hàng ======
         Order savedOrder = orderRepository.save(order);
         session.removeAttribute("paymentTime");
 
-        // Lặp qua từng CartDetail và chuyển nó thành OrderDetail
+        /*
+         * ================================
+         * CHUYỂN CART → ORDER DETAIL
+         * ================================
+         */
+
         for (CartDetail cd : cartDetails) {
-            // Kiểm tra tồn kho sản phẩm
+
             Product product = cd.getProduct();
             if (product.getQuantity() < cd.getQuantity()) {
-                throw new IllegalArgumentException("Sản phẩm " + product.getName() + " không đủ số lượng trong kho.");
+                throw new IllegalArgumentException(
+                        "Sản phẩm " + product.getName() + " không đủ số lượng trong kho.");
             }
 
-            // Giảm số lượng tồn kho sau khi mua
             product.setQuantity(product.getQuantity() - cd.getQuantity());
             product.setSold(cd.getQuantity());
             productService.saveProduct(product);
 
-            // Tạo OrderDetail và lưu vào cơ sở dữ liệu
             OrderDetail orderDetail = new OrderDetail();
             orderDetail.setOrder(savedOrder);
-            orderDetail.setProduct(cd.getProduct());
+            orderDetail.setProduct(product);
             orderDetail.setPrice(cd.getPrice());
             orderDetail.setQuantity(cd.getQuantity());
             orderDetail.setTotalPrice(cd.getPrice() * cd.getQuantity());
 
             orderDetailRepository.save(orderDetail);
 
-            // Xoá CartDetail sau khi đã chuyển sang OrderDetail
             cartDetailRepository.deleteById(cd.getId());
         }
 
-        // Xoá giỏ hàng sau khi đã đặt hàng
         cartRepository.deleteById(cart.getId());
-
-        // Reset số lượng trong session
         session.setAttribute("sum", 0);
-        // GỬI EMAIL XÁC NHẬN ĐƠN HÀNG
 
-        // Lấy danh sách sản phẩm đã đặt để đưa vào email
+        // ====== Gửi email xác nhận ======
         List<OrderDetail> orderDetails = orderDetailRepository.findByOrder(savedOrder);
-
-        // Gọi phương thức gửi email
         applicationEmailService.sendOrder(email, savedOrder, orderDetails);
     }
 

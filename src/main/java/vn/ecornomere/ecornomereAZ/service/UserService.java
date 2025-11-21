@@ -1,8 +1,17 @@
 package vn.ecornomere.ecornomereAZ.service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.Year;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -14,10 +23,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import vn.ecornomere.ecornomereAZ.model.Cart;
 import vn.ecornomere.ecornomereAZ.model.Order;
+import vn.ecornomere.ecornomereAZ.model.OrderDetail;
+import vn.ecornomere.ecornomereAZ.model.Product;
 import vn.ecornomere.ecornomereAZ.model.Role;
 import vn.ecornomere.ecornomereAZ.model.User;
+import vn.ecornomere.ecornomereAZ.model.dto.ProductSales;
 import vn.ecornomere.ecornomereAZ.model.dto.RegisterDTO;
 import vn.ecornomere.ecornomereAZ.repository.CartRepository;
+import vn.ecornomere.ecornomereAZ.repository.OrderDetailRepository;
 import vn.ecornomere.ecornomereAZ.repository.OrderRepository;
 import vn.ecornomere.ecornomereAZ.repository.ProductRepository;
 import vn.ecornomere.ecornomereAZ.repository.UserRepository;
@@ -27,15 +40,25 @@ import org.springframework.data.domain.Pageable;
 public class UserService {
   final private UserRepository userRepository;
   @Autowired
+
   PasswordEncoder passwordEncoder;
   @Autowired
   RoleService roleService;
+
   @Autowired
   private ProductRepository productRepository;
+
   @Autowired
   private OrderRepository orderRepository;
+
   @Autowired
   private CartRepository cartRepository;
+
+  @Autowired
+  private OrderDetailRepository orderDetailRepository;
+
+  @Autowired
+  private ProductService productService;
 
   public UserService(UserRepository userRepository) {
     this.userRepository = userRepository;
@@ -169,6 +192,148 @@ public class UserService {
   public Page<Order> getlistHistory(User user, int page, int size) {
     Pageable pageable = PageRequest.of(page, size);
     return this.orderRepository.findByUser(user, pageable);
+  }
+
+  @Transactional
+  public Map<String, Object> cancelOrderDetailAjax(long orderDetailId, long userId) {
+
+    OrderDetail detail = orderDetailRepository.findById(orderDetailId)
+        .orElseThrow(() -> new RuntimeException("Không tìm thấy OrderDetail"));
+
+    Order order = detail.getOrder();
+
+    if (order.getUser().getId() != userId) {
+      throw new RuntimeException("Bạn không có quyền hủy chi tiết đơn này!");
+    }
+
+    // ---- Logic kiểm tra quyền hủy (COD / Online / Pending / Unpaid / Paid) ----
+    String paymentMethod = order.getPaymentMethod();
+    String orderStatus = order.getStatus();
+    String paymentStatus = order.getPaymentStatus();
+
+    boolean allowCancel = false;
+
+    if (paymentMethod.equalsIgnoreCase("COD")) {
+      if (orderStatus.equals("Pending"))
+        allowCancel = true;
+    } else {
+      if (paymentStatus.equals("Unpaid"))
+        allowCancel = true;
+      else if (paymentStatus.equals("Paid") && orderStatus.equals("Pending"))
+        allowCancel = true;
+    }
+
+    if (!allowCancel) {
+      throw new RuntimeException("Không thể hủy chi tiết đơn hàng ở trạng thái hiện tại!");
+    }
+
+    // ======= ROLLBACK INVENTORY =======
+    Product product = detail.getProduct();
+    product.setQuantity(product.getQuantity() + detail.getQuantity()); // trả lại kho
+    product.setSold(product.getSold() - detail.getQuantity()); // giảm sold
+    productService.saveProduct(product);
+
+    // ======= XÓA ORDERDETAIL =======
+    orderDetailRepository.delete(detail);
+
+    List<OrderDetail> remain = orderDetailRepository.findByOrder(order);
+
+    Map<String, Object> response = new HashMap<>();
+
+    if (remain.isEmpty()) {
+      // Xóa luôn Order nếu không còn detail
+      orderRepository.delete(order);
+      response.put("orderDeleted", true);
+      return response;
+    }
+
+    // Cập nhật tổng tiền
+    double newTotal = remain.stream().mapToDouble(OrderDetail::getTotalPrice).sum();
+    double newTotalShip = newTotal + 50000;
+
+    response.put("orderDeleted", false);
+    response.put("newTotal", newTotal);
+    response.put("newTotalShip", newTotalShip);
+    response.put("remainCount", remain.size());
+
+    return response;
+  }
+
+  public void recalculateOrderPrice(Order order) {
+
+    List<OrderDetail> details = orderDetailRepository.findByOrder(order);
+
+    if (details.isEmpty()) {
+      // Không còn chi tiết nào → Order sẽ bị xóa ở phần khác
+      return;
+    }
+
+    double newTotal = details.stream()
+        .mapToDouble(OrderDetail::getTotalPrice)
+        .sum();
+
+    order.setTotalPrice(newTotal);
+
+    // Nếu có phí ship cố định (ví dụ 50k):
+    double shipFee = 50000;
+
+    order.setTotalPriceaddShip(newTotal + shipFee);
+
+    orderRepository.save(order);
+  }
+
+  // Lấy tất cả đơn hàng
+  public List<Order> getAllOrder() {
+    return orderRepository.findAll();
+  }
+
+  public List<Order> getOrdersThisYear() {
+    int currentYear = LocalDate.now().getYear();
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+
+    List<Order> ordersThisYear = orderRepository.findAll()
+        .stream()
+        .filter(o -> {
+          try {
+            LocalDate date = LocalDateTime.parse(o.getPaymentTime(), formatter).toLocalDate();
+            return date.getYear() == currentYear;
+          } catch (Exception e) {
+            return false;
+          }
+        })
+        .collect(Collectors.toList());
+
+    return ordersThisYear;
+  }
+
+  public List<Double> getMonthlyRevenue() {
+    List<Double> monthlyRevenue = new ArrayList<>(Collections.nCopies(12, 0.0));
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+
+    List<Order> ordersThisYear = getOrdersThisYear();
+
+    for (Order order : ordersThisYear) {
+      try {
+        LocalDate date = LocalDateTime.parse(order.getPaymentTime(), formatter).toLocalDate();
+        int month = date.getMonthValue(); // 1-12
+        monthlyRevenue.set(month - 1,
+            monthlyRevenue.get(month - 1) + order.getTotalPriceaddShip());
+      } catch (Exception e) {
+        // bỏ qua nếu format sai
+      }
+    }
+
+    System.out.println("Monthly Revenue: " + monthlyRevenue); // kiểm tra
+    return monthlyRevenue;
+  }
+
+  // Đếm đơn hàng theo trạng thái
+  public int countByStatus(String status) {
+    return orderRepository.countByStatus(status);
+  }
+
+  public List<ProductSales> getTop5Products() {
+    return orderDetailRepository.findTop5Products();
   }
 
 }

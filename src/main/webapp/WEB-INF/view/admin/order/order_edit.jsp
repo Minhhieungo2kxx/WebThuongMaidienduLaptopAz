@@ -90,25 +90,31 @@
                                                                                           class="form-label">Trạng thái
                                                                                           đơn hàng:</label>
                                                                                     <!-- truyen tu controller data sang view -->
-                                                                                    <form:select path="status"
+                                                                                    <!-- <form:select path="status"
                                                                                           class="form-select"
                                                                                           id="status">
                                                                                           <form:options
                                                                                                 items="${statusList}" />
+                                                                                    </form:select> -->
+                                                                                    <form:select path="status"
+                                                                                          class="form-select">
+                                                                                          <form:options
+                                                                                                items="${statusList}" />
                                                                                     </form:select>
+
 
                                                                               </div>
                                                                               <div class="mb-3">
                                                                                     <label for="status"
                                                                                           class="form-label">Trạng thái
                                                                                           Thanh toán:</label>
-                                                                                    <!-- truyen tu controller data sang view -->
+
                                                                                     <form:select path="paymentStatus"
-                                                                                          class="form-select"
-                                                                                          id="status">
+                                                                                          class="form-select">
                                                                                           <form:options
                                                                                                 items="${statuspaymentList}" />
                                                                                     </form:select>
+
 
                                                                               </div>
 

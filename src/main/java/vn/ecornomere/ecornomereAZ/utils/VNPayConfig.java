@@ -7,19 +7,25 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
 import jakarta.servlet.http.HttpServletRequest;
 
 @Configuration
 public class VNPayConfig {
-      public static String vnp_PayUrl = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
-      public static String vnp_ReturnUrl = "http://localhost:8081/vnpay-payment-return";
-      public static String vnp_TmnCode = "GSIQMJSF"; // Mã website tại VNPAY
-      public static String vnp_HashSecret = "40WG3OMYWXSZ93PFQZBVRG21A00KYZT4"; // Chuỗi bí mật
-      public static String vnp_ApiUrl = "https://sandbox.vnpayment.vn/merchant_webapi/api/transaction";
+      public String vnp_PayUrl = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
+      public String vnp_ReturnUrl = "http://localhost:8081/vnpay-payment-return";
 
-      public static String hashAllFields(Map<String, String> fields) {
+      @Value("${vnp.tmn-code}")
+      private String vnpTmnCode;
+
+      @Value("${vnp.hash-secret}")
+      private String vnpHashSecret;
+
+      public String vnp_ApiUrl = "https://sandbox.vnpayment.vn/merchant_webapi/api/transaction";
+
+      public String hashAllFields(Map<String, String> fields) {
             List<String> fieldNames = new ArrayList<>(fields.keySet());
             Collections.sort(fieldNames);
             StringBuilder sb = new StringBuilder();
@@ -29,7 +35,7 @@ public class VNPayConfig {
                   String fieldValue = fields.get(fieldName);
                   if (fieldValue != null && fieldValue.length() > 0) {
                         try {
-                              fieldValue = URLEncoder.encode(fieldValue, "UTF-8"); // ✅ Quan trọng
+                              fieldValue = URLEncoder.encode(fieldValue, "UTF-8");
                         } catch (UnsupportedEncodingException e) {
                               throw new RuntimeException(e);
                         }
@@ -41,12 +47,12 @@ public class VNPayConfig {
                         first = false;
                   }
             }
-            System.out.println("✅ Chuoi chu ki VNP: " + sb.toString());
+            System.out.println(" Chuoi chu ki VNP: " + sb.toString());
 
-            return hmacSHA512(vnp_HashSecret, sb.toString());
+            return hmacSHA512(vnpHashSecret, sb.toString());
       }
 
-      public static String hmacSHA512(final String key, final String data) {
+      public String hmacSHA512(final String key, final String data) {
             try {
                   if (key == null || data == null) {
                         throw new NullPointerException();
@@ -68,7 +74,7 @@ public class VNPayConfig {
             }
       }
 
-      public static String getIpAddress(HttpServletRequest request) {
+      public String getIpAddress(HttpServletRequest request) {
             String ipAdress;
             try {
                   ipAdress = request.getHeader("X-FORWARDED-FOR");
@@ -81,7 +87,7 @@ public class VNPayConfig {
             return ipAdress;
       }
 
-      public static String getRandomNumber(int len) {
+      public String getRandomNumber(int len) {
             java.util.Random rnd = new java.util.Random();
             String chars = "0123456789";
             StringBuilder sb = new StringBuilder(len);
@@ -89,6 +95,14 @@ public class VNPayConfig {
                   sb.append(chars.charAt(rnd.nextInt(chars.length())));
             }
             return sb.toString();
+      }
+
+      public String getVnpTmnCode() {
+            return vnpTmnCode;
+      }
+
+      public String getVnpHashSecret() {
+            return vnpHashSecret;
       }
 
 }

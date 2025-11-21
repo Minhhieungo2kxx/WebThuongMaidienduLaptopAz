@@ -26,9 +26,12 @@ public class ProductSpec {
 
       @Column(columnDefinition = "MEDIUMTEXT")
       private String cpu; // Bộ vi xử lý
+
       private String ram; // Dung lượng RAM
       private String storage; // Dung lượng ổ cứng
+
       private String graphicsCard; // Card đồ họa
+
       @Column(columnDefinition = "MEDIUMTEXT")
       private String battery; // Thông tin pin
 

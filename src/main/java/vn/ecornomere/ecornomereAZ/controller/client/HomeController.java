@@ -1,17 +1,22 @@
 package vn.ecornomere.ecornomereAZ.controller.client;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -203,11 +208,37 @@ public class HomeController {
         User user = userService.getbyEmail(email);
 
         Page<Order> orderlistPage = userService.getlistHistory(user, page, pageSize);
+        for (Order od : orderlistPage.getContent()) {
+            userService.recalculateOrderPrice(od);
+        }
         model.addAttribute("listOrderbyUser", orderlistPage.getContent());
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", orderlistPage.getTotalPages());
         return "client/cart/orderhistory";
 
+    }
+
+    @PostMapping("/api/order-detail/cancel/{id}")
+    @ResponseBody
+    public ResponseEntity<?> cancelOrderDetailAjax(
+            @PathVariable long id,
+            HttpServletRequest request) {
+
+        HttpSession session = request.getSession();
+        String email = (String) session.getAttribute("email");
+
+        User user = userService.getbyEmail(email);
+
+        try {
+            Map<String, Object> result = userService.cancelOrderDetailAjax(id, user.getId());
+            return ResponseEntity.ok(result);
+
+        } catch (Exception e) {
+
+            Map<String, Object> error = new HashMap<>();
+            error.put("error", e.getMessage());
+            return ResponseEntity.badRequest().body(error);
+        }
     }
 
 }

@@ -16,7 +16,7 @@ public class PaymentDefault implements Serializable {
       @Size(max = 100, message = "Họ tên không được vượt quá 100 ký tự")
       private String receiverAddress;
 
-      @Pattern(regexp = "^\\d{10}$", message = "Số điện thoại phải là 10 chữ số")
+      @Pattern(regexp = "^\\d{10}$", message = "Số điện thoại phảis là 10 chữ số")
       private String receiverPhone;
 
       private Double summoney;

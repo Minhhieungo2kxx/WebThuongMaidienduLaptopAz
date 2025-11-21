@@ -1,5 +1,7 @@
 package vn.ecornomere.ecornomereAZ.repository;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -20,5 +22,8 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
                   + "OR LOWER(p.factory) LIKE LOWER(CONCAT('%', :searchTerm, '%')) "
                   + "OR LOWER(p.target) LIKE LOWER(CONCAT('%', :searchTerm, '%'))) ")
       Page<Product> searchProducts(@Param("searchTerm") String searchTerm, Pageable pageable);
+
+
+     
 
 }

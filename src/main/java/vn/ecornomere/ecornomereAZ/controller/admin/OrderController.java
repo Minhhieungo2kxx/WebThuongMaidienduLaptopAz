@@ -1,7 +1,9 @@
 package vn.ecornomere.ecornomereAZ.controller.admin;
 
 import java.io.IOException;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,14 +70,24 @@ public class OrderController {
     // Hiển thị danh sách
     @GetMapping("/admin/order/edit/{id}")
     public String getEditOrder(@PathVariable("id") Long id, Model model) {
-        Optional<Order> orderid = orderRepository.findById(id);
-        Order order = orderid.get();
-        // Danh sách trạng thái
-        List<String> statusList = List.of("Pending", "Shipping", "Cancelled", "Completed");
-        List<String> statuspaymentsList = List.of("Unpaid", "Paid");
+
+        Order order = orderRepository.findById(id).orElse(null);
         model.addAttribute("order", order);
+
+        // --- ORDER STATUS ---
+        Map<String, String> statusList = new LinkedHashMap<>();
+        statusList.put("Pending", "Pending");
+        statusList.put("Shipping", "Shipping");
+        statusList.put("Cancelled", "Cancelled");
+        statusList.put("Completed", "Completed");
         model.addAttribute("statusList", statusList);
+
+        // --- PAYMENT STATUS --- (Đoạn này bạn sai)
+        Map<String, String> statuspaymentsList = new LinkedHashMap<>();
+        statuspaymentsList.put("Unpaid", "Unpaid");
+        statuspaymentsList.put("Paid", "Paid");
         model.addAttribute("statuspaymentList", statuspaymentsList);
+
         return "admin/order/order_edit";
     }
 

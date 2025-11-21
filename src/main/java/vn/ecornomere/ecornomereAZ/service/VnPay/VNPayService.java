@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,12 +22,15 @@ import vn.ecornomere.ecornomereAZ.utils.VNPayConfig;
 
 @Service
 public class VNPayService {
+      @Autowired
+      private VNPayConfig vnPayConfig;
+
       public String createOrder(HttpServletRequest request, int amount, String orderInfor, String urlReturn) {
             String vnp_Version = "2.1.0";
             String vnp_Command = "pay";
-            String vnp_TxnRef = VNPayConfig.getRandomNumber(8);
-            String vnp_IpAddr = VNPayConfig.getIpAddress(request);
-            String vnp_TmnCode = VNPayConfig.vnp_TmnCode;
+            String vnp_TxnRef = vnPayConfig.getRandomNumber(8);
+            String vnp_IpAddr = vnPayConfig.getIpAddress(request);
+            String vnp_TmnCode = vnPayConfig.getVnpTmnCode();
             String orderType = "order-type";
 
             Map<String, String> vnp_Params = new HashMap<>();
@@ -44,7 +48,7 @@ public class VNPayService {
             String locate = "vn";
             vnp_Params.put("vnp_Locale", locate);
 
-            urlReturn += VNPayConfig.vnp_ReturnUrl;
+            urlReturn += vnPayConfig.vnp_ReturnUrl;
             vnp_Params.put("vnp_ReturnUrl", urlReturn);
             vnp_Params.put("vnp_IpAddr", vnp_IpAddr);
 
@@ -85,9 +89,9 @@ public class VNPayService {
                   }
             }
             String queryUrl = query.toString();
-            String vnp_SecureHash = VNPayConfig.hmacSHA512(VNPayConfig.vnp_HashSecret, hashData.toString());
+            String vnp_SecureHash = vnPayConfig.hmacSHA512(vnPayConfig.getVnpHashSecret(), hashData.toString());
             queryUrl += "&vnp_SecureHash=" + vnp_SecureHash;
-            String paymentUrl = VNPayConfig.vnp_PayUrl + "?" + queryUrl;
+            String paymentUrl = vnPayConfig.vnp_PayUrl + "?" + queryUrl;
             return paymentUrl;
       }
 
@@ -108,7 +112,7 @@ public class VNPayService {
             if (fields.containsKey("vnp_SecureHash")) {
                   fields.remove("vnp_SecureHash");
             }
-            String signValue = VNPayConfig.hashAllFields(fields);
+            String signValue = vnPayConfig.hashAllFields(fields);
 
             System.out.println("🔐 Chữ ký hệ thống tạo: " + signValue);
             System.out.println("🔐 Chữ ký VNPAY gửi về: " + vnp_SecureHash);
