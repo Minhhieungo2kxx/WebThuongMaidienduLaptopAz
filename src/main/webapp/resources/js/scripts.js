@@ -24,3 +24,25 @@ window.addEventListener('DOMContentLoaded', event => {
     }
 
 });
+
+
+document.addEventListener("DOMContentLoaded", function () {
+    const toggle = document.getElementById("togglePassword");
+    const pwd = document.getElementById("inputPassword");
+    const icon = toggle.querySelector("i");
+
+    toggle.addEventListener("click", function () {
+        if (pwd.type === "password") {
+            pwd.type = "text";
+            icon.classList.remove("fa-eye-slash");
+            icon.classList.add("fa-eye");
+        } else {
+            pwd.type = "password";
+            icon.classList.remove("fa-eye");
+            icon.classList.add("fa-eye-slash");
+        }
+    });
+});
+
+
+

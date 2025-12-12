@@ -14,6 +14,9 @@
                     <meta name="author" content="" />
                     <title>Login</title>
                     <link href="/css/styles.css" rel="stylesheet" />
+                    <link rel="stylesheet"
+                        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
                     <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js"
                         crossorigin="anonymous"></script>
 
@@ -108,12 +111,23 @@
                                                                 placeholder=" name@example.com" />
                                                             <label for="inputEmail">Email address</label>
                                                         </div>
-                                                        <div class="form-floating mb-3">
+
+                                                        <div class="form-floating mb-3 position-relative">
                                                             <input class="form-control" id="inputPassword"
                                                                 name="password" type="password"
                                                                 placeholder="Password" />
                                                             <label for="inputPassword">Password</label>
+
+                                                            <!-- Icon mắt -->
+                                                            <span id="togglePassword"
+                                                                class="position-absolute top-50 end-0 translate-middle-y me-3"
+                                                                style="cursor:pointer; z-index: 10;">
+                                                                <i class="fa-solid fa-eye-slash"></i>
+                                                            </span>
                                                         </div>
+
+
+
                                                         <div>
                                                             <input type="hidden" name="${_csrf.parameterName}"
                                                                 value="${_csrf.token}" />

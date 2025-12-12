@@ -375,10 +375,7 @@
                                                                                     thanh toán:</h5>
 
                                                                               <div class="form-check mb-2">
-                                                                                    <!-- <input class="form-check-input"
-                                                                                          type="radio"
-                                                                                          name="paymentMethod" id="cod"
-                                                                                          value="cod" checked> -->
+
                                                                                     <form:radiobutton
                                                                                           path="paymentMethod"
                                                                                           value="cod"
@@ -393,10 +390,7 @@
                                                                               </div>
 
                                                                               <div class="form-check mb-3">
-                                                                                    <!-- <input class="form-check-input"
-                                                                                          type="radio"
-                                                                                          name="paymentMethod"
-                                                                                          id="vnpay" value="vnpay"> -->
+
                                                                                     <form:radiobutton
                                                                                           path="paymentMethod"
                                                                                           value="vnpay"
@@ -410,6 +404,23 @@
                                                                                           Thanh toán qua VNPay
                                                                                           <img src="/uploads/products/vnpaylogo.png"
                                                                                                 alt="VNPay"
+                                                                                                style="height: 50px; margin-left: 10px;">
+                                                                                    </label>
+                                                                              </div>
+                                                                              <div class="form-check mb-3">
+                                                                                    <form:radiobutton
+                                                                                          path="paymentMethod"
+                                                                                          value="momo"
+                                                                                          cssClass="form-check-input"
+                                                                                          id="momo" />
+                                                                                    <label class="form-check-label"
+                                                                                          style="font-size:1.2em;"
+                                                                                          for="momo">
+                                                                                          <i
+                                                                                                class="fas fa-credit-card"></i>
+                                                                                          Thanh toán qua MoMo
+                                                                                          <img src="https://play-lh.googleusercontent.com/uCtnppeJ9ENYdJaSL5av-ZL1ZM1f3b35u9k8EOEjK3ZdyG509_2osbXGH5qzXVmoFv0"
+                                                                                                alt="MoMo"
                                                                                                 style="height: 50px; margin-left: 10px;">
                                                                                     </label>
                                                                               </div>
@@ -464,7 +475,12 @@
                                                 method.addEventListener('change', function () {
                                                       if (this.value === 'vnpay') {
                                                             paymentText.textContent = 'Thanh toán qua VNPay';
-                                                      } else {
+                                                      }
+                                                      else if (this.value === 'momo') {
+                                                            paymentText.textContent = 'Thanh toán qua MoMo';
+                                                      }
+
+                                                      else {
                                                             paymentText.textContent = 'Xác nhận Thanh toán';
                                                       }
                                                 });

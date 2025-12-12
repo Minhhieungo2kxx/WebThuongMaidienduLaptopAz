@@ -1,5 +1,7 @@
 package vn.ecornomere.ecornomereAZ.controller.client;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -26,6 +28,7 @@ import vn.ecornomere.ecornomereAZ.model.dto.PaymentDefault;
 
 import vn.ecornomere.ecornomereAZ.service.ItemService;
 import vn.ecornomere.ecornomereAZ.service.ProductService;
+import vn.ecornomere.ecornomereAZ.service.Momo.MomoService;
 import vn.ecornomere.ecornomereAZ.service.VnPay.VNPayService;
 
 @Controller
@@ -36,6 +39,8 @@ public class ItemController {
     private ProductService productService;
     @Autowired
     private VNPayService vnPayService;
+    @Autowired
+    private MomoService momoService;
 
     @GetMapping("/product/detail/{id}")
     public String ShowDetailItem(@PathVariable Long id, Model model, HttpServletRequest request) {
@@ -233,11 +238,20 @@ public class ItemController {
         HttpSession session = request.getSession();
         String email = (String) session.getAttribute("email");
         double sumtien = paymentDefault.getSummoney();
+        // ====== COD ======
         if (paymentDefault.getPaymentMethod().equals("cod")) {
             // double sumtien = paymentDefault.getSummoney();
             itemService.SavePlaceOrder(email, paymentDefault, session);
             return "redirect:/payment-success"; // redirect lại trang giỏ hàng
 
+        }
+        // ====== MOMO ======
+        if (paymentDefault.getPaymentMethod().equals("momo")) {
+
+            session.setAttribute("tempPaymentDefault", paymentDefault);
+            session.setAttribute("tempEmail", email);
+            String payUrl = momoService.createPaymentRequest(String.valueOf((int) sumtien));
+            return "redirect:" + payUrl;
         }
         // Lưu thông tin đơn hàng tạm thời vào session trước khi chuyển đến VNPay
         session.setAttribute("tempPaymentDefault", paymentDefault);
@@ -290,6 +304,48 @@ public class ItemController {
         }
 
         return "redirect:/cart";
+    }
+
+    @GetMapping("/momo-return")
+    public String momoReturn(HttpServletRequest request, Model model) {
+        // Lấy các tham số trả về từ MoMo
+        String resultCode = request.getParameter("resultCode");
+        String message = request.getParameter("message");
+        String amount = request.getParameter("amount");
+        String orderId = request.getParameter("orderId");
+        String transId = request.getParameter("transId");
+        String orderInfo = request.getParameter("orderInfo");
+        String payType = request.getParameter("payType");
+        HttpSession session = request.getSession();
+        // ====== Thanh toán thành công resultCode = "0" ======
+        if ("0".equals(resultCode)) {
+
+            PaymentDefault paymentDefault = (PaymentDefault) session.getAttribute("tempPaymentDefault");
+            String email = (String) session.getAttribute("tempEmail");
+            // Tạo thời gian thanh toán theo format yyyyMMddHHmmss
+            String paymentTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
+            session.setAttribute("paymentTime", paymentTime);
+            if (paymentDefault != null && email != null) {
+                itemService.SavePlaceOrder(email, paymentDefault, session);
+                // Xóa session tạm
+                session.removeAttribute("tempPaymentDefault");
+                session.removeAttribute("tempEmail");
+
+                // Gửi dữ liệu sang màn hình thông báo thành công
+                model.addAttribute("orderId", orderId);
+                model.addAttribute("amount", amount);
+                model.addAttribute("message", message);
+                model.addAttribute("transId", transId);
+                model.addAttribute("orderInfo", orderInfo);
+                model.addAttribute("payType", payType);
+                model.addAttribute("paymentTime", paymentTime);
+
+                return "client/momonotification/succesful-momo";
+            }
+        }
+        // ====== Thanh toán thất bại ======
+        model.addAttribute("message", "Thanh toán MoMo thất bại: " + message);
+        return "client/momonotification/failpayment-momo";
     }
 
 }
