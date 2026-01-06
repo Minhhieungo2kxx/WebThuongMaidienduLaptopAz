@@ -1,5 +1,9 @@
 package vn.ecornomere.ecornomereAZ.model.dto;
 
+import java.time.LocalDateTime;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
@@ -9,18 +13,19 @@ public class ChatMessageDto {
       private String message;
 
       private String response;
-      private Long timestamp;
+      @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+      private LocalDateTime timestamp;
       private String sessionId;
 
       public ChatMessageDto() {
-            this.timestamp = System.currentTimeMillis();
+            
       }
 
       // Constructor cần thiết
-      public ChatMessageDto(String message, String response) {
+      public ChatMessageDto(String message, String response, LocalDateTime localDateTime) {
             this.message = message;
             this.response = response;
-            this.timestamp = System.currentTimeMillis(); // optional nếu bạn muốn set luôn
+            this.timestamp = localDateTime; // optional nếu bạn muốn set luôn
       }
 
       // Getters and Setters
@@ -40,14 +45,6 @@ public class ChatMessageDto {
             this.response = response;
       }
 
-      public Long getTimestamp() {
-            return timestamp;
-      }
-
-      public void setTimestamp(Long timestamp) {
-            this.timestamp = timestamp;
-      }
-
       public String getSessionId() {
             return sessionId;
       }
@@ -64,6 +61,14 @@ public class ChatMessageDto {
                         ", timestamp=" + timestamp +
                         ", sessionId='" + sessionId + '\'' +
                         '}';
+      }
+
+      public LocalDateTime getTimestamp() {
+            return timestamp;
+      }
+
+      public void setTimestamp(LocalDateTime timestamp) {
+            this.timestamp = timestamp;
       }
 
 }

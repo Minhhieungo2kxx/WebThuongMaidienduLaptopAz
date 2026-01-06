@@ -23,6 +23,8 @@ public class EnvConfig {
             System.setProperty("gemini.api.key", dotenv.get("gemini.api.key"));
             System.setProperty("VNP_TMN_CODE", dotenv.get("VNP_TMN_CODE"));
             System.setProperty("VNP_HASH_SECRET", dotenv.get("VNP_HASH_SECRET"));
+            System.setProperty("ACCESS_KEY", dotenv.get("ACCESS_KEY"));
+            System.setProperty("SECRET_KEY", dotenv.get("SECRET_KEY"));
       }
 
 }

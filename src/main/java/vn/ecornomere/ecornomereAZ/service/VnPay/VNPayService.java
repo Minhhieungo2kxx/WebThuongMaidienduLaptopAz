@@ -114,9 +114,9 @@ public class VNPayService {
             }
             String signValue = vnPayConfig.hashAllFields(fields);
 
-            System.out.println("🔐 Chữ ký hệ thống tạo: " + signValue);
-            System.out.println("🔐 Chữ ký VNPAY gửi về: " + vnp_SecureHash);
-            System.out.println("✅ Trạng thái giao dịch: " + request.getParameter("vnp_TransactionStatus"));
+            System.out.println(" Chữ ký hệ thống tạo: " + signValue);
+            System.out.println(" Chữ ký VNPAY gửi về: " + vnp_SecureHash);
+            System.out.println(" Trạng thái giao dịch: " + request.getParameter("vnp_TransactionStatus"));
 
             if (signValue.equals(vnp_SecureHash)) {
                   if ("00".equals(request.getParameter("vnp_TransactionStatus"))) {

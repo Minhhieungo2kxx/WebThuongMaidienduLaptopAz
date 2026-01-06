@@ -113,7 +113,6 @@ public class ChatController {
                   response.put("data", history);
                   response.put("count", history.size());
                   response.put("timestamp", System.currentTimeMillis());
-
                   return ResponseEntity.ok(response);
 
             } catch (Exception e) {

@@ -10,6 +10,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -21,8 +22,10 @@ import vn.ecornomere.ecornomereAZ.model.dto.ChatMessageDto;
 import vn.ecornomere.ecornomereAZ.model.entity.ChatMessage;
 import vn.ecornomere.ecornomereAZ.repository.ChatMessageRepository;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Arrays;
+
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -40,14 +43,68 @@ public class ChatService {
       @Value("${gemini.api.key}")
       private String apiKey;
 
-      @Value("${gemini.api.url}")
-      private String apiUrl;
+      @Value("${gemini.api.base-url}")
+      private String baseUrl;
+      @Value("${gemini.api.models}")
+      private String models; // chuỗi CSV
 
       private static final String SYSTEM_TEMPLATE = """
-                  Bạn là một trợ lý AI thông minh và hữu ích.
-                  Hãy trả lời một cách ngắn gọn, chính xác và thân thiện.
-                  Nếu không biết câu trả lời, hãy thành thật nói là không biết.
-                  Trả lời bằng tiếng Việt trừ khi được yêu cầu khác.
+                  Bạn là trợ lý AI của một website thương mại điện tử chuyên bán Laptop.
+
+                  NHIỆM VỤ CHÍNH:
+                  1. Xác định câu hỏi của người dùng có liên quan đến việc mua bán Laptop hay không
+                  2. Phát hiện câu hỏi MƠ HỒ hoặc THIẾU NGỮ CẢNH
+                  3. Trả lời phù hợp theo từng trường hợp
+
+                  ========================
+                  A. CHỦ ĐỀ ĐƯỢC PHÉP
+                  ========================
+                  - Laptop, máy tính, MacBook
+                  - Cấu hình Laptop: CPU, RAM, SSD/HDD, card đồ họa (GPU), màn hình, pin
+                  - Giá sản phẩm, so sánh, tư vấn mua Laptop
+                  - Mua hàng, thanh toán, trả góp
+                  - Bảo hành, đổi trả, vận chuyển
+
+                  ========================
+                  B. CHỦ ĐỀ KHÔNG ĐƯỢC PHÉP
+                  ========================
+                  - Toán học, lập trình, y tế, chính trị, đời sống cá nhân
+                  - Kiến thức công nghệ CHUNG không gắn với Laptop
+                  - Bất kỳ nội dung nào ngoài phạm vi website
+
+                  ========================
+                  C. XỬ LÝ CÂU HỎI
+                  ========================
+
+                   TRƯỜNG HỢP 1 – NGOÀI CHỦ ĐỀ:
+                  Nếu câu hỏi KHÔNG liên quan đến Laptop hoặc mua bán trên website:
+                  → Trả lời CHÍNH XÁC đoạn sau (không thêm gì khác):
+
+                  [INVALID]
+                  Xin lỗi, tôi chỉ hỗ trợ các câu hỏi liên quan đến Laptop và mua sắm trên website.
+
+                   TRƯỜNG HỢP 2 – MƠ HỒ / THIẾU THÔNG TIN:
+                  Nếu câu hỏi CÓ liên quan đến Laptop nhưng thiếu thông tin quan trọng
+                  (ví dụ: chỉ hỏi "RAM bao nhiêu là đủ?", "Card đồ họa có tốt không?", "Laptop này ổn không?")
+                  → KHÔNG tự suy đoán
+                  → Hỏi lại người dùng để làm rõ, chỉ hỏi những thông tin cần thiết, ví dụ:
+                  - Nhu cầu sử dụng (học tập, văn phòng, gaming, đồ họa…)
+                  - Ngân sách
+                  - Thương hiệu hoặc mẫu máy (nếu có)
+
+                  Câu trả lời phải ngắn gọn, lịch sự và hướng người dùng bổ sung thông tin.
+
+                   TRƯỜNG HỢP 3 – HỢP LỆ & ĐỦ THÔNG TIN:
+                  Nếu câu hỏi rõ ràng và đầy đủ:
+                  → Trả lời trực tiếp, chính xác, không lan man.
+
+                  ========================
+                  D. QUY TẮC BẮT BUỘC
+                  ========================
+                  - KHÔNG trả lời kiến thức chung ngoài ngữ cảnh Laptop
+                  - KHÔNG đoán nhu cầu người dùng
+                  - KHÔNG nhắc đến từ "AI", "prompt", hay quy tắc nội bộ
+                  - Trả lời bằng tiếng Việt, thân thiện, chuyên nghiệp
                   """;
 
       public ChatMessageDto processMessage(ChatMessageDto messageDto, String sessionId, User user) {
@@ -60,16 +117,22 @@ public class ChatService {
 
                   String context = buildContext(sessionId, user);
 
-                  String aiResponse = callGeminiApi(messageDto.getMessage(), context);
+                  String aiResponse = callGeminiWithFallback(messageDto.getMessage(), context);
 
                   ChatMessageDto responseDto = new ChatMessageDto();
                   responseDto.setMessage(messageDto.getMessage());
-                  responseDto.setResponse(aiResponse);
                   responseDto.setSessionId(sessionId);
-                  responseDto.setTimestamp(System.currentTimeMillis());
-
+                  responseDto.setTimestamp(LocalDateTime.now());
+                  // Intent không hợp lệ
+                  if (aiResponse.contains("[INVALID]")) {
+                        responseDto.setResponse(
+                                    "Xin lỗi, tôi chỉ hỗ trợ các câu hỏi liên quan đến Laptop và mua sắm trên website.");
+                        return responseDto;
+                  }
+                  // Intent hợp lệ
+                  responseDto.setResponse(aiResponse);
+                  responseDto.setMessage(messageDto.getMessage());
                   addResponseToHistory(sessionId, aiResponse);
-
                   logger.info("Successfully processed message for session: {}", sessionId);
                   saveMessage(sessionId, user, messageDto.getMessage(), aiResponse);
 
@@ -85,54 +148,71 @@ public class ChatService {
             }
       }
 
-      private String callGeminiApi(String userMessage, String context) throws Exception {
+      private String callGeminiWithFallback(String userMessage, String context) throws Exception {
+            List<String> modelList = Arrays.stream(models.split(","))
+                        .map(String::trim)
+                        .toList();
+
+            Exception lastException = null;
+
+            for (String model : modelList) {
+                  try {
+                        logger.warn("Trying Gemini model: {}", model);
+                        return callGeminiApiWithModel(model, userMessage, context);
+                  } catch (HttpClientErrorException e) {
+                        lastException = e;
+
+                        // Chỉ fallback khi lỗi quota / not found / rate limit
+                        if (e.getStatusCode().value() == 429 || e.getStatusCode().value() == 404) {
+                              logger.warn("Model {} failed ({}), switching...", model, e.getStatusCode());
+                              continue;
+                        } else {
+                              throw e;
+                        }
+                  }
+            }
+
+            throw new RuntimeException("All Gemini models are unavailable", lastException);
+      }
+
+      private String callGeminiApiWithModel(String model, String userMessage, String context) throws Exception {
+
             RestTemplate rest = new RestTemplate();
             ObjectMapper mapper = new ObjectMapper();
 
-            // Tạo prompt kết hợp hệ thống + context + message
             String fullPrompt;
             if (context == null || context.isEmpty()) {
-                  fullPrompt = SYSTEM_TEMPLATE + "\n" + userMessage;
+                  fullPrompt = SYSTEM_TEMPLATE + "\nNgười dùng: " + userMessage + "\nTrợ lý:";
             } else {
-                  fullPrompt = SYSTEM_TEMPLATE + "\nLịch sử cuộc trò chuyện:\n" + context + "\n\nTin nhắn hiện tại: "
-                              + userMessage;
+                  fullPrompt = SYSTEM_TEMPLATE
+                              + "\nLịch sử:\n" + context
+                              + "\nNgười dùng: " + userMessage
+                              + "\nTrợ lý:";
             }
 
-            // Tạo body JSON theo spec API
-            Map<String, Object> part = new HashMap<>();
-            part.put("text", fullPrompt);
-
-            Map<String, Object> content = new HashMap<>();
-            content.put("parts", List.of(part));
-
-            Map<String, Object> body = new HashMap<>();
-            body.put("contents", List.of(content));
-
-            String bodyJson = mapper.writeValueAsString(body);
+            Map<String, Object> part = Map.of("text", fullPrompt);
+            Map<String, Object> content = Map.of("parts", List.of(part));
+            Map<String, Object> body = Map.of("contents", List.of(content));
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             headers.set("X-goog-api-key", apiKey);
 
-            HttpEntity<String> request = new HttpEntity<>(bodyJson, headers);
+            HttpEntity<String> request = new HttpEntity<>(mapper.writeValueAsString(body), headers);
 
-            ResponseEntity<String> resp = rest.postForEntity(apiUrl, request, String.class);
-            if (!resp.getStatusCode().is2xxSuccessful()) {
-                  throw new RuntimeException(
-                              "Gemini API response error: " + resp.getStatusCodeValue() + " / " + resp.getBody());
-            }
+            String url = baseUrl + "/" + model + ":generateContent";
 
-            String respBody = resp.getBody();
-            JsonNode root = mapper.readTree(respBody);
-            // Dựa theo cấu trúc JSON trả về, bạn cần điều chỉnh đường dẫn sau
-            // Ví dụ: root.candidates[0].content.parts[0].text
-            JsonNode candidate = root.path("candidates").get(0);
-            if (candidate.isMissingNode()) {
-                  return "Xin lỗi, không có phản hồi từ AI.";
-            }
-            JsonNode textNode = candidate.path("content").path("parts").get(0).path("text");
-            String result = textNode.asText("");
-            return result.isEmpty() ? "Xin lỗi, không có phản hồi hợp lệ." : result;
+            ResponseEntity<String> resp = rest.postForEntity(url, request, String.class);
+
+            JsonNode root = mapper.readTree(resp.getBody());
+            JsonNode textNode = root.path("candidates")
+                        .get(0)
+                        .path("content")
+                        .path("parts")
+                        .get(0)
+                        .path("text");
+
+            return textNode.asText("Xin lỗi, không có phản hồi.");
       }
 
       private String buildContext(String sessionId, User user) {
@@ -142,7 +222,7 @@ public class ChatService {
                   // Lấy lịch sử từ DB theo user
                   List<ChatMessage> messages = chatMessageRepository.findByUserOrderByCreatedAtAsc(user);
                   history = messages.stream()
-                              .map(m -> new ChatMessageDto(m.getMessage(), m.getResponse()))
+                              .map(m -> new ChatMessageDto(m.getMessage(), m.getResponse(), m.getCreatedAt()))
                               .collect(Collectors.toList());
             } else {
                   // Lấy từ RAM theo session
@@ -206,7 +286,7 @@ public class ChatService {
             }
 
             return messages.stream()
-                        .map(m -> new ChatMessageDto(m.getMessage(), m.getResponse()))
+                        .map(m -> new ChatMessageDto(m.getMessage(), m.getResponse(), m.getCreatedAt()))
                         .collect(Collectors.toList());
       }
 
