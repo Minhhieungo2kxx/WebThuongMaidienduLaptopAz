@@ -34,6 +34,8 @@ import vn.ecornomere.ecornomereAZ.repository.OrderDetailRepository;
 import vn.ecornomere.ecornomereAZ.repository.OrderRepository;
 import vn.ecornomere.ecornomereAZ.repository.ProductRepository;
 import vn.ecornomere.ecornomereAZ.repository.UserRepository;
+import vn.ecornomere.ecornomereAZ.utils.UploadFile;
+
 import org.springframework.data.domain.Pageable;
 
 @Service
@@ -59,6 +61,7 @@ public class UserService {
 
   @Autowired
   private ProductService productService;
+  private UploadFile uploadFile = new UploadFile();
 
   public UserService(UserRepository userRepository) {
     this.userRepository = userRepository;
@@ -89,6 +92,7 @@ public class UserService {
       cart.setUser(null);
       cartRepository.save(cart);
     }
+    uploadFile.deleteImageFile(user.getAvatar(), "avatars");
 
     // Xóa user
     userRepository.delete(user);

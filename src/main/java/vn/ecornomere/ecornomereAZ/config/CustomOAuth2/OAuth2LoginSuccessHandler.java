@@ -43,35 +43,42 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
         OAuth2AuthenticationToken oAuth2AuthenticationToken = (OAuth2AuthenticationToken) authentication;
 
         if ("google".equals(oAuth2AuthenticationToken.getAuthorizedClientRegistrationId())) {
+
             OAuth2User oAuth2User = oAuth2AuthenticationToken.getPrincipal();
 
             String email = oAuth2User.getAttribute("email");
             String name = oAuth2User.getAttribute("name");
             String picture = oAuth2User.getAttribute("picture");
-            // Set thông tin vào session
+
             HttpSession session = request.getSession();
 
-            // Kiểm tra user đã tồn tại chưa
+            // Tìm user theo email
             User existingUser = userService.getbyEmail(email);
+            User currentUser;
 
             if (existingUser == null) {
-                User newuser = userService.createOAuth2User(email, name, picture);
-                session.setAttribute("avatar", newuser.getAvatar().trim());
+                // Tạo mới user
+                currentUser = userService.createOAuth2User(email, name, picture);
             } else {
-                // Cập nhật thông tin nếu cần
-                User updateuser = userService.updateOAuth2User(existingUser, name, picture);
-                session.setAttribute("avatar", updateuser.getAvatar().trim());
+                // Cập nhật user
+                currentUser = userService.updateOAuth2User(existingUser, name, picture);
             }
+
+            // Set session
+            session.setAttribute("avatar",
+                    currentUser.getAvatar() != null ? currentUser.getAvatar().trim() : null);
             session.setAttribute("fullName", name);
             session.setAttribute("email", email);
 
-            Cart cart = existingUser.getCart();
-            int sumcart = 0; // mặc định là 0
-            if (cart != null) {
-                sumcart = cart.getSum(); // chỉ gọi getSum() nếu cart không null
-            }
-            session.setAttribute("sum", sumcart);
+            // Lấy cart an toàn
+            Cart cart = currentUser.getCart();
+            int sumcart = 0;
 
+            if (cart != null) {
+                sumcart = cart.getSum();
+            }
+
+            session.setAttribute("sum", sumcart);
         }
 
         String targetUrl = determineTargetUrl(authentication);

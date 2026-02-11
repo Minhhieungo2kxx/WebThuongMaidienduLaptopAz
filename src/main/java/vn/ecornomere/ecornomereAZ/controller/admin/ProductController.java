@@ -129,13 +129,16 @@ public class ProductController {
     }
 
     @PostMapping("/admin/product/edit")
-    public String editProduct(@ModelAttribute("updateProduct") Product updateProduct,
+    public String editProduct(
+            @ModelAttribute("updateProduct") Product updateProduct,
             @RequestParam(value = "avatarFile", required = false) MultipartFile avatarFile,
-            RedirectAttributes redirectAttributes)
-            throws IOException {
+            RedirectAttributes redirectAttributes) {
 
         Product existingProduct = productService.getProductbyId(updateProduct.getId())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid user Id:" + updateProduct.getId()));
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Invalid product Id:" + updateProduct.getId()));
+
+        String oldImage = existingProduct.getImage();
 
         ModelMapper map = new ModelMapper();
         map.typeMap(Product.class, Product.class)
@@ -146,36 +149,36 @@ public class ProductController {
                 .addMappings(m -> m.skip(Product::setReviews))
                 .addMappings(m -> m.skip(Product::setStockdetails));
 
-        // Map các field khács
         map.map(updateProduct, existingProduct);
 
-        // Xử lý ảnh
-        if (!avatarFile.isEmpty()) {
-            existingProduct.setImage(uploadFile.getnameFile(avatarFile, "products"));
+        try {
+            if (avatarFile != null && !avatarFile.isEmpty()) {
+                String newImage = uploadFile.getnameFile(avatarFile, "products");
+                existingProduct.setImage(newImage);
+                uploadFile.deleteImageFile(oldImage, "products");
+            }
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            return "redirect:/admin/product/edit/" + updateProduct.getId();
+        } catch (IOException e) {
+            redirectAttributes.addFlashAttribute(
+                    "errorMessage", "Lỗi upload ảnh, vui lòng thử lại");
+            return "redirect:/admin/product/edit/" + updateProduct.getId();
         }
 
         List<ProductSpec> newSpecs = updateProduct.getProductSpecs();
-        List<ProductSpec> oldSpecs = existingProduct.getProductSpecs();
-
         if (newSpecs != null) {
-
-            // Xóa danh sách cũ
-            if (oldSpecs != null) {
-                oldSpecs.clear();
-            } else {
-                existingProduct.setProductSpecs(new ArrayList<>());
-            }
-
-            // Thêm mới vào existingProduct
+            existingProduct.getProductSpecs().clear();
             for (ProductSpec spec : newSpecs) {
-                spec.setProduct(existingProduct); // Quan trọng!
+                spec.setProduct(existingProduct);
                 existingProduct.getProductSpecs().add(spec);
             }
         }
 
         productService.saveProduct(existingProduct);
 
-        redirectAttributes.addFlashAttribute("successMessage", "Edit sản phẩm thành công!");
+        redirectAttributes.addFlashAttribute(
+                "successMessage", "Edit sản phẩm thành công!");
         return "redirect:/admin/product";
     }
 

@@ -16,6 +16,7 @@ import org.springframework.data.jpa.domain.Specification;
 import vn.ecornomere.ecornomereAZ.repository.CartDetailRepository;
 import vn.ecornomere.ecornomereAZ.repository.OrderDetailRepository;
 import vn.ecornomere.ecornomereAZ.repository.ProductRepository;
+import vn.ecornomere.ecornomereAZ.utils.UploadFile;
 import vn.ecornomere.ecornomereAZ.model.CartDetail;
 import vn.ecornomere.ecornomereAZ.model.OrderDetail;
 import vn.ecornomere.ecornomereAZ.model.Product;
@@ -24,6 +25,7 @@ import vn.ecornomere.ecornomereAZ.model.dto.ProductSearchRequest;
 @Service
 public class ProductService {
     private final ProductRepository productRepository;
+    private UploadFile uploadFile = new UploadFile();
 
     @Autowired
     private OrderDetailRepository orderDetailRepository;
@@ -74,6 +76,7 @@ public class ProductService {
             }
             cartDetailRepository.saveAll(cartDetails);
         }
+        uploadFile.deleteImageFile(product.getImage(), "products");
 
         // Cuối cùng mới xóa product
         productRepository.delete(product);

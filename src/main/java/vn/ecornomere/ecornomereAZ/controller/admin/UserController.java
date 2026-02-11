@@ -26,13 +26,8 @@ import vn.ecornomere.ecornomereAZ.service.RoleService;
 import vn.ecornomere.ecornomereAZ.model.Role;
 
 @Controller
-// @PropertySource("classpath:application.properties")
 public class UserController {
-  // dung cai nay se testcase de hon thay vi dung @autowired
-  // private final UserService userService;
-  // public UserController(UserService userService) {
-  // this.userService = userService;
-  // }
+
   @Autowired
   private UserService userService;
   @Autowired
@@ -73,43 +68,57 @@ public class UserController {
 
   // Xử lý cập nhật
   @PostMapping("/admin/user/update")
-  public String updateUser(@ModelAttribute("updatedUser") User updatedUser,
-      @RequestParam(value = "avatarFile", required = false) MultipartFile avatarFile)
-      throws IOException {
+  public String updateUser(
+      @ModelAttribute("updatedUser") User updatedUser,
+      @RequestParam(value = "avatarFile", required = false) MultipartFile avatarFile,
+      RedirectAttributes redirectAttributes) {
+
     User existingUser = userService.findUserById(updatedUser.getId())
         .orElseThrow(() -> new IllegalArgumentException("Invalid user Id:" + updatedUser.getId()));
+
+    String oldImage = existingUser.getAvatar();
+
     ModelMapper map = new ModelMapper();
     map.typeMap(User.class, User.class)
-        .addMappings(mapper -> mapper.skip(
-            User::setAvatar))
+        .addMappings(mapper -> mapper.skip(User::setAvatar))
         .addMappings(mapper -> mapper.skip(User::setId))
         .addMappings(mapper -> mapper.skip(User::setPassword))
         .addMappings(mapper -> mapper.skip(User::setReviews))
         .addMappings(mapper -> mapper.skip(User::setStocks))
-        .addMappings(mapper -> mapper.skip(User::setPassword))
         .addMappings(mapper -> mapper.skip(User::setChatMessages))
         .addMappings(mapper -> mapper.skip(User::setRole));
 
     map.map(updatedUser, existingUser);
 
-    // Mã hóa mật khẩu trước khi lưu
+    // Nếu có nhập mật khẩu mới
     if (updatedUser.getPassword() != null && !updatedUser.getPassword().isEmpty()) {
-      String encodedPassword = passwordEncoder.encode(updatedUser.getPassword());
-      existingUser.setPassword(encodedPassword);
-    }
-    if (!avatarFile.isEmpty()) {
-      existingUser.setAvatar(uploadFile.getnameFile(avatarFile, "avatars"));
-
-    } else {
-      // Người dùng không chọn ảnh mới → giữ ảnh cũ
-      User oldUser = userService.findUserById(updatedUser.getId())
-          .orElseThrow(() -> new IllegalArgumentException("Invalid user Id:" + updatedUser.getId()));
-      existingUser.setAvatar(oldUser.getAvatar());
+      existingUser.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
     }
 
-    userService.handleSaveUser(existingUser);
-    return "redirect:/admin/list/user";
+    try {
+      if (avatarFile != null && !avatarFile.isEmpty()) {
+        String newImage = uploadFile.getnameFile(avatarFile, "avatars");
+        existingUser.setAvatar(newImage);
+        uploadFile.deleteImageFile(oldImage, "avatars");
+      }
 
+      userService.handleSaveUser(existingUser);
+
+      // THÔNG BÁO THÀNH CÔNG
+      redirectAttributes.addFlashAttribute(
+          "successMessage", "Cập nhật người dùng thành công!");
+
+      return "redirect:/admin/list/user";
+
+    } catch (IllegalArgumentException e) {
+      redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+      return "redirect:/admin/user/edit/" + updatedUser.getId();
+
+    } catch (IOException e) {
+      redirectAttributes.addFlashAttribute(
+          "errorMessage", "Lỗi upload ảnh, vui lòng thử lại");
+      return "redirect:/admin/user/edit/" + updatedUser.getId();
+    }
   }
 
   // Hiển thị danh sách user
@@ -171,10 +180,5 @@ public class UserController {
 
     return "redirect:/admin/list/user"; // Sau khi lưu thì chuyển về danh sách user
   }
-
-  // // Trong service hoặc controller đăng nhập giai ma
-  // public boolean verifyPassword(String rawPassword, String encodedPassword) {
-  // return passwordEncoder.matches(rawPassword, encodedPassword);
-  // }
 
 }

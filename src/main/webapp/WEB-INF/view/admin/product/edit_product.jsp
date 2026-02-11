@@ -34,8 +34,19 @@
                                             <hr class="mb-4" />
 
 
+                                            <c:if test="${not empty errorMessage}">
+                                                <div class="alert alert-danger alert-dismissible fade show"
+                                                    role="alert">
+                                                    <i class="fa-solid fa-circle-xmark me-2"></i>
+                                                    ${errorMessage}
+                                                    <button type="button" class="btn-close"
+                                                        data-bs-dismiss="alert"></button>
+                                                </div>
+                                            </c:if>
 
-                                            <!-- ✅ Form bắt đầu -->
+
+
+                                            <!--  Form bắt đầu -->
                                             <form:form method="post" action="/admin/product/edit"
                                                 modelAttribute="updateProduct" enctype="multipart/form-data">
 

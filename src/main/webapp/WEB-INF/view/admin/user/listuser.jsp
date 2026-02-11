@@ -70,6 +70,15 @@
                                                   alert('${successMessage}');
                                                 </script>
                                               </c:if>
+                                              <c:if test="${not empty successMessage}">
+                                                <div class="alert alert-success alert-dismissible fade show"
+                                                  role="alert">
+                                                  <i class="fa-solid fa-circle-check me-2"></i>
+                                                  ${successMessage}
+                                                  <button type="button" class="btn-close"
+                                                    data-bs-dismiss="alert"></button>
+                                                </div>
+                                              </c:if>
                                               <%-- Iterate through the list of users --%>
                                                 <c:forEach items="${users}" var="user">
                                                   <tr>

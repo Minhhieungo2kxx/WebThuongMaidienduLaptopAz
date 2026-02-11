@@ -47,64 +47,33 @@ public class ChatService {
       private String baseUrl;
       @Value("${gemini.api.models}")
       private String models; // chuỗi CSV
-
       private static final String SYSTEM_TEMPLATE = """
-                  Bạn là trợ lý AI của một website thương mại điện tử chuyên bán Laptop.
+                  Bạn là trợ lý tư vấn mua sắm của một website thương mại điện tử chuyên bán laptop, PC và các linh kiện, phụ kiện máy tính.
 
-                  NHIỆM VỤ CHÍNH:
-                  1. Xác định câu hỏi của người dùng có liên quan đến việc mua bán Laptop hay không
-                  2. Phát hiện câu hỏi MƠ HỒ hoặc THIẾU NGỮ CẢNH
-                  3. Trả lời phù hợp theo từng trường hợp
-
-                  ========================
-                  A. CHỦ ĐỀ ĐƯỢC PHÉP
-                  ========================
-                  - Laptop, máy tính, MacBook
-                  - Cấu hình Laptop: CPU, RAM, SSD/HDD, card đồ họa (GPU), màn hình, pin
-                  - Giá sản phẩm, so sánh, tư vấn mua Laptop
-                  - Mua hàng, thanh toán, trả góp
-                  - Bảo hành, đổi trả, vận chuyển
+                  NHIỆM VỤ:
+                  - Chỉ trả lời các câu hỏi liên quan đến laptop, PC, linh kiện máy tính và phụ kiện đi kèm
+                  - Tư vấn cấu hình, so sánh sản phẩm, khả năng tương thích, nhu cầu sử dụng
+                  - Không suy đoán khi thiếu thông tin
+                  - Không trả lời ngoài phạm vi sản phẩm công nghệ của website
 
                   ========================
-                  B. CHỦ ĐỀ KHÔNG ĐƯỢC PHÉP
-                  ========================
-                  - Toán học, lập trình, y tế, chính trị, đời sống cá nhân
-                  - Kiến thức công nghệ CHUNG không gắn với Laptop
-                  - Bất kỳ nội dung nào ngoài phạm vi website
-
-                  ========================
-                  C. XỬ LÝ CÂU HỎI
+                  ĐỊNH DẠNG BẮT BUỘC:
                   ========================
 
-                   TRƯỜNG HỢP 1 – NGOÀI CHỦ ĐỀ:
-                  Nếu câu hỏi KHÔNG liên quan đến Laptop hoặc mua bán trên website:
-                  → Trả lời CHÍNH XÁC đoạn sau (không thêm gì khác):
-
+                  Nếu câu hỏi KHÔNG liên quan đến laptop, PC hoặc linh kiện:
+                  → CHỈ trả về đúng:
                   [INVALID]
-                  Xin lỗi, tôi chỉ hỗ trợ các câu hỏi liên quan đến Laptop và mua sắm trên website.
 
-                   TRƯỜNG HỢP 2 – MƠ HỒ / THIẾU THÔNG TIN:
-                  Nếu câu hỏi CÓ liên quan đến Laptop nhưng thiếu thông tin quan trọng
-                  (ví dụ: chỉ hỏi "RAM bao nhiêu là đủ?", "Card đồ họa có tốt không?", "Laptop này ổn không?")
-                  → KHÔNG tự suy đoán
-                  → Hỏi lại người dùng để làm rõ, chỉ hỏi những thông tin cần thiết, ví dụ:
-                  - Nhu cầu sử dụng (học tập, văn phòng, gaming, đồ họa…)
-                  - Ngân sách
-                  - Thương hiệu hoặc mẫu máy (nếu có)
+                  Nếu câu hỏi liên quan và hợp lệ:
+                  → Trả về đúng định dạng:
+                  [OK]
+                  <nội dung trả lời>
 
-                  Câu trả lời phải ngắn gọn, lịch sự và hướng người dùng bổ sung thông tin.
+                  KHÔNG được viết thêm bất kỳ nội dung nào ngoài định dạng trên.
+                  KHÔNG giải thích lý do khi trả về [INVALID].
+                  KHÔNG nhắc đến quy tắc hay hệ thống.
 
-                   TRƯỜNG HỢP 3 – HỢP LỆ & ĐỦ THÔNG TIN:
-                  Nếu câu hỏi rõ ràng và đầy đủ:
-                  → Trả lời trực tiếp, chính xác, không lan man.
-
-                  ========================
-                  D. QUY TẮC BẮT BUỘC
-                  ========================
-                  - KHÔNG trả lời kiến thức chung ngoài ngữ cảnh Laptop
-                  - KHÔNG đoán nhu cầu người dùng
-                  - KHÔNG nhắc đến từ "AI", "prompt", hay quy tắc nội bộ
-                  - Trả lời bằng tiếng Việt, thân thiện, chuyên nghiệp
+                  Luôn trả lời bằng tiếng Việt, ngắn gọn, chuyên nghiệp.
                   """;
 
       public ChatMessageDto processMessage(ChatMessageDto messageDto, String sessionId, User user) {
@@ -113,28 +82,29 @@ public class ChatService {
 
                   // Lưu tin nhắn user
                   messageDto.setSessionId(sessionId);
-                  addToHistory(sessionId, messageDto);
-
-                  String context = buildContext(sessionId, user);
-
-                  String aiResponse = callGeminiWithFallback(messageDto.getMessage(), context);
+                  // addToHistory(sessionId, messageDto);
+                  List<ChatMessageDto> history = getChatHistory(sessionId, user);
+                  String aiResponse = callGeminiWithFallback(
+                              messageDto.getMessage(),
+                              history);
 
                   ChatMessageDto responseDto = new ChatMessageDto();
                   responseDto.setMessage(messageDto.getMessage());
                   responseDto.setSessionId(sessionId);
                   responseDto.setTimestamp(LocalDateTime.now());
                   // Intent không hợp lệ
-                  if (aiResponse.contains("[INVALID]")) {
+
+                  if (isInvalidResponse(aiResponse)) {
                         responseDto.setResponse(
-                                    "Xin lỗi, tôi chỉ hỗ trợ các câu hỏi liên quan đến Laptop và mua sắm trên website.");
+                                    "Xin lỗi, tôi chỉ hỗ trợ các câu hỏi liên quan đến Laptop và mua sắm trên website");
                         return responseDto;
                   }
-                  // Intent hợp lệ
-                  responseDto.setResponse(aiResponse);
+                  String finalResponse = extractOkContent(aiResponse);
+                  responseDto.setResponse(finalResponse);
                   responseDto.setMessage(messageDto.getMessage());
-                  addResponseToHistory(sessionId, aiResponse);
+                  // addResponseToHistory(sessionId, aiResponse);
                   logger.info("Successfully processed message for session: {}", sessionId);
-                  saveMessage(sessionId, user, messageDto.getMessage(), aiResponse);
+                  saveMessage(sessionId, user, messageDto.getMessage(),"[OK]\n" + finalResponse);
 
                   return responseDto;
 
@@ -148,7 +118,7 @@ public class ChatService {
             }
       }
 
-      private String callGeminiWithFallback(String userMessage, String context) throws Exception {
+      private String callGeminiWithFallback(String userMessage, List<ChatMessageDto> history) throws Exception {
             List<String> modelList = Arrays.stream(models.split(","))
                         .map(String::trim)
                         .toList();
@@ -158,7 +128,7 @@ public class ChatService {
             for (String model : modelList) {
                   try {
                         logger.warn("Trying Gemini model: {}", model);
-                        return callGeminiApiWithModel(model, userMessage, context);
+                        return callGeminiApiWithModel(model, userMessage, history);
                   } catch (HttpClientErrorException e) {
                         lastException = e;
 
@@ -175,24 +145,15 @@ public class ChatService {
             throw new RuntimeException("All Gemini models are unavailable", lastException);
       }
 
-      private String callGeminiApiWithModel(String model, String userMessage, String context) throws Exception {
+      private String callGeminiApiWithModel(
+                  String model,
+                  String userMessage,
+                  List<ChatMessageDto> history) throws Exception {
 
-            RestTemplate rest = new RestTemplate();
+            RestTemplate restTemplate = new RestTemplate();
             ObjectMapper mapper = new ObjectMapper();
 
-            String fullPrompt;
-            if (context == null || context.isEmpty()) {
-                  fullPrompt = SYSTEM_TEMPLATE + "\nNgười dùng: " + userMessage + "\nTrợ lý:";
-            } else {
-                  fullPrompt = SYSTEM_TEMPLATE
-                              + "\nLịch sử:\n" + context
-                              + "\nNgười dùng: " + userMessage
-                              + "\nTrợ lý:";
-            }
-
-            Map<String, Object> part = Map.of("text", fullPrompt);
-            Map<String, Object> content = Map.of("parts", List.of(part));
-            Map<String, Object> body = Map.of("contents", List.of(content));
+            Map<String, Object> body = buildRequestBody(userMessage, history);
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
@@ -202,67 +163,59 @@ public class ChatService {
 
             String url = baseUrl + "/" + model + ":generateContent";
 
-            ResponseEntity<String> resp = rest.postForEntity(url, request, String.class);
+            ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
 
-            JsonNode root = mapper.readTree(resp.getBody());
-            JsonNode textNode = root.path("candidates")
+            JsonNode root = mapper.readTree(response.getBody());
+
+            return root.path("candidates")
                         .get(0)
                         .path("content")
                         .path("parts")
                         .get(0)
-                        .path("text");
-
-            return textNode.asText("Xin lỗi, không có phản hồi.");
+                        .path("text")
+                        .asText("");
       }
 
-      private String buildContext(String sessionId, User user) {
-            List<ChatMessageDto> history;
+      private Map<String, Object> buildRequestBody(String userMessage, List<ChatMessageDto> history) {
+            List<Map<String, Object>> contents = new ArrayList<>();
 
-            if (user != null) {
-                  // Lấy lịch sử từ DB theo user
-                  List<ChatMessage> messages = chatMessageRepository.findByUserOrderByCreatedAtAsc(user);
-                  history = messages.stream()
-                              .map(m -> new ChatMessageDto(m.getMessage(), m.getResponse(), m.getCreatedAt()))
-                              .collect(Collectors.toList());
-            } else {
-                  // Lấy từ RAM theo session
-                  history = chatHistory.get(sessionId);
+            // 1. SYSTEM (neo hành vi)
+            contents.add(Map.of(
+                        "role", "user",
+                        "parts", List.of(Map.of("text", SYSTEM_TEMPLATE))));
+
+            // 2. HISTORY (tối đa 5, chỉ hợp lệ)
+            if (history != null) {
+                  history.stream()
+                              .filter(h -> h.getResponse() != null && h.getResponse().startsWith("[OK]"))
+                              .skip(Math.max(0, history.size() - 5))
+                              .forEach(h -> {
+                                    contents.add(Map.of(
+                                                "role", "user",
+                                                "parts", List.of(Map.of("text", h.getMessage()))));
+                                    contents.add(Map.of(
+                                                "role", "model",
+                                                "parts", List.of(Map.of("text", h.getResponse()))));
+                              });
             }
 
-            if (history == null || history.isEmpty()) {
-                  return "";
-            }
+            // 3. USER MESSAGE (luôn là cuối)
+            contents.add(Map.of(
+                        "role", "user",
+                        "parts", List.of(Map.of("text", userMessage))));
 
-            StringBuilder sb = new StringBuilder();
-            int start = Math.max(0, history.size() - 5); // lấy 5 đoạn gần nhất
-            for (int i = start; i < history.size(); i++) {
-                  ChatMessageDto msg = history.get(i);
-                  if (msg.getMessage() != null) {
-                        sb.append("User: ").append(msg.getMessage()).append("\n");
-                  }
-                  if (msg.getResponse() != null) {
-                        sb.append("AI: ").append(msg.getResponse()).append("\n");
-                  }
-            }
-
-            return sb.toString();
+            return Map.of("contents", contents);
       }
 
-      private void addToHistory(String sessionId, ChatMessageDto m) {
-            chatHistory.computeIfAbsent(sessionId, k -> new ArrayList<>()).add(m);
-            List<ChatMessageDto> list = chatHistory.get(sessionId);
-            if (list.size() > 50) {
-                  list.subList(0, list.size() - 50).clear();
-            }
+      private boolean isInvalidResponse(String aiResponse) {
+            return aiResponse != null && aiResponse.trim().equals("[INVALID]");
       }
 
-      private void addResponseToHistory(String sessionId, String response) {
-            List<ChatMessageDto> list = chatHistory.get(sessionId);
-            if (list != null && !list.isEmpty()) {
-                  ChatMessageDto last = list.get(list.size() - 1);
-                  last.setResponse(response);
-            }
+      private String extractOkContent(String aiResponse) {
+            return aiResponse.replaceFirst("^\\[OK\\]\\s*", "").trim();
       }
+
+      
 
       // Lưu tin nhắn (theo user nếu có, ngược lại thì theo sessionId)
       @Transactional
