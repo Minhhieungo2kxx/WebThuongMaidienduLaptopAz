@@ -99,7 +99,7 @@
                                                                                     <td>${product.quantity}</td>
                                                                                     <td>${product.shortDesc}</td>
                                                                                     <td>${product.target}</td>
-                                                                                    <td><img src="/uploads/products/${product.image}"
+                                                                                    <td><img src="${product.image}"
                                                                                             alt="Product Avatar"
                                                                                             style="max-width:120px; max-height: 120px;" />
                                                                                     </td>

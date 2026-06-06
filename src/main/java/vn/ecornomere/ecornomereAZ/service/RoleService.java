@@ -1,16 +1,16 @@
 package vn.ecornomere.ecornomereAZ.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import vn.ecornomere.ecornomereAZ.model.entity.Role;
 import vn.ecornomere.ecornomereAZ.repository.RoleRepository;
-import vn.ecornomere.ecornomereAZ.model.Role;
 
 @Service
+@RequiredArgsConstructor
 public class RoleService {
-    private RoleRepository roleRepository;
+    private final RoleRepository roleRepository;
 
-    public RoleService(RoleRepository roleRepository) {
-        this.roleRepository = roleRepository;
-    }
 
     public Role findRoleId(Long roleId) {
         return roleRepository.findById(roleId)

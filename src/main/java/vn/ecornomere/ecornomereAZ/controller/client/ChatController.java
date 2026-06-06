@@ -19,157 +19,109 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
-import vn.ecornomere.ecornomereAZ.model.User;
 import vn.ecornomere.ecornomereAZ.model.dto.ChatMessageDto;
+import vn.ecornomere.ecornomereAZ.model.entity.User;
 import vn.ecornomere.ecornomereAZ.service.UserService;
 import vn.ecornomere.ecornomereAZ.service.ChatBoxAi.ChatService;
 
 @RestController
 @RequestMapping("/api/chat")
 public class ChatController {
-      private static final Logger logger = LoggerFactory.getLogger(ChatController.class);
+    private static final Logger logger = LoggerFactory.getLogger(ChatController.class);
 
-      private final ChatService chatService;
+    private final ChatService chatService;
 
-      private final UserService userService;
+    private final UserService userService;
 
-      public ChatController(ChatService chatService, UserService userService) {
-            this.chatService = chatService;
-            this.userService = userService;
-      }
+    public ChatController(ChatService chatService, UserService userService) {
+        this.chatService = chatService;
+        this.userService = userService;
+    }
 
-      /**
-       * Gửi tin nhắn đến AI và nhận phản hồi
-       */
-      @PostMapping("/send")
-      public ResponseEntity<Map<String, Object>> sendMessage(
-                  @Valid @RequestBody ChatMessageDto messageDto,
-                  BindingResult bindingResult,
-                  HttpSession session) {
+    @PostMapping("/send")
+    public ResponseEntity<Map<String, Object>> sendMessage(
+            @Valid @RequestBody ChatMessageDto messageDto,
+            BindingResult bindingResult,
+            HttpSession session) {
 
-            Map<String, Object> response = new HashMap<>();
+        Map<String, Object> response = new HashMap<>();
 
-            if (bindingResult.hasErrors()) {
-                  response.put("success", false);
-                  response.put("message", "Dữ liệu không hợp lệ");
-                  response.put("errors", bindingResult.getAllErrors());
-                  return ResponseEntity.badRequest().body(response);
-            }
+        if (bindingResult.hasErrors()) {
+            response.put("success", false);
+            response.put("message", "Dữ liệu không hợp lệ");
+            response.put("errors", bindingResult.getAllErrors());
+            return ResponseEntity.badRequest().body(response);
+        }
 
-            String sessionId = session.getId();
-            logger.info("Gửi tin nhắn mới từ session: {}", sessionId);
-            String email = (String) session.getAttribute("email");
-            User user = null;
+        String sessionId = session.getId();
+        logger.info("Gửi tin nhắn mới từ session: {}", sessionId);
+        String email = (String) session.getAttribute("email");
+        User user = null;
 
-            if (email != null && !email.isEmpty()) {
-                  user = userService.getbyEmail(email);
-            } else {
-                  logger.warn("Email trong session bị null hoặc rỗng");
-            }
+        if (email != null && !email.isEmpty()) {
+            user = userService.getbyEmail(email);
+        } else {
+            logger.warn("Email trong session bị null hoặc rỗng");
+        }
+        ChatMessageDto result = chatService.processMessage(messageDto, sessionId, user);
+        response.put("success", true);
+        response.put("message", "Tin nhắn đã được xử lý thành công");
+        response.put("data", result);
+        response.put("timestamp", System.currentTimeMillis());
 
-            try {
+        return ResponseEntity.ok(response);
 
-                  ChatMessageDto result = chatService.processMessage(messageDto, sessionId, user);
+    }
 
-                  response.put("success", true);
-                  response.put("message", "Tin nhắn đã được xử lý thành công");
-                  response.put("data", result);
-                  response.put("timestamp", System.currentTimeMillis());
+    @GetMapping("/history")
+    public ResponseEntity<Map<String, Object>> getChatHistory(HttpSession session) {
+        Map<String, Object> response = new HashMap<>();
+        String sessionId = session.getId();
 
-                  return ResponseEntity.ok(response);
+        String email = (String) session.getAttribute("email");
+        User user = null;
 
-            } catch (Exception e) {
-                  logger.error("Lỗi khi xử lý tin nhắn AI", e);
+        if (email != null && !email.isEmpty()) {
+            user = userService.getbyEmail(email);
+        } else {
+            logger.warn("Email trong session bị null hoặc rỗng");
+        }
+        List<ChatMessageDto> history = chatService.getChatHistory(sessionId, user);
+        response.put("success", true);
+        response.put("data", history);
+        response.put("count", history.size());
+        response.put("timestamp", System.currentTimeMillis());
+        return ResponseEntity.ok(response);
+    }
 
-                  response.put("success", false);
-                  response.put("message", "Đã có lỗi xảy ra khi xử lý tin nhắn");
-                  response.put("error", e.getMessage());
+    @DeleteMapping("/history/clear")
+    public ResponseEntity<Map<String, Object>> clearChatHistory(HttpSession session) throws Exception {
+        Map<String, Object> response = new HashMap<>();
+        String sessionId = session.getId();
 
-                  return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-            }
-      }
+        String email = (String) session.getAttribute("email");
+        User user = null;
 
-      /**
-       * Lấy lịch sử chat của người dùng (theo session)
-       */
-      @GetMapping("/history")
-      public ResponseEntity<Map<String, Object>> getChatHistory(HttpSession session) {
-            Map<String, Object> response = new HashMap<>();
-            String sessionId = session.getId();
+        if (email != null && !email.isEmpty()) {
+            user = userService.getbyEmail(email);
+        } else {
+            logger.warn("Email trong session bị null hoặc rỗng");
+        }
+        chatService.clearChatHistory(sessionId, user);
+        response.put("success", true);
+        response.put("message", "Lịch sử chat đã được xóa thành công");
+        return ResponseEntity.ok(response);
 
-            String email = (String) session.getAttribute("email");
-            User user = null;
+    }
 
-            if (email != null && !email.isEmpty()) {
-                  user = userService.getbyEmail(email);
-            } else {
-                  logger.warn("Email trong session bị null hoặc rỗng");
-            }
+    @GetMapping("/health")
+    public ResponseEntity<Map<String, Object>> healthCheck() {
+        Map<String, Object> response = new HashMap<>();
+        response.put("status", "OK");
+        response.put("service", "Chat AI Service");
+        response.put("timestamp", System.currentTimeMillis());
 
-            try {
-                  List<ChatMessageDto> history = chatService.getChatHistory(sessionId, user);
-
-                  response.put("success", true);
-                  response.put("data", history);
-                  response.put("count", history.size());
-                  response.put("timestamp", System.currentTimeMillis());
-                  return ResponseEntity.ok(response);
-
-            } catch (Exception e) {
-                  response.put("success", false);
-                  response.put("message", "Không thể lấy lịch sử chat");
-                  response.put("error", e.getMessage());
-                  return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-            }
-      }
-
-      /**
-       * Xóa lịch sử chat theo session
-       */
-      @DeleteMapping("/history/clear")
-      public ResponseEntity<Map<String, Object>> clearChatHistory(HttpSession session) {
-            Map<String, Object> response = new HashMap<>();
-            String sessionId = session.getId();
-
-            String email = (String) session.getAttribute("email");
-            User user = null;
-
-            if (email != null && !email.isEmpty()) {
-                  user = userService.getbyEmail(email);
-            } else {
-                  logger.warn("Email trong session bị null hoặc rỗng");
-            }
-
-            try {
-                  chatService.clearChatHistory(sessionId, user);
-
-                  response.put("success", true);
-                  response.put("message", "Lịch sử chat đã được xóa thành công");
-
-                  return ResponseEntity.ok(response);
-
-            } catch (Exception e) {
-                  logger.error("Lỗi khi xóa lịch sử chat", e);
-
-                  response.put("success", false);
-                  response.put("message", "Không thể xóa lịch sử chat");
-                  response.put("error", e.getMessage());
-
-                  return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-            }
-      }
-
-      /**
-       * Kiểm tra trạng thái hoạt động của API
-       */
-      @GetMapping("/health")
-      public ResponseEntity<Map<String, Object>> healthCheck() {
-            Map<String, Object> response = new HashMap<>();
-            response.put("status", "OK");
-            response.put("service", "Chat AI Service");
-            response.put("timestamp", System.currentTimeMillis());
-
-            return ResponseEntity.ok(response);
-      }
+        return ResponseEntity.ok(response);
+    }
 
 }

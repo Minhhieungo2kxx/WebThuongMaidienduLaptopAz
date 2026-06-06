@@ -19,7 +19,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        vn.ecornomere.ecornomereAZ.model.User user = this.userService.getbyEmail(username);
+        vn.ecornomere.ecornomereAZ.model.entity.User user = this.userService.getbyEmail(username);
 
         if (user == null) {
             throw new UsernameNotFoundException("User not found");

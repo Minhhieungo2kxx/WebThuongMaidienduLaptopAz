@@ -19,6 +19,18 @@
                         <link href="/css/styles.css" rel="stylesheet" />
                         <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js"
                             crossorigin="anonymous"></script>
+                        <style>
+                            .payment-info {
+                                margin-bottom: 10px;
+                                font-size: 14px;
+                            }
+
+                            .payment-time {
+                                color: #198754;
+                                font-weight: 500;
+                            }
+
+                        </style>
                     </head>
 
                     <body class="sb-nav-fixed">
@@ -101,7 +113,7 @@
 
                                                                                         <td>
                                                                                             <fmt:formatNumber
-                                                                                                value="${order.totalPriceaddShip}"
+                                                                                                value="${order.totalPriceAddShip}"
                                                                                                 type="number"
                                                                                                 groupingUsed="true" />
                                                                                         </td>
@@ -111,14 +123,12 @@
                                                                                         </td>
                                                                                         <td>${order.receiverPhone}</td>
                                                                                         <td
-                                                                                            style="color:red;font-size:1em;">
-                                                                                            <fmt:parseDate
-                                                                                                value="${order.paymentTime}"
-                                                                                                var="parsedDate"
-                                                                                                pattern="yyyyMMddHHmmss" />
-                                                                                            <fmt:formatDate
-                                                                                                value="${parsedDate}"
-                                                                                                pattern="dd/MM/yyyy HH:mm:ss" />
+                                                                                        <div class="payment-info">
+                                                                                            <strong>Ngày thanh toán:</strong>
+                                                                                            <span class="payment-time">
+                                                                                                    ${order.paymentTimeDisplay}
+                                                                                            </span>
+                                                                                        </div>
 
                                                                                         </td>
                                                                                         <td>${order.status}</td>

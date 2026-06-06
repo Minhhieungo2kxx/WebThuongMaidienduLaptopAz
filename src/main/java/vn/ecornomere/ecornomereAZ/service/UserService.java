@@ -2,17 +2,12 @@ package vn.ecornomere.ecornomereAZ.service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.Year;
+
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -21,51 +16,51 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import vn.ecornomere.ecornomereAZ.model.Cart;
-import vn.ecornomere.ecornomereAZ.model.Order;
-import vn.ecornomere.ecornomereAZ.model.OrderDetail;
-import vn.ecornomere.ecornomereAZ.model.Product;
-import vn.ecornomere.ecornomereAZ.model.Role;
-import vn.ecornomere.ecornomereAZ.model.User;
+import vn.ecornomere.ecornomereAZ.model.Enum.PaymentMethod;
+import vn.ecornomere.ecornomereAZ.model.dto.OrderDetailDTO;
+import vn.ecornomere.ecornomereAZ.model.dto.OrderHistoryDTO;
 import vn.ecornomere.ecornomereAZ.model.dto.ProductSales;
 import vn.ecornomere.ecornomereAZ.model.dto.RegisterDTO;
+import vn.ecornomere.ecornomereAZ.model.entity.Cart;
+import vn.ecornomere.ecornomereAZ.model.entity.Order;
+import vn.ecornomere.ecornomereAZ.model.entity.OrderDetail;
+import vn.ecornomere.ecornomereAZ.model.entity.Product;
+import vn.ecornomere.ecornomereAZ.model.entity.Role;
+import vn.ecornomere.ecornomereAZ.model.entity.User;
 import vn.ecornomere.ecornomereAZ.repository.CartRepository;
 import vn.ecornomere.ecornomereAZ.repository.OrderDetailRepository;
 import vn.ecornomere.ecornomereAZ.repository.OrderRepository;
 import vn.ecornomere.ecornomereAZ.repository.ProductRepository;
 import vn.ecornomere.ecornomereAZ.repository.UserRepository;
+import vn.ecornomere.ecornomereAZ.service.UploadFile.TemporaryUpload;
 import vn.ecornomere.ecornomereAZ.utils.UploadFile;
 
 import org.springframework.data.domain.Pageable;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
-  final private UserRepository userRepository;
-  @Autowired
 
-  PasswordEncoder passwordEncoder;
-  @Autowired
-  RoleService roleService;
+  private final UserRepository userRepository;
 
-  @Autowired
-  private ProductRepository productRepository;
+  private final PasswordEncoder passwordEncoder;
 
-  @Autowired
-  private OrderRepository orderRepository;
+  private final RoleService roleService;
 
-  @Autowired
-  private CartRepository cartRepository;
+  private final ProductRepository productRepository;
 
-  @Autowired
-  private OrderDetailRepository orderDetailRepository;
+  private final OrderRepository orderRepository;
 
-  @Autowired
-  private ProductService productService;
-  private UploadFile uploadFile = new UploadFile();
+  private final CartRepository cartRepository;
 
-  public UserService(UserRepository userRepository) {
-    this.userRepository = userRepository;
-  }
+  private final OrderDetailRepository orderDetailRepository;
+
+  private final ProductService productService;
+
+  private final TemporaryUpload temporaryUpload;
+  private final UploadFile uploadFile = new UploadFile();
+
+
 
   public Optional<User> findUserById(Long id) {
     return this.userRepository.findById(id);
@@ -73,11 +68,12 @@ public class UserService {
 
   @Transactional
   public void deleteUser(User user) {
+
     if (user == null) {
       throw new IllegalArgumentException("User không hợp lệ.");
     }
 
-    // Xử lý Order liên quan
+    // 1. Xử lý Order
     List<Order> orders = orderRepository.findByUserId(user.getId());
     if (!orders.isEmpty()) {
       for (Order order : orders) {
@@ -86,15 +82,19 @@ public class UserService {
       orderRepository.saveAll(orders);
     }
 
-    // Xử lý Cart nếu có
+    // 2. Xử lý Cart
     Cart cart = cartRepository.findByUser(user);
     if (cart != null) {
       cart.setUser(null);
       cartRepository.save(cart);
     }
-    uploadFile.deleteImageFile(user.getAvatar(), "avatars");
 
-    // Xóa user
+    // 3. KHÔNG xóa Cloudinary ngay → chỉ mark
+    if (user.getAvatarPublicId() != null) {
+      temporaryUpload.markAsUnused(user.getAvatarPublicId());
+    }
+
+    // 4. Xóa user
     userRepository.delete(user);
   }
 
@@ -299,7 +299,7 @@ public class UserService {
         .stream()
         .filter(o -> {
           try {
-            LocalDate date = LocalDateTime.parse(o.getPaymentTime(), formatter).toLocalDate();
+            LocalDate date = LocalDateTime.parse(o.getPaymentTime().toString(), formatter).toLocalDate();
             return date.getYear() == currentYear;
           } catch (Exception e) {
             return false;
@@ -318,7 +318,7 @@ public class UserService {
 
     for (Order order : ordersThisYear) {
       try {
-        LocalDate date = LocalDateTime.parse(order.getPaymentTime(), formatter).toLocalDate();
+        LocalDate date = LocalDateTime.parse(order.getPaymentTime().toString(), formatter).toLocalDate();
         int month = date.getMonthValue(); // 1-12
         monthlyRevenue.set(month - 1,
             monthlyRevenue.get(month - 1) + order.getTotalPriceaddShip());
@@ -338,6 +338,48 @@ public class UserService {
 
   public List<ProductSales> getTop5Products() {
     return orderDetailRepository.findTop5Products();
+  }
+  public OrderHistoryDTO toDTO(Order order) {
+
+    OrderHistoryDTO dto = new OrderHistoryDTO();
+
+    dto.setId(order.getId());
+    dto.setReceiverName(order.getReceiverName());
+    dto.setReceiverAddress(order.getReceiverAddress());
+    dto.setReceiverPhone(order.getReceiverPhone());
+
+    dto.setTotalPrice(order.getTotalPrice());
+    dto.setTotalPriceAddShip(order.getTotalPriceaddShip());
+
+    dto.setStatus(order.getStatus());
+    dto.setPaymentStatus(order.getPaymentStatus());
+    dto.setPaymentMethod(order.getPaymentMethod());
+
+    dto.setPaymentTime(order.getPaymentTime());
+    if (Objects.equals(order.getPaymentMethod(), PaymentMethod.COD.name())) {
+      dto.setPaymentTimeDisplay("Thanh toán khi nhận hàng");
+    }
+    else {
+      dto.setPaymentTimeDisplay(
+              order.getPaymentTime()
+                      .format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
+    }
+
+    List<OrderDetailDTO> details = order.getOrderDetails().stream()
+            .map(od -> {
+              OrderDetailDTO d = new OrderDetailDTO();
+              d.setId(od.getId());
+              d.setProductName(od.getProduct().getName());
+              d.setProductImage(od.getProduct().getImage());
+              d.setPrice(od.getPrice());
+              d.setQuantity((int)od.getQuantity());
+              d.setTotalPrice(od.getTotalPrice());
+              return d;
+            }).toList();
+
+    dto.setOrderDetails(details);
+
+    return dto;
   }
 
 }

@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,17 +13,20 @@ import org.springframework.web.bind.annotation.GetMapping;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import vn.ecornomere.ecornomereAZ.model.Order;
+import org.springframework.web.bind.annotation.PostMapping;
 import vn.ecornomere.ecornomereAZ.model.dto.ProductSales;
+import vn.ecornomere.ecornomereAZ.model.entity.Order;
 import vn.ecornomere.ecornomereAZ.service.ItemService;
 import vn.ecornomere.ecornomereAZ.service.UserService;
 
 @Controller
+@RequiredArgsConstructor
 public class AdminController {
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private ItemService itemService;
+
+    private final UserService userService;
+
+    private final ItemService itemService;
+
 
     @GetMapping("/admin")
     public String getHomePage(Model model) {
@@ -91,5 +95,6 @@ public class AdminController {
 
         return "admin/dashboard/index_admin";
     }
+
 
 }

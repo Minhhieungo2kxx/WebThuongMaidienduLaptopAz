@@ -6,8 +6,8 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import vn.ecornomere.ecornomereAZ.model.PasswordResetToken;
-import vn.ecornomere.ecornomereAZ.model.User;
+import vn.ecornomere.ecornomereAZ.model.entity.PasswordResetToken;
+import vn.ecornomere.ecornomereAZ.model.entity.User;
 
 @Repository
 public interface PasswordResetTokenRepository extends JpaRepository<PasswordResetToken, Long> {

@@ -1,12 +1,18 @@
 package vn.ecornomere.ecornomereAZ.service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 import java.util.List;
 
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -16,44 +22,45 @@ import org.springframework.stereotype.Service;
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.transaction.Transactional;
-import vn.ecornomere.ecornomereAZ.model.Cart;
-import vn.ecornomere.ecornomereAZ.model.CartDetail;
-import vn.ecornomere.ecornomereAZ.model.Order;
-import vn.ecornomere.ecornomereAZ.model.OrderDetail;
-import vn.ecornomere.ecornomereAZ.model.User;
+import vn.ecornomere.ecornomereAZ.model.Enum.OrderStatus;
+import vn.ecornomere.ecornomereAZ.model.Enum.PaymentMethod;
+import vn.ecornomere.ecornomereAZ.model.Enum.PaymentTransactionStatus;
 import vn.ecornomere.ecornomereAZ.model.dto.PaymentDefault;
-import vn.ecornomere.ecornomereAZ.model.Product;
+import vn.ecornomere.ecornomereAZ.model.entity.Cart;
+import vn.ecornomere.ecornomereAZ.model.entity.CartDetail;
+import vn.ecornomere.ecornomereAZ.model.entity.Order;
+import vn.ecornomere.ecornomereAZ.model.entity.OrderDetail;
+import vn.ecornomere.ecornomereAZ.model.entity.Product;
+import vn.ecornomere.ecornomereAZ.model.entity.User;
 import vn.ecornomere.ecornomereAZ.repository.CartDetailRepository;
 import vn.ecornomere.ecornomereAZ.repository.CartRepository;
 import vn.ecornomere.ecornomereAZ.repository.ItemRepository;
 import vn.ecornomere.ecornomereAZ.repository.OrderDetailRepository;
 import vn.ecornomere.ecornomereAZ.repository.OrderRepository;
 import vn.ecornomere.ecornomereAZ.service.SendEmail.ApplicationEmailService;
+import vn.ecornomere.ecornomereAZ.utils.PaymentTimeParser;
 
 @Service
+@RequiredArgsConstructor
+@Slf4j
 public class ItemService {
 
     private final ItemRepository itemRepository;
 
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private ProductService productService;
-    @Autowired
-    private CartRepository cartRepository;
-    @Autowired
-    private CartDetailRepository cartDetailRepository;
-    @Autowired
-    private OrderRepository orderRepository;
-    @Autowired
-    private OrderDetailRepository orderDetailRepository;
+    private final UserService userService;
 
-    @Autowired
-    private ApplicationEmailService applicationEmailService;
+    private final ProductService productService;
+    private final CartRepository cartRepository;
 
-    public ItemService(ItemRepository itemRepository) {
-        this.itemRepository = itemRepository;
-    }
+    private final CartDetailRepository cartDetailRepository;
+
+    private final OrderRepository orderRepository;
+
+    private final OrderDetailRepository orderDetailRepository;
+
+    private final ApplicationEmailService applicationEmailService;
+
+
 
     public List<Product> listNameItems(String name) {
         return this.itemRepository.findByTarget(name);
@@ -213,8 +220,7 @@ public class ItemService {
     }
 
     @Transactional
-    public void SavePlaceOrder(String email, PaymentDefault paymentDefault, HttpSession session) {
-
+    public void SavePlaceOrder(String email, PaymentDefault paymentDefault, HttpSession session,double totalAmount) {
         User user = userService.getbyEmail(email);
         if (user == null)
             return;
@@ -233,49 +239,19 @@ public class ItemService {
         order.setReceiverName(paymentDefault.getReceiverName());
         order.setReceiverAddress(paymentDefault.getReceiverAddress());
         order.setReceiverPhone(paymentDefault.getReceiverPhone());
-        order.setTotalPrice(paymentDefault.getSummoney() - 50000);
-        order.setTotalPriceaddShip(paymentDefault.getSummoney());
-        order.setStatus("Pending"); // trạng thái mặc định
+        order.setTotalPrice(totalAmount - 50000);
+        order.setTotalPriceaddShip(totalAmount);
+        order.setStatus("PENDING"); // trạng thái mặc định
 
-        /*
-         * ================================
-         * XỬ LÝ PHƯƠNG THỨC THANH TOÁN
-         * ================================
-         */
-        String method = paymentDefault.getPaymentMethod(); // "cod", "vnpay", "momo", "zalopay"
-        method = method.toUpperCase(); // chuẩn hóa tên
-
+        String method = paymentDefault.getPaymentMethod().toString(); // "cod", "vnpay", "momo", "zalopay"
         order.setPaymentMethod(method); // Lưu đúng tên cổng thanh toán
-
         String paymentTimeSession = (String) session.getAttribute("paymentTime");
-
-        // COD → luôn Unpaid
-        if (method.equals("COD")) {
-            order.setPaymentStatus("Unpaid");
-
-        } else {
-            // CÁC CỔNG ONLINE: VNPay, MoMo, ZaloPay, ...
-            if (paymentTimeSession != null) {
-                order.setPaymentStatus("Paid"); // thanh toán thành công
-            } else {
-                order.setPaymentStatus("Unpaid"); // thất bại hoặc chưa thanh toán
-            }
-        }
-
-        // ====== Lưu paymentTime ======
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
-
-        if (paymentTimeSession != null) {
-            LocalDateTime paymentTime = LocalDateTime.parse(paymentTimeSession, formatter);
-            order.setPaymentTime(paymentTime.format(formatter));
-        } else {
-            order.setPaymentTime(LocalDateTime.now().format(formatter));
-        }
+        order.setPaymentStatus("UNPAID");
+        order.setPaymentTime(null);
 
         // ====== Lưu đơn hàng ======
         Order savedOrder = orderRepository.save(order);
         session.removeAttribute("paymentTime");
-
         /*
          * ================================
          * CHUYỂN CART → ORDER DETAIL
@@ -305,13 +281,69 @@ public class ItemService {
 
             cartDetailRepository.deleteById(cd.getId());
         }
-
         cartRepository.deleteById(cart.getId());
         session.setAttribute("sum", 0);
-
         // ====== Gửi email xác nhận ======
         List<OrderDetail> orderDetails = orderDetailRepository.findByOrder(savedOrder);
         applicationEmailService.sendOrder(email, savedOrder, orderDetails);
+    }
+    @Transactional
+    public void SavePlaceOrderGateway(String email, PaymentDefault paymentDefault, BigDecimal totalAmount, String paymentTime) {
+        User user = getUser(email);
+        Cart cart = getCart(user);
+        List<CartDetail> cartDetails = getCartDetails(cart);
+        Order order = createOrder(user, paymentDefault, totalAmount, paymentTime);
+        Order savedOrder = orderRepository.save(order);
+        log.info("Order created id={}", savedOrder.getId());
+//         * CHUYỂN CART → ORDER DETAIL
+        checkout(savedOrder,cartDetails);
+        cartRepository.deleteById(cart.getId());
+        // ====== Gửi email xác nhận ======
+        List<OrderDetail> orderDetails = orderDetailRepository.findByOrder(savedOrder);
+        applicationEmailService.sendOrder(email, savedOrder, orderDetails);
+        log.info("Email sent to {}", email);
+    }
+    @Transactional
+    public void checkout(Order savedOrder, List<CartDetail> cartDetails) {
+        // 1. Lấy danh sách productId duy nhất và sắp xếp
+        List<Long> productIds = cartDetails.stream().map(cd -> cd.getProduct().getId())
+                .distinct().sorted().toList();
+        // 2. Lock toàn bộ product cần xử lý
+        List<Product> lockedProducts =
+                productService.getforUpdate(productIds);
+        // 3. Convert sang Map để lookup nhanh
+        Map<Long, Product> productMap = lockedProducts.stream().collect(Collectors.toMap(
+                        Product::getId,
+                        Function.identity()));
+        // 4. Xử lý checkout
+        for (CartDetail cd : cartDetails) {
+            Product product = productMap.get(cd.getProduct().getId());
+            if (product == null) {
+                throw new RuntimeException("Không tìm thấy sản phẩm: " + cd.getProduct().getId());
+            }
+            // Kiểm tra tồn kho
+            if (product.getQuantity() < cd.getQuantity()) {throw new IllegalArgumentException("Sản phẩm "
+                                + product.getName()
+                                + " không đủ số lượng trong kho.");
+            }
+            // Trừ kho
+            product.setQuantity(
+                    product.getQuantity() - cd.getQuantity());
+            // Tăng số lượng bán
+            product.setSold(
+                    product.getSold() + cd.getQuantity());
+            OrderDetail orderDetail = new OrderDetail();
+            orderDetail.setOrder(savedOrder);
+            orderDetail.setProduct(product);
+            orderDetail.setPrice(cd.getPrice());
+            orderDetail.setQuantity(cd.getQuantity());
+            orderDetail.setTotalPrice(
+                    cd.getPrice() * cd.getQuantity());
+            orderDetailRepository.save(orderDetail);
+            cartDetailRepository.deleteById(cd.getId());
+        }
+        // 5. Save tất cả product một lần
+        productService.SaveAll(lockedProducts);
     }
 
     public List<Order> getAllOrder() {
@@ -328,6 +360,70 @@ public class ItemService {
         Optional<Order> order = orderRepository.findById(id);
         Order neworder = order.get();
         return orderDetailRepository.findByOrder(neworder);
+    }
+    private Order createOrder(User user, PaymentDefault paymentDefault, BigDecimal totalAmount, String paymentTime) {
+        Order order = new Order();
+        order.setUser(user);
+        order.setReceiverName(paymentDefault.getReceiverName());
+        order.setReceiverAddress(paymentDefault.getReceiverAddress());
+        order.setReceiverPhone(paymentDefault.getReceiverPhone());
+        order.setTotalPrice(totalAmount.subtract(BigDecimal.valueOf(50000)).doubleValue());
+        order.setTotalPriceaddShip(totalAmount.doubleValue());
+        order.setStatus(PaymentTransactionStatus.PENDING.name());
+        order.setPaymentMethod(paymentDefault.getPaymentMethod().name());
+        // =========================
+        // CASE 1: COD
+        // =========================
+        if (paymentDefault.getPaymentMethod() == PaymentMethod.COD ) {
+            order.setPaymentStatus("UNPAID");
+            order.setPaymentTime(null);
+            return order;
+        }
+        // =========================
+        // CASE 2: ONLINE PAYMENT (MOMO / VNPAY)
+        // =========================
+        LocalDateTime paymentDateTime = PaymentTimeParser.parse(paymentTime,paymentDefault.getPaymentMethod());
+        if (paymentDateTime != null) {
+            order.setPaymentTime(paymentDateTime);
+            order.setPaymentStatus("PAID");
+        } else {
+            order.setPaymentStatus("UNPAID");
+        }
+        return order;
+    }
+    private User getUser(String email) {
+
+        User user = userService.getbyEmail(email);
+
+        if (user == null) {
+            throw new RuntimeException(
+                    "User not found");
+        }
+
+        return user;
+    }
+    private Cart getCart(User user) {
+
+        Cart cart = cartRepository.findByUser(user);
+
+        if (cart == null) {
+            throw new RuntimeException(
+                    "Cart not found");
+        }
+
+        return cart;
+    }
+    private List<CartDetail> getCartDetails(Cart cart) {
+
+        List<CartDetail> cartDetails =
+                cartDetailRepository.findByCart(cart);
+
+        if (cartDetails.isEmpty()) {
+            throw new RuntimeException(
+                    "Cart is empty");
+        }
+
+        return cartDetails;
     }
 
 }

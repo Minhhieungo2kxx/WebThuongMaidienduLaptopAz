@@ -105,17 +105,16 @@
 
                                                                               </div>
                                                                               <div class="mb-3">
-                                                                                    <label for="status"
-                                                                                          class="form-label">Trạng thái
-                                                                                          Thanh toán:</label>
+                                                                                    <label class="form-label">
+                                                                                          Trạng thái Thanh toán:
+                                                                                    </label>
 
-                                                                                    <form:select path="paymentStatus"
-                                                                                          class="form-select">
-                                                                                          <form:options
-                                                                                                items="${statuspaymentList}" />
-                                                                                    </form:select>
+                                                                                    <input type="text"
+                                                                                           class="form-control"
+                                                                                           value="${order.paymentStatus}"
+                                                                                           readonly />
 
-
+                                                                                    <form:hidden path="paymentStatus"/>
                                                                               </div>
 
                                                                               <div class="text-center">

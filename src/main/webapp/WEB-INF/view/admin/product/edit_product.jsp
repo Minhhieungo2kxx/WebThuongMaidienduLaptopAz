@@ -115,12 +115,20 @@
                                                 <!-- Ảnh preview -->
                                                 <div class="mb-3">
                                                     <div class="text-center">
-                                                        <img src="/uploads/products/${updateProduct.image}"
-                                                            alt="User Avatar"
+                                                        <img src="${updateProduct.image}" alt="User Avatar"
                                                             style="max-width:120px; max-height: 120px;"
                                                             id="avatarPreview" />
                                                     </div>
                                                 </div>
+                                                <form:hidden path="image" id="imageUrl" />
+                                                <form:hidden path="publicId" id="imagePublicId" />
+                                                <form:hidden path="resourceType" id="imageResourceType" />
+
+                                                <!-- <input type="hidden" id="oldImagePublicId"
+                                                    value="${updateProduct.publicId}" />
+
+                                                <input type="hidden" id="oldImageResourceType"
+                                                    value="${updateProduct.resourceType}" /> -->
 
 
                                                 <div class="text-center">
@@ -129,7 +137,7 @@
                                                 </div>
 
                                             </form:form>
-                                            <!-- ✅ Form kết thúc -->
+                                            <!--  Form kết thúc -->
                                         </div>
                                     </div>
                                 </div>
@@ -166,6 +174,34 @@
                                 $preview.attr('src', '#').css('display', 'none');
                             }
                         });
+                    });
+                    $('#image').on('change', async function () {
+
+                        const file = this.files[0];
+
+                        if (!file) {
+                            return;
+                        }
+
+                        const formData = new FormData();
+                        formData.append('file', file);
+                        formData.append('folder', 'products');
+
+                        const response = await fetch('/api/v1/file/cloudinary', {
+                            method: 'POST',
+                            body: formData
+                        });
+
+                        const result = await response.json();
+                        const data = result.data;
+                        // Lưu metadata vào hidden fields
+                        $('#imageUrl').val(data.fileName);
+                        $('#imagePublicId').val(data.public_id);
+                        $('#imageResourceType').val(data.resourceType);
+
+                        console.log('Upload Cloudinary thành công');
+
+                        $('#avatarPreview').attr('src', data.fileName);
                     });
                 </script>
 

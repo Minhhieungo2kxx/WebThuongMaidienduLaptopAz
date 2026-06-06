@@ -74,7 +74,7 @@
                                                                 </li>
                                                                 <li class="list-group-item">
                                                                     <strong>Avatar:</strong><br />
-                                                                    <img src="/uploads/avatars/${detailUser.avatar}"
+                                                                    <img src="${detailUser.avatar}"
                                                                         alt="User Avatar"
                                                                         style="max-width:120px; max-height: 120px;"
                                                                         id="avatar" />

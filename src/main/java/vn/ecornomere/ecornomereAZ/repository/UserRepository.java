@@ -3,7 +3,7 @@ package vn.ecornomere.ecornomereAZ.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import vn.ecornomere.ecornomereAZ.model.User;
+import vn.ecornomere.ecornomereAZ.model.entity.User;
 
 import java.util.List;
 

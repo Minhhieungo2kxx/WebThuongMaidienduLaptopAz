@@ -7,8 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import vn.ecornomere.ecornomereAZ.model.Order;
-import vn.ecornomere.ecornomereAZ.model.OrderDetail;
+import vn.ecornomere.ecornomereAZ.model.entity.Order;
+import vn.ecornomere.ecornomereAZ.model.entity.OrderDetail;
 
 @Service
 public class ApplicationEmailService {

@@ -378,7 +378,7 @@
 
                                                                                     <form:radiobutton
                                                                                           path="paymentMethod"
-                                                                                          value="cod"
+                                                                                          value="COD"
                                                                                           cssClass="form-check-input"
                                                                                           id="cod" />
                                                                                     <label class="form-check-label"
@@ -393,7 +393,7 @@
 
                                                                                     <form:radiobutton
                                                                                           path="paymentMethod"
-                                                                                          value="vnpay"
+                                                                                          value="VNPAY"
                                                                                           cssClass="form-check-input"
                                                                                           id="vnpay" />
                                                                                     <label class="form-check-label"
@@ -410,7 +410,7 @@
                                                                               <div class="form-check mb-3">
                                                                                     <form:radiobutton
                                                                                           path="paymentMethod"
-                                                                                          value="momo"
+                                                                                          value="MOMO"
                                                                                           cssClass="form-check-input"
                                                                                           id="momo" />
                                                                                     <label class="form-check-label"

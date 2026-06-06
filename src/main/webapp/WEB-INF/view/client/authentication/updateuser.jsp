@@ -108,7 +108,7 @@
                                                                         <div class="mb-3">
                                                                               <label for="password"
                                                                                     class="form-label">Mật khẩu
-                                                                                    cũ</label>
+                                                                                    </label>
                                                                               <form:input type="password"
                                                                                     class="form-control" id="password"
                                                                                     path="password"
@@ -116,17 +116,7 @@
                                                                               <form:errors path="password"
                                                                                     cssClass="error" element="div" />
                                                                         </div>
-                                                                        <div class="mb-3">
-                                                                              <label for="password"
-                                                                                    class="form-label">Mật khẩu
-                                                                                    mới</label>
-                                                                              <form:input type="password"
-                                                                                    class="form-control"
-                                                                                    id="passwordnew" path="passwordnew"
-                                                                                    placeholder="Để trống nếu không muốn thay đổi" />
-                                                                              <form:errors path="password"
-                                                                                    cssClass="error" element="div" />
-                                                                        </div>
+
 
                                                                         <div class="mb-3">
                                                                               <label for="phone" class="form-label">Số
@@ -167,15 +157,16 @@
                                                                                     <label for="avatar"
                                                                                           class="form-label">Ảnh đại
                                                                                           diện</label>
-                                                                                    <input class="form-control"
-                                                                                          type="file" id="avatar"
-                                                                                          name="avatarFile"
-                                                                                          accept=".png, .jpg, .jpeg" />
+                                                                                  <input class="form-control" type="file" id="avatar" name="avatarFile"
+                                                                                         accept=".png, .jpg, .jpeg"/>
                                                                               </div>
                                                                         </div>
+                                                                      <form:hidden path="avatar" id="avatarUrl"/>
+                                                                      <form:hidden path="avatarPublicId" id="avatarPublicId"/>
+                                                                      <form:hidden path="avatarResourceType" id="avatarResourceType"/>
 
                                                                         <div class="mb-3 text-center">
-                                                                              <img src="/uploads/avatars/${Userupdate.avatar}"
+                                                                              <img src="${Userupdate.avatar}"
                                                                                     alt="Avatar" class="avatar-preview"
                                                                                     id="avatarPreview"
                                                                                     style="max-width: 200px; max-height: 200px;" />
@@ -218,10 +209,45 @@
                                                       };
                                                       reader.readAsDataURL(file);
                                                 } else {
-                                                      $preview.attr('src', '/Uploads/avatars/${updatedUser.avatar}').css('display', 'block');
+                                                      $preview.attr('src', '${updatedUser.avatar}').css('display', 'block');
                                                 }
                                           });
                                     });
+                              </script>
+                              <script>
+                                  $(document).ready(function () {
+
+                                      $('#avatar').on('change', function () {
+                                          const file = this.files[0];
+                                          if (!file) return;
+
+                                          const formData = new FormData();
+                                          formData.append("file", file);
+                                          formData.append("folder", "avatars");
+
+                                          $.ajax({
+                                              url: "/api/v1/file/cloudinary",
+                                              type: "POST",
+                                              data: formData,
+                                              processData: false,
+                                              contentType: false,
+                                              success: function (res) {
+
+                                                  const data = res.data;
+
+                                                  $('#avatarUrl').val(data.fileName);
+                                                  $('#avatarPublicId').val(data.public_id);
+                                                  $('#avatarResourceType').val(data.resourceType);
+
+                                                  $('#avatarPreview').attr('src', data.fileName);
+                                              },
+                                              error: function () {
+                                                  alert("Upload failed");
+                                              }
+                                          });
+                                      });
+
+                                  });
                               </script>
                         </body>
 

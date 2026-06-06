@@ -30,8 +30,8 @@
                                 <div class="card">
                                     <h3 class="mb-4 text-center">Create a New Product</h3>
                                     <hr class="mb-4" />
-                                    <form:form method="post" action="/admin/product/create" modelAttribute="NewProduct"
-                                        enctype="multipart/form-data">
+                                    <form:form id="productForm" method="post" action="/admin/product/create"
+                                        modelAttribute="NewProduct" enctype="multipart/form-data">
                                         <div class="mb-3">
                                             <label for="name" class="form-label">Name:</label>
                                             <form:input type="text" class="form-control" id="name" path="name"
@@ -93,6 +93,9 @@
                                             <input class="form-control" type="file" id="image" name="avatarFile"
                                                 accept=".png, .jpg, .jpeg" />
                                         </div>
+                                        <form:hidden path="image" id="imageUrl" />
+                                        <form:hidden path="publicId" id="imagePublicId" />
+                                        <form:hidden path="resourceType" id="imageResourceType" />
                                         <div class="mb-3 text-center">
                                             <img id="avatarPreview" class="img-fluid"
                                                 style="max-width: 180px; display: none;" alt="Avatar preview" />
@@ -111,21 +114,91 @@
                     crossorigin="anonymous"></script>
                 <script src="/js/scripts.js"></script>
                 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
                 <script>
                     $(document).ready(function () {
-                        $('#image').on('change', function () {
+
+                        $('#image').on('change', async function () {
+
                             const file = this.files[0];
                             const $preview = $('#avatarPreview');
-                            if (file && file.type.startsWith('image/')) {
-                                const reader = new FileReader();
-                                reader.onload = function (e) {
-                                    $preview.attr('src', e.target.result).css('display', 'block');
-                                };
-                                reader.readAsDataURL(file);
-                            } else {
-                                $preview.attr('src', '#').css('display', 'none');
+
+                            if (!file) {
+                                return;
                             }
+
+                            if (!file.type.startsWith('image/')) {
+                                alert('Vui lòng chọn file ảnh');
+                                $(this).val('');
+                                return;
+                            }
+
+                            try {
+
+                                // Preview ảnh ngay
+                                const reader = new FileReader();
+
+                                reader.onload = function (e) {
+                                    $preview.attr('src', e.target.result)
+                                        .css('display', 'block');
+                                };
+
+                                reader.readAsDataURL(file);
+
+                                // Upload Cloudinary
+                                const formData = new FormData();
+                                formData.append("file", file);
+                                formData.append("folder", "products");
+
+                                const response = await fetch('/api/v1/file/cloudinary', {
+                                    method: 'POST',
+                                    body: formData
+                                });
+
+                                if (!response.ok) {
+                                    throw new Error("Upload thất bại");
+                                }
+
+                                const result = await response.json();
+
+                                const data = result.data;
+
+                                // Lưu metadata vào hidden fields
+                                $('#imageUrl').val(data.fileName);
+                                $('#imagePublicId').val(data.public_id);
+                                $('#imageResourceType').val(data.resourceType);
+
+                                console.log('Upload Cloudinary thành công');
+
+                            } catch (error) {
+
+                                console.error(error);
+
+                                $('#imageUrl').val('');
+                                $('#imagePublicId').val('');
+                                $('#imageResourceType').val('');
+
+                                alert('Upload ảnh thất bại');
+                            }
+
                         });
+
+                    });
+
+                    $('#productForm').on('submit', function (e) {
+
+                        if (!$('#imageUrl').val()) {
+
+                            e.preventDefault();
+
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Ảnh sản phẩm chưa được upload'
+                            });
+
+                            return false;
+                        }
+
                     });
                 </script>
             </body>

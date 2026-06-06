@@ -11,10 +11,17 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import vn.ecornomere.ecornomereAZ.model.User;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "chat_messages")
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class ChatMessage {
       @Id
       @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,52 +42,6 @@ public class ChatMessage {
       @Column(name = "created_at")
       private LocalDateTime createdAt = LocalDateTime.now();
 
-      public Long getId() {
-            return id;
-      }
 
-      public void setId(Long id) {
-            this.id = id;
-      }
-
-      public String getSessionId() {
-            return sessionId;
-      }
-
-      public void setSessionId(String sessionId) {
-            this.sessionId = sessionId;
-      }
-
-      public User getUser() {
-            return user;
-      }
-
-      public void setUser(User user) {
-            this.user = user;
-      }
-
-      public String getMessage() {
-            return message;
-      }
-
-      public void setMessage(String message) {
-            this.message = message;
-      }
-
-      public String getResponse() {
-            return response;
-      }
-
-      public void setResponse(String response) {
-            this.response = response;
-      }
-
-      public LocalDateTime getCreatedAt() {
-            return createdAt;
-      }
-
-      public void setCreatedAt(LocalDateTime createdAt) {
-            this.createdAt = createdAt;
-      }
 
 }

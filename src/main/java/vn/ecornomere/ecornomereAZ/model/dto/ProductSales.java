@@ -1,6 +1,6 @@
 package vn.ecornomere.ecornomereAZ.model.dto;
 
-import vn.ecornomere.ecornomereAZ.model.Product;
+import vn.ecornomere.ecornomereAZ.model.entity.Product;
 
 public class ProductSales {
       private Product product;

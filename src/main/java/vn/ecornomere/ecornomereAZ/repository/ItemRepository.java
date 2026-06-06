@@ -7,7 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import vn.ecornomere.ecornomereAZ.model.Product;
+import vn.ecornomere.ecornomereAZ.model.entity.Product;
 
 @Repository
 public interface ItemRepository extends JpaRepository<Product, Long> {
@@ -17,7 +17,7 @@ public interface ItemRepository extends JpaRepository<Product, Long> {
     // Hoặc: tìm sản phẩm có tên chứa chuỗi (giống LIKE %name%)
     List<Product> findByNameContainingIgnoreCase(String name);
 
-    List<Product> findByTarget(String target); // ➕ thêm dòng này
+    List<Product> findByTarget(String target); //  thêm dòng này
 
     List<Product> findByTargetIn(List<String> targets);
 

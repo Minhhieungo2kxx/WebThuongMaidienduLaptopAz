@@ -1,11 +1,15 @@
 package vn.ecornomere.ecornomereAZ.controller.client;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
@@ -16,31 +20,35 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-
+import vn.ecornomere.ecornomereAZ.model.Enum.PaymentMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
-import vn.ecornomere.ecornomereAZ.model.CartDetail;
-import vn.ecornomere.ecornomereAZ.model.Product;
+import vn.ecornomere.ecornomereAZ.model.Enum.PaymentTransactionStatus;
+import vn.ecornomere.ecornomereAZ.model.dto.MomoCallbackRequest;
 import vn.ecornomere.ecornomereAZ.model.dto.PaymentDefault;
-
+import vn.ecornomere.ecornomereAZ.model.entity.CartDetail;
+import vn.ecornomere.ecornomereAZ.model.entity.PaymentTransaction;
+import vn.ecornomere.ecornomereAZ.model.entity.Product;
+import vn.ecornomere.ecornomereAZ.repository.PaymentTransactionRepository;
 import vn.ecornomere.ecornomereAZ.service.ItemService;
 import vn.ecornomere.ecornomereAZ.service.ProductService;
-import vn.ecornomere.ecornomereAZ.service.Momo.MomoService;
-import vn.ecornomere.ecornomereAZ.service.VnPay.VNPayService;
+import vn.ecornomere.ecornomereAZ.service.payments.MomoService;
+import vn.ecornomere.ecornomereAZ.service.payments.VNPayService;
 
 @Controller
+@Slf4j
+@RequiredArgsConstructor
 public class ItemController {
-    @Autowired
-    private ItemService itemService;
-    @Autowired
-    private ProductService productService;
-    @Autowired
-    private VNPayService vnPayService;
-    @Autowired
-    private MomoService momoService;
+
+    private final ItemService itemService;
+    private final ProductService productService;
+    private final VNPayService vnPayService;
+    private final MomoService momoService;
+    private final PaymentTransactionRepository paymentTransactionRepository;
+    private final ObjectMapper objectMapper;
 
     @GetMapping("/product/detail/{id}")
     public String ShowDetailItem(@PathVariable Long id, Model model, HttpServletRequest request) {
@@ -160,7 +168,7 @@ public class ItemController {
 
     @PostMapping("/delete-cart-product/{id}")
     public String deleteProduct(@PathVariable Long id, HttpServletRequest request,
-            RedirectAttributes redirectAttributes) {
+                                RedirectAttributes redirectAttributes) {
         HttpSession session = request.getSession();
 
         if (session == null || session.getAttribute("email") == null) {
@@ -203,7 +211,7 @@ public class ItemController {
 
     @PostMapping("/cart/update")
     public String updateCartQuantity(@RequestParam("cartDetailId") Long cartDetailId,
-            @RequestParam("quantity") int quantity, RedirectAttributes redirectAttributes) {
+                                     @RequestParam("quantity") int quantity, RedirectAttributes redirectAttributes) {
         // Cập nhật lại trong database
         itemService.updateQuantity(cartDetailId, quantity);
 
@@ -211,141 +219,189 @@ public class ItemController {
     }
 
     @PostMapping("/place-order")
-    public String SavePlaceOrder(@Valid @ModelAttribute("PaymentDefault") PaymentDefault paymentDefault,
-            BindingResult result,
-            HttpServletRequest request) {
-        // Kiểm tra lỗi validation
-        if (result.hasErrors()) {
-
-            // Gán lại dữ liệu như bên GET va gui lai du lieu ve form thong bao loi
-            HttpSession session = request.getSession();
-            String email = (String) session.getAttribute("email");
-
-            List<CartDetail> list = itemService.getbyCartDetails(email);
-            if (list == null) {
-                list = new ArrayList<>();
-            }
-
-            double totalPrice = 0.0;
-            for (CartDetail detail : list) {
-                totalPrice += detail.getQuantity() * detail.getPrice();
-            }
-
-            request.setAttribute("listCartDetails", list);
-            request.setAttribute("sumPrice", totalPrice);
-            return "client/cart/checkout"; // ❗Không redirect!
+    public String savePlaceOrder(@Valid @ModelAttribute("PaymentDefault") PaymentDefault paymentDefault, BindingResult result,
+                                 HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        if (session == null) {
+            return "redirect:/login";
         }
-        HttpSession session = request.getSession();
         String email = (String) session.getAttribute("email");
-        double sumtien = paymentDefault.getSummoney();
-        // ====== COD ======
-        if (paymentDefault.getPaymentMethod().equals("cod")) {
-            // double sumtien = paymentDefault.getSummoney();
-            itemService.SavePlaceOrder(email, paymentDefault, session);
-            return "redirect:/payment-success"; // redirect lại trang giỏ hàng
-
+        if (email == null) {
+            return "redirect:/login";
         }
-        // ====== MOMO ======
-        if (paymentDefault.getPaymentMethod().equals("momo")) {
-
-            session.setAttribute("tempPaymentDefault", paymentDefault);
-            session.setAttribute("tempEmail", email);
-            String payUrl = momoService.createPaymentRequest(String.valueOf((int) sumtien));
-            return "redirect:" + payUrl;
+        if (result.hasErrors()) {
+            log.warn(
+                    "Checkout validation failed. Email={}",
+                    email
+            );
+            loadCheckoutData(email, request);
+            return "client/cart/checkout";
         }
-        // Lưu thông tin đơn hàng tạm thời vào session trước khi chuyển đến VNPay
-        session.setAttribute("tempPaymentDefault", paymentDefault);
-        session.setAttribute("tempEmail", email);
-        // Tạo URL thanh toán VNPay
-        String orderInfo = "Thanh toan don hang tai FPT Shop";
-        String paymentUrl = vnPayService.createOrder(request, (int) sumtien, orderInfo, "");
+        try {
+            List<CartDetail> cartDetails = itemService.getbyCartDetails(email);
+            if (cartDetails == null || cartDetails.isEmpty()) {
+                log.warn("Cart is empty. Email={}", email);
+                return "redirect:/cart";
+            }
+            BigDecimal totalAmount = cartDetails.stream().map(item -> BigDecimal.valueOf(item.getPrice())
+                            .multiply(BigDecimal.valueOf(item.getQuantity())))
+                    .reduce(BigDecimal.ZERO, BigDecimal::add)
+                    .add(BigDecimal.valueOf(50000));
+            PaymentMethod method = paymentDefault.getPaymentMethod();
+            log.info("Start place order. Email={}, Method={}, Amount={}", email, method, totalAmount
+            );
+            switch (method) {
+                case COD:
+                    itemService.SavePlaceOrder(email, paymentDefault, session, totalAmount.doubleValue());
+                    log.info("COD order created successfully. Email={}", email);
+                    return "redirect:/payment-success";
+                case MOMO:
+                    String payUrl = momoService.createMomoPayment(email, totalAmount, request, paymentDefault);
+                    log.info("MOMO payment url generated. Email={}", email);
+                    return "redirect:" + payUrl;
 
-        return "redirect:" + paymentUrl;
+                case VNPAY:
+                    String paymentUrl = vnPayService.createVNPayPayment(email, totalAmount, request, paymentDefault);
+                    log.info("VNPAY payment url generated. Email={}", email);
+                    return "redirect:" + paymentUrl;
+                default:
+                    log.error("Unsupported payment method. Email={}, Method={}", email, method
+                    );
+                    throw new IllegalArgumentException("Unsupported payment method");
+            }
+        } catch (Exception ex) {
+            log.error("Place order failed. Email={}", email, ex);
+            return "redirect:/checkout";
+        }
+    }
 
+
+
+    public void loadCheckoutData(String email, HttpServletRequest request) {
+        HttpSession session = request.getSession();
+        List<CartDetail> list = itemService.getbyCartDetails(email);
+        if (list == null) {
+            list = new ArrayList<>();
+        }
+
+        double totalPrice = 0.0;
+        for (CartDetail detail : list) {
+            totalPrice += detail.getQuantity() * detail.getPrice();
+        }
+
+        request.setAttribute("listCartDetails", list);
+        request.setAttribute("sumPrice", totalPrice);
     }
 
     @GetMapping("/vnpay-payment-return")
-    public String paymentCompleted(HttpServletRequest request, Model model) {
-        int paymentStatus = vnPayService.orderReturn(request);
-
-        String orderInfo = request.getParameter("vnp_OrderInfo");
-        String paymentTime = request.getParameter("vnp_PayDate");
-        String transactionId = request.getParameter("vnp_TransactionNo");
-        String totalPrice = request.getParameter("vnp_Amount");
-
-        HttpSession session = request.getSession();
-
-        if (paymentStatus == 1) {
-            // Thanh toán thành công - Lưu đơn hàng vào database
-            PaymentDefault paymentDefault = (PaymentDefault) session.getAttribute("tempPaymentDefault");
-            String email = (String) session.getAttribute("tempEmail");
-            session.setAttribute("paymentTime", paymentTime);
-
-            if (paymentDefault != null && email != null) {
-                itemService.SavePlaceOrder(email, paymentDefault, session);
-
-                // Xóa dữ liệu tạm thời
-                session.removeAttribute("tempPaymentDefault");
-                session.removeAttribute("tempEmail");
-                // Sau khi sử dụng paymentTime
-                session.removeAttribute("paymentTime");
-
-                model.addAttribute("orderInfo", orderInfo);
-                model.addAttribute("totalPrice", totalPrice);
-                model.addAttribute("paymentTime", paymentTime);
-                model.addAttribute("transactionId", transactionId);
-
-                return "client/vnpaynotification/succesful";
-            }
-        } else {
-            // Thanh toán thất bại
+    public String paymentCompleted(HttpServletRequest request, Model model, HttpSession session) {
+        int verifyResult = vnPayService.orderReturn(request);
+        if (verifyResult != 1) {
             model.addAttribute("message", "Thanh toán thất bại");
             return "client/vnpaynotification/failpayment";
         }
+        String txnRef = request.getParameter("vnp_TxnRef");
+        PaymentTransaction transaction = paymentTransactionRepository.findByTxnRefForUpdate(txnRef).orElse(null);
 
-        return "redirect:/cart";
+        if (transaction == null) {
+            model.addAttribute("message", "Không tìm thấy giao dịch");
+            return "client/vnpaynotification/failpayment";
+        }
+//     Idempotency
+        if (transaction.getStatus()
+                == PaymentTransactionStatus.SUCCESS) {
+            log.warn("Transaction already processed: {}", txnRef);
+            return "client/vnpaynotification/succesful";
+        }
+//     * Verify Amount
+        String amountParam = request.getParameter("vnp_Amount");
+        BigDecimal amountFromVNPay = BigDecimal.valueOf(Long.parseLong(amountParam)).divide(BigDecimal.valueOf(100));
+        if (transaction.getAmount().compareTo(amountFromVNPay) != 0) {
+            log.error("Amount mismatch txnRef={}", txnRef);
+            model.addAttribute("message", "Sai số tiền");
+            return "client/vnpaynotification/failpayment";
+        }
+        try {
+            PaymentDefault paymentDefault = objectMapper.readValue(transaction.getShippingInfoJson(), PaymentDefault.class);
+            itemService.SavePlaceOrderGateway(transaction.getEmail(), paymentDefault, amountFromVNPay, request.getParameter("vnp_PayDate"));
+            transaction.setStatus(PaymentTransactionStatus.SUCCESS);
+            transaction.setTransactionNo(request.getParameter("vnp_TransactionNo"));
+            transaction.setPaidAt(LocalDateTime.now());
+            paymentTransactionRepository.save(transaction);
+            log.info("Payment success txnRef={}", txnRef);
+            model.addAttribute("orderInfo", request.getParameter("vnp_OrderInfo"));
+            model.addAttribute("totalPrice", transaction.getAmount());
+            model.addAttribute("paymentTime",request.getParameter("vnp_PayDate")
+                    .formatted(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
+            model.addAttribute("transactionId", request.getParameter("vnp_TransactionNo"));
+            session.setAttribute("sum", 0);
+            model.addAttribute(
+                    "transactionId", transaction.getTransactionNo());
+            return "client/vnpaynotification/succesful";
+
+        } catch (Exception ex) {
+            log.error("Create order failed txnRef={}", txnRef, ex);
+            model.addAttribute("message", "Tạo đơn hàng thất bại");
+            return "client/vnpaynotification/failpayment";
+        }
     }
+
 
     @GetMapping("/momo-return")
-    public String momoReturn(HttpServletRequest request, Model model) {
-        // Lấy các tham số trả về từ MoMo
-        String resultCode = request.getParameter("resultCode");
-        String message = request.getParameter("message");
-        String amount = request.getParameter("amount");
-        String orderId = request.getParameter("orderId");
-        String transId = request.getParameter("transId");
-        String orderInfo = request.getParameter("orderInfo");
-        String payType = request.getParameter("payType");
-        HttpSession session = request.getSession();
-        // ====== Thanh toán thành công resultCode = "0" ======
-        if ("0".equals(resultCode)) {
-
-            PaymentDefault paymentDefault = (PaymentDefault) session.getAttribute("tempPaymentDefault");
-            String email = (String) session.getAttribute("tempEmail");
-            // Tạo thời gian thanh toán theo format yyyyMMddHHmmss
-            String paymentTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
-            session.setAttribute("paymentTime", paymentTime);
-            if (paymentDefault != null && email != null) {
-                itemService.SavePlaceOrder(email, paymentDefault, session);
-                // Xóa session tạm
-                session.removeAttribute("tempPaymentDefault");
-                session.removeAttribute("tempEmail");
-
-                // Gửi dữ liệu sang màn hình thông báo thành công
-                model.addAttribute("orderId", orderId);
-                model.addAttribute("amount", amount);
-                model.addAttribute("message", message);
-                model.addAttribute("transId", transId);
-                model.addAttribute("orderInfo", orderInfo);
-                model.addAttribute("payType", payType);
-                model.addAttribute("paymentTime", paymentTime);
-
-                return "client/momonotification/succesful-momo";
-            }
+    public String momoReturn(MomoCallbackRequest callback, Model model, HttpSession session) {
+        if (!momoService.verifyMomoCallbackSignature(callback)) {
+            model.addAttribute("message", "Thanh toán MoMo thất bại: " + callback.getMessage());
+            return "client/momonotification/failpayment-momo";
         }
-        // ====== Thanh toán thất bại ======
-        model.addAttribute("message", "Thanh toán MoMo thất bại: " + message);
-        return "client/momonotification/failpayment-momo";
-    }
+        PaymentTransaction transaction = paymentTransactionRepository.findByTxnRefForUpdate(callback.getOrderId()).orElse(null);
+        if (transaction == null) {
+            model.addAttribute("message", "Không tìm thấy giao dịch");
+            return "client/momonotification/failpayment-momo";
+        }
+//        Idempotency
+        if (transaction.getStatus()
+                == PaymentTransactionStatus.SUCCESS) {
+            log.warn("Transaction already processed: {}",callback.getRequestId());
+            return "client/momonotification/succesful-momo";
+        }
+//        * Verify Amount
+        String amountParam = callback.getAmount();
+        BigDecimal amountFromVNPay = BigDecimal.valueOf(Long.parseLong(amountParam));
+        if (transaction.getAmount().compareTo(amountFromVNPay) != 0) {
+            log.error("Amount mismatch txnRef={}", callback.getOrderInfo());
+            model.addAttribute("message", "Sai số tiền");
+            return "client/momonotification/failpayment-momo";
+        }
+        try {
+            PaymentDefault paymentDefault = objectMapper.readValue(transaction.getShippingInfoJson(), PaymentDefault.class);
+            itemService.SavePlaceOrderGateway(transaction.getEmail(), paymentDefault, amountFromVNPay, callback.getResponseTime());
+            transaction.setStatus(PaymentTransactionStatus.SUCCESS);
+            transaction.setTransactionNo(callback.getTransId());
+            transaction.setPaidAt(LocalDateTime.now());
+            paymentTransactionRepository.save(transaction);
+            log.info("Payment success txnRef={}", callback.getRequestId());
+            // Gửi dữ liệu sang màn hình thông báo thành công
+            model.addAttribute("orderId", callback.getOrderId());
+            model.addAttribute("amount", callback.getAmount());
+            model.addAttribute("message", callback.getMessage());
+            model.addAttribute("transId", callback.getTransId());
+            model.addAttribute("orderInfo", callback.getOrderInfo());
+            model.addAttribute("payType", callback.getPayType());
+            model.addAttribute("paymentTime", callback.getResponseTime().formatted(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
+            session.setAttribute("sum", 0);
+            return "client/momonotification/succesful-momo";
 
+        } catch (Exception ex) {
+            log.error("Create order failed txnRef={}", callback.getRequestId(), ex);
+            model.addAttribute("message", "Thanh toán MoMo thất bại: ");
+            return "client/momonotification/failpayment-momo";
+        }
+
+
+    }
 }
+
+
+
+
+

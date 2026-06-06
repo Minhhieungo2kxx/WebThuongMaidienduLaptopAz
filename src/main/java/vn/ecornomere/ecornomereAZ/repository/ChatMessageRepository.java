@@ -5,8 +5,8 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import vn.ecornomere.ecornomereAZ.model.User;
 import vn.ecornomere.ecornomereAZ.model.entity.ChatMessage;
+import vn.ecornomere.ecornomereAZ.model.entity.User;
 
 @Repository
 public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> {

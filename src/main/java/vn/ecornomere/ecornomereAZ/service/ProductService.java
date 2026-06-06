@@ -1,46 +1,110 @@
 package vn.ecornomere.ecornomereAZ.service;
 
-import java.util.List;
-import java.util.Optional;
+import java.io.IOException;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch.core.SearchResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+import org.modelmapper.ModelMapper;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 
+import vn.ecornomere.ecornomereAZ.model.document.ProductDocument;
 import vn.ecornomere.ecornomereAZ.repository.CartDetailRepository;
 import vn.ecornomere.ecornomereAZ.repository.OrderDetailRepository;
 import vn.ecornomere.ecornomereAZ.repository.ProductRepository;
+import vn.ecornomere.ecornomereAZ.repository.TemporaryUploadRepository;
+import vn.ecornomere.ecornomereAZ.service.Elasticsearch.ProductIndexService;
+import vn.ecornomere.ecornomereAZ.service.UploadFile.FileService;
+import vn.ecornomere.ecornomereAZ.service.UploadFile.TemporaryUpload;
 import vn.ecornomere.ecornomereAZ.utils.UploadFile;
-import vn.ecornomere.ecornomereAZ.model.CartDetail;
-import vn.ecornomere.ecornomereAZ.model.OrderDetail;
-import vn.ecornomere.ecornomereAZ.model.Product;
 import vn.ecornomere.ecornomereAZ.model.dto.ProductSearchRequest;
 
+import vn.ecornomere.ecornomereAZ.model.entity.Product;
+
 @Service
+@RequiredArgsConstructor
+@Slf4j
 public class ProductService {
     private final ProductRepository productRepository;
     private UploadFile uploadFile = new UploadFile();
 
-    @Autowired
-    private OrderDetailRepository orderDetailRepository;
+    private final OrderDetailRepository orderDetailRepository;
 
-    @Autowired
-    private CartDetailRepository cartDetailRepository;
+    private final CartDetailRepository cartDetailRepository;
 
-    public ProductService(ProductRepository productRepository) {
+    private final FileService fileService;
 
-        this.productRepository = productRepository;
-    }
+    private final TemporaryUpload temporaryUpload;
+    private final ElasticsearchClient elasticsearchClient;
+    private final ProductIndexService productIndexService;
+
 
     public Product saveProduct(Product product) {
         return this.productRepository.save(product);
 
+    }
+
+    @Transactional
+    public void createProduct(Product product) {
+        productRepository.save(product);
+        try {
+            productIndexService.indexProduct(product);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        temporaryUpload.markAsUsed(product.getPublicId());
+    }
+
+
+    @Transactional
+    public void updateProduct(Product updateProduct) {
+
+        Product existingProduct = productRepository.findById(updateProduct.getId())
+                .orElseThrow(() -> new IllegalArgumentException("Product không tồn tại"));
+
+        String oldPublicId = existingProduct.getPublicId();
+
+        String newPublicId = updateProduct.getPublicId();
+
+        ModelMapper mapper = new ModelMapper();
+
+        mapper.typeMap(Product.class, Product.class)
+                .addMappings(m -> m.skip(Product::setId))
+                .addMappings(m -> m.skip(Product::setSold))
+                .addMappings(m -> m.skip(Product::setProductSpecs))
+                .addMappings(m -> m.skip(Product::setReviews))
+                .addMappings(m -> m.skip(Product::setStockdetails));
+
+        mapper.map(updateProduct, existingProduct);
+
+        productRepository.saveAndFlush(existingProduct); // quan trọng
+        try {
+            productIndexService.indexProduct(existingProduct);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        boolean imageChanged =
+                !oldPublicId.equals(newPublicId);
+
+        if (imageChanged) {
+
+            temporaryUpload.markAsUsed(newPublicId);
+            temporaryUpload.markAsUnused(oldPublicId);
+        }
     }
 
     public List<Product> getlistProduct() {
@@ -53,33 +117,34 @@ public class ProductService {
 
     @Transactional
     public void deleteProductById(Product product) {
+
         if (product == null) {
             throw new IllegalArgumentException("Product không hợp lệ");
         }
 
         Long productId = product.getId();
 
-        // Xử lý các OrderDetail liên quan
-        List<OrderDetail> orderDetails = orderDetailRepository.findByProductId(productId);
-        if (!orderDetails.isEmpty()) {
-            for (OrderDetail od : orderDetails) {
-                od.setProduct(null);
-            }
-            orderDetailRepository.saveAll(orderDetails);
-        }
+        // 1. detach relations
+        orderDetailRepository.findByProductId(productId)
+                .forEach(od -> od.setProduct(null));
 
-        // Xử lý các CartDetail liên quan
-        List<CartDetail> cartDetails = cartDetailRepository.findByProductId(productId);
-        if (!cartDetails.isEmpty()) {
-            for (CartDetail cd : cartDetails) {
-                cd.setProduct(null);
-            }
-            cartDetailRepository.saveAll(cartDetails);
-        }
-        uploadFile.deleteImageFile(product.getImage(), "products");
+        cartDetailRepository.findByProductId(productId)
+                .forEach(cd -> cd.setProduct(null));
 
-        // Cuối cùng mới xóa product
+        orderDetailRepository.flush();
+        cartDetailRepository.flush();
+
+        // 2. delete DB first OR last
         productRepository.delete(product);
+        productIndexService.DeleteIndexElasticsearch(product);
+        // 3. delete Cloudinary (SAU DB SUCCESS)
+        try {
+            fileService.deleteFile(
+                    product.getPublicId(),
+                    product.getResourceType());
+        } catch (Exception e) {
+            log.error("Cannot delete Cloudinary image {}", product.getPublicId(), e);
+        }
     }
 
     public Page<Product> getProductsPaginated(int page, int size) {
@@ -88,7 +153,7 @@ public class ProductService {
     }
 
     public Page<Product> filterProducts(List<String> factorys, List<String> targets, List<String> priceRanges,
-            String sortOption, int page, int size) {
+                                        String sortOption, int page, int size) {
 
         Specification<Product> spec = Specification.where(null);
 
@@ -136,5 +201,60 @@ public class ProductService {
         return products;
 
     }
+
+    public List<Product> getforUpdate(List<Long> ids) {
+        return productRepository.findAllForUpdate(ids);
+    }
+
+    public void SaveAll(List<Product> list) {
+        productRepository.saveAll(list);
+    }
+
+    public List<Product> findRelevantProducts(String question) throws IOException {
+
+        List<Long> ids =searchProducts(question);
+        List<Product> products =
+                productRepository.findAllById(ids);
+        Map<Long, Product> map =
+                products.stream()
+                        .collect(Collectors.toMap(
+                                Product::getId,
+                                Function.identity()
+                        ));
+        return ids.stream()
+                .map(map::get)
+                .filter(Objects::nonNull)
+                .toList();
+    }
+    public List<Long> searchProducts(String question)
+            throws IOException {
+
+        SearchResponse<ProductDocument> response =
+                elasticsearchClient.search(s -> s
+                                .index("products")
+                                .size(5)
+
+                                .query(q -> q
+                                        .multiMatch(mm -> mm
+                                                .query(question)
+                                                .fields(
+                                                        "name^5",
+                                                        "shortDesc^3",
+                                                        "detailDesc",
+                                                        "factory^2",
+                                                        "target^2"
+                                                )
+                                                .fuzziness("AUTO")
+                                        )
+                                ),
+                        ProductDocument.class
+                );
+        return response.hits()
+                .hits()
+                .stream()
+                .map(hit -> hit.source().getId())
+                .toList();
+    }
+
 
 }

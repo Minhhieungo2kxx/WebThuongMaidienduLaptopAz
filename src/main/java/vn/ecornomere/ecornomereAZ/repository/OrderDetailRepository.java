@@ -8,9 +8,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import vn.ecornomere.ecornomereAZ.model.Order;
-import vn.ecornomere.ecornomereAZ.model.OrderDetail;
 import vn.ecornomere.ecornomereAZ.model.dto.ProductSales;
+import vn.ecornomere.ecornomereAZ.model.entity.Order;
+import vn.ecornomere.ecornomereAZ.model.entity.OrderDetail;
 
 @Repository
 public interface OrderDetailRepository extends JpaRepository<OrderDetail, Long> {

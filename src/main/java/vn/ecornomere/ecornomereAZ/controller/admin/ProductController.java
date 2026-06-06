@@ -1,13 +1,10 @@
 package vn.ecornomere.ecornomereAZ.controller.admin;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.List;
+
 import java.util.Map;
 
-import org.modelmapper.ModelMapper;
-
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
@@ -18,21 +15,24 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartFile;
+
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.validation.Valid;
-import vn.ecornomere.ecornomereAZ.model.Product;
-import vn.ecornomere.ecornomereAZ.model.ProductSpec;
+import vn.ecornomere.ecornomereAZ.model.entity.Product;
+
+import vn.ecornomere.ecornomereAZ.service.Elasticsearch.ProductIndexService;
 import vn.ecornomere.ecornomereAZ.service.ProductService;
 import vn.ecornomere.ecornomereAZ.utils.UploadFile;
 
 @Controller
+@RequiredArgsConstructor
 public class ProductController {
 
-    @Autowired
-    private ProductService productService;
-    private UploadFile uploadFile = new UploadFile();
+
+    private final ProductService productService;
+    private final UploadFile uploadFile = new UploadFile();
+
 
     // Save san pham
     @GetMapping("/admin/product/create")
@@ -41,23 +41,21 @@ public class ProductController {
         return "admin/product/create_product";
     }
 
-    // Save san pham
     @PostMapping("/admin/product/create")
-    public String createnewProduct(@ModelAttribute("NewProduct") @Valid Product product, BindingResult result,
-            @RequestParam(value = "avatarFile", required = false) MultipartFile avatarFile,
-            RedirectAttributes redirectAttributes)
-            throws IllegalStateException, IOException {
+    public String createNewProduct(
+            @ModelAttribute("NewProduct") @Valid Product product,
+            BindingResult result,
+            RedirectAttributes redirectAttributes) {
 
-        // Kiểm tra lỗi validation
         if (result.hasErrors()) {
-            return "admin/product/create_product"; // Trả về form với lỗi
+            return "admin/product/create_product";
         }
-        product.setImage(uploadFile.getnameFile(avatarFile, "products"));
-        // Lưu user vào database
-        productService.saveProduct(product);
-        redirectAttributes.addFlashAttribute("successMessage", "Thêm sản phẩm thành công!");
+        productService.createProduct(product);
+        redirectAttributes.addFlashAttribute(
+                "successMessage",
+                "Thêm sản phẩm thành công!");
 
-        return "redirect:/admin/product"; // Sau khi lưu thì chuyển về danh sách Product
+        return "redirect:/admin/product";
     }
 
     // Hiển thị danh sách
@@ -131,55 +129,26 @@ public class ProductController {
     @PostMapping("/admin/product/edit")
     public String editProduct(
             @ModelAttribute("updateProduct") Product updateProduct,
-            @RequestParam(value = "avatarFile", required = false) MultipartFile avatarFile,
             RedirectAttributes redirectAttributes) {
 
-        Product existingProduct = productService.getProductbyId(updateProduct.getId())
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "Invalid product Id:" + updateProduct.getId()));
-
-        String oldImage = existingProduct.getImage();
-
-        ModelMapper map = new ModelMapper();
-        map.typeMap(Product.class, Product.class)
-                .addMappings(m -> m.skip(Product::setId))
-                .addMappings(m -> m.skip(Product::setImage))
-                .addMappings(m -> m.skip(Product::setSold))
-                .addMappings(m -> m.skip(Product::setProductSpecs))
-                .addMappings(m -> m.skip(Product::setReviews))
-                .addMappings(m -> m.skip(Product::setStockdetails));
-
-        map.map(updateProduct, existingProduct);
-
         try {
-            if (avatarFile != null && !avatarFile.isEmpty()) {
-                String newImage = uploadFile.getnameFile(avatarFile, "products");
-                existingProduct.setImage(newImage);
-                uploadFile.deleteImageFile(oldImage, "products");
-            }
-        } catch (IllegalArgumentException e) {
-            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
-            return "redirect:/admin/product/edit/" + updateProduct.getId();
-        } catch (IOException e) {
+
+            productService.updateProduct(updateProduct);
+
             redirectAttributes.addFlashAttribute(
-                    "errorMessage", "Lỗi upload ảnh, vui lòng thử lại");
-            return "redirect:/admin/product/edit/" + updateProduct.getId();
+                    "successMessage",
+                    "Edit sản phẩm thành công!");
+
+            return "redirect:/admin/product";
+
+        } catch (Exception e) {
+
+            redirectAttributes.addFlashAttribute(
+                    "errorMessage",
+                    e.getMessage());
+            return "redirect:/admin/product/edit/"
+                    + updateProduct.getId();
         }
-
-        List<ProductSpec> newSpecs = updateProduct.getProductSpecs();
-        if (newSpecs != null) {
-            existingProduct.getProductSpecs().clear();
-            for (ProductSpec spec : newSpecs) {
-                spec.setProduct(existingProduct);
-                existingProduct.getProductSpecs().add(spec);
-            }
-        }
-
-        productService.saveProduct(existingProduct);
-
-        redirectAttributes.addFlashAttribute(
-                "successMessage", "Edit sản phẩm thành công!");
-        return "redirect:/admin/product";
     }
 
     // Delete user

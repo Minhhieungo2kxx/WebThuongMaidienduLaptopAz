@@ -5,20 +5,187 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3c9a2cfc-111a-4cca-93ac-df44b1499b47" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/Exception/ApiResponse.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/Exception/ChatHistoryException.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/Exception/ChatProcessingException.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/Exception/GeminiUnavailableException.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/config/Elasticsearch/ElasticsearchConfig.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/config/Redis/RedisConfig.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/controller/admin/ElasticsearchAdminController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/model/Enum/OrderStatus.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/model/Enum/PaymentMethod.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/model/Enum/PaymentTransactionStatus.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/model/document/ProductDocument.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/model/dto/MomoCallbackRequest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/model/dto/OrderDetailDTO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/model/dto/OrderHistoryDTO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/model/entity/PaymentTransaction.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/repository/PaymentTransactionRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/service/Elasticsearch/ProductIndexService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/service/Elasticsearch/ProductMigrationService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/service/UploadFile/TemporaryUpload.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/utils/PaymentTimeParser.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/static/favicon.ico" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/WebshopApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/WebshopApplication.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/config/CustomOAuth2/OAuth2LoginSuccessHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/config/CustomOAuth2/OAuth2LoginSuccessHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/config/CustomSuccessHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/config/CustomSuccessHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/config/EnvConfig.java" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/config/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/config/SecurityConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/utils/VNPayConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/utils/VNPayConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/config/WebMvcConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/config/WebMvcConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/controller/admin/AdminController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/controller/admin/AdminController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/controller/admin/OrderController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/controller/admin/OrderController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/controller/admin/ProductController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/controller/admin/ProductController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/controller/admin/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/controller/admin/UserController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/controller/client/ChatController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/controller/client/ChatController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/controller/client/FilterProductController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/controller/client/FilterProductController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/controller/client/HomeController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/controller/client/HomeController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/controller/client/ItemController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/controller/client/ItemController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/model/Cart.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/model/CartDetail.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/model/Order.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/model/OrderDetail.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/model/PasswordResetToken.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/model/Product.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/model/ProductSpec.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/model/Review.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/model/Role.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/model/Stock.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/model/StockDetail.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/model/Supplier.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/model/User.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/model/dto/ChatMessageDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/model/dto/ChatMessageDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/model/dto/PaymentDefault.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/model/dto/PaymentDefault.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/model/dto/ProductSales.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/model/dto/ProductSales.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/model/dto/Userupdate.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/model/dto/Userupdate.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/model/entity/ChatMessage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/model/entity/ChatMessage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/repository/CartDetailRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/repository/CartDetailRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/repository/CartRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/repository/CartRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/repository/ChatMessageRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/repository/ChatMessageRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/repository/ItemRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/repository/ItemRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/repository/OrderDetailRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/repository/OrderDetailRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/repository/OrderRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/repository/OrderRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/repository/PasswordResetTokenRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/repository/PasswordResetTokenRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/repository/ProductRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/repository/ProductRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/repository/RoleRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/repository/RoleRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/repository/UserRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/repository/UserRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/service/ChatBoxAi/ChatService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/service/ChatBoxAi/ChatService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/service/CustomUserDetailsService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/service/CustomUserDetailsService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/service/ForgotPasswordService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/service/ForgotPasswordService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/service/ItemService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/service/ItemService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/service/Momo/MomoService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/service/payments/MomoService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/service/OAuth2/CustomOAuth2UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/service/OAuth2/CustomOAuth2UserService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/service/ProductService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/service/ProductService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/service/RoleService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/service/RoleService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/service/SendEmail/ApplicationEmailService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/service/SendEmail/ApplicationEmailService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/service/SendEmail/EmailService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/service/SendEmail/EmailService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/service/UserService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/service/VnPay/VNPayService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/service/payments/VNPayService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/utils/GlobalExceptionHandler.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/utils/VNPayConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/config/Payments/VNPayConfig.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/view/admin/order/order_edit.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/WEB-INF/view/admin/order/order_edit.jsp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/view/admin/order/order_index.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/WEB-INF/view/admin/order/order_index.jsp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/view/admin/product/create_product.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/WEB-INF/view/admin/product/create_product.jsp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/view/admin/product/edit_product.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/WEB-INF/view/admin/product/edit_product.jsp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/view/admin/product/product_index.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/WEB-INF/view/admin/product/product_index.jsp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/view/admin/user/create.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/WEB-INF/view/admin/user/create.jsp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/view/admin/user/detailuser.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/WEB-INF/view/admin/user/detailuser.jsp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/view/admin/user/listuser.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/WEB-INF/view/admin/user/listuser.jsp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/view/admin/user/update.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/WEB-INF/view/admin/user/update.jsp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/view/client/authentication/updateuser.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/WEB-INF/view/client/authentication/updateuser.jsp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/view/client/cart/checkout.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/WEB-INF/view/client/cart/checkout.jsp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/view/client/cart/orderhistory.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/WEB-INF/view/client/cart/orderhistory.jsp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/view/client/layout/chatbox.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/WEB-INF/view/client/layout/chatbox.jsp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/view/client/layout/header.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/WEB-INF/view/client/layout/header.jsp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/resources/client/css/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/resources/client/css/style.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/config/AsyncConfig.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/config/AsyncConfig.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/config/CustomOAuth2/OAuth2LoginFailureHandler.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/config/CustomOAuth2/OAuth2LoginFailureHandler.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/config/CustomOAuth2/OAuth2LoginSuccessHandler.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/config/CustomOAuth2/OAuth2LoginSuccessHandler.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/config/CustomSuccessHandler.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/config/CustomSuccessHandler.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/config/EnvConfig.class" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/config/SecurityConfig.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/config/SecurityConfig.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/utils/VNPayConfig.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/utils/VNPayConfig.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/config/ValidatorConfig.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/config/ValidatorConfig.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/config/WebMvcConfig.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/config/WebMvcConfig.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/config/annotation/checkemail/UniqueEmail.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/config/annotation/checkemail/UniqueEmail.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/config/annotation/checkemail/UniqueEmailValidator.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/config/annotation/checkemail/UniqueEmailValidator.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/config/annotation/checkpassword/PasswordMatch.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/config/annotation/checkpassword/PasswordMatch.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/config/annotation/checkpassword/PasswordMatchValidator.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/config/annotation/checkpassword/PasswordMatchValidator.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/controller/admin/AdminController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/controller/admin/AdminController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/controller/admin/OrderController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/controller/admin/OrderController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/controller/admin/ProductController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/controller/admin/ProductController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/controller/admin/UserController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/controller/admin/UserController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/controller/client/FilterProductController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/controller/client/FilterProductController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/controller/client/HomeController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/controller/client/HomeController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/controller/client/ItemController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/controller/client/ItemController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/model/Cart.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/model/CartDetail.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/model/Order.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/model/OrderDetail.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/model/PasswordResetToken.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/model/Product.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/model/Role.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/model/User.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/model/dto/ForgotPasswordDTO.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/model/dto/ForgotPasswordDTO.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/model/dto/PaymentDefault.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/model/dto/PaymentDefault.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/model/dto/ProductFilterDTO.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/model/dto/ProductFilterDTO.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/model/dto/ProductSearchRequest.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/model/dto/ProductSearchRequest.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/model/dto/RegisterDTO.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/model/dto/RegisterDTO.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/model/dto/Userupdate.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/model/dto/Userupdate.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/repository/CartDetailRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/repository/CartDetailRepository.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/repository/CartRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/repository/CartRepository.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/repository/ItemRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/repository/ItemRepository.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/repository/OrderDetailRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/repository/OrderDetailRepository.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/repository/OrderRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/repository/OrderRepository.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/repository/PasswordResetTokenRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/repository/PasswordResetTokenRepository.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/repository/ProductRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/repository/ProductRepository.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/repository/RoleRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/repository/RoleRepository.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/repository/UserRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/repository/UserRepository.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/service/CustomUserDetailsService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/service/CustomUserDetailsService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/service/ForgotPasswordService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/service/ForgotPasswordService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/service/ItemService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/service/ItemService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/service/OAuth2/CustomOAuth2UserService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/service/OAuth2/CustomOAuth2UserService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/service/ProductService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/service/ProductService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/service/RoleService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/service/RoleService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/service/SendEmail/ApplicationEmailService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/service/SendEmail/ApplicationEmailService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/service/SendEmail/EmailService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/service/SendEmail/EmailService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/service/UserService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/service/UserService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/service/VnPay/VNPayService.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/utils/AppConfig.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/utils/AppConfig.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/utils/UploadFile.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/utils/UploadFile.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/vn/ecornomere/ecornomereAZ/utils/VNPayConfig.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/laptopshopaz-0.0.1-SNAPSHOT.jar.original" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/maven-archiver/pom.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/testCompile/default-testCompile/createdFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/testCompile/default-testCompile/createdFiles.lst" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/testCompile/default-testCompile/inputFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/testCompile/default-testCompile/inputFiles.lst" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Interface" />
+        <option value="Enum" />
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
   </component>
   <component name="MavenImportPreferences">
     <option name="generalSettings">
@@ -27,30 +194,63 @@
       </MavenGeneralSettings>
     </option>
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 0
-}]]></component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 0
+}</component>
   <component name="ProjectId" id="2zE2bDdz8FZ3In3IK8XE9W3q60f" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "Rebasing master",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "D:/Ngominhhieu/Back_end_java/spring-mvc-ecornomere-laptopaz",
-    "nodejs_package_manager_path": "npm",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
+    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
+    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
+    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;Spring Boot.LaptopshopApplication.executor&quot;: &quot;Run&quot;,
+    &quot;Spring Boot.WebshopApplication.executor&quot;: &quot;Run&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/Ngominhhieu/Back_end_java/spring-mvc-ecornomere-laptopaz/src/main/resources/static&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;editor.preferences.fonts.default&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
+  <component name="ReactorSettings">
+    <option name="notificationShown" value="true" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\Ngominhhieu\Back_end_java\spring-mvc-ecornomere-laptopaz\src\main\resources\static" />
+    </key>
+  </component>
   <component name="RunManager">
-    <configuration name="LaptopshopApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+    <configuration name="WebshopApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
       <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UpdateClassesAndResources" />
       <module name="laptopshopaz" />
-      <option name="SPRING_BOOT_MAIN_CLASS" value="vn.ecornomere.ecornomereAZ.LaptopshopApplication" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="vn.ecornomere.ecornomereAZ.WebshopApplication" />
+      <extension name="net.ashald.envfile">
+        <option name="IS_ENABLED" value="true" />
+        <option name="IS_SUBST" value="false" />
+        <option name="IS_PATH_MACRO_SUPPORTED" value="false" />
+        <option name="IS_IGNORE_MISSING_FILES" value="false" />
+        <option name="IS_ENABLE_EXPERIMENTAL_INTEGRATIONS" value="false" />
+        <ENTRIES>
+          <ENTRY IS_ENABLED="true" PARSER="runconfig" IS_EXECUTABLE="false" />
+          <ENTRY IS_ENABLED="true" PARSER="env" IS_EXECUTABLE="false" PATH=".env" />
+        </ENTRIES>
+      </extension>
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -65,10 +265,68 @@
       <option name="presentableId" value="Default" />
       <updated>1751281981693</updated>
       <workItem from="1751281982961" duration="45000" />
+      <workItem from="1780142771481" duration="82000" />
+      <workItem from="1780142888230" duration="30000" />
+      <workItem from="1780142933618" duration="949000" />
+      <workItem from="1780143898971" duration="191000" />
+      <workItem from="1780186329819" duration="11172000" />
+      <workItem from="1780201328927" duration="4000" />
+      <workItem from="1780222165590" duration="7908000" />
+      <workItem from="1780239267987" duration="6844000" />
+      <workItem from="1780246224986" duration="48000" />
+      <workItem from="1780272732577" duration="9712000" />
+      <workItem from="1780303964819" duration="7784000" />
+      <workItem from="1780324439170" duration="7744000" />
+      <workItem from="1780360157347" duration="9520000" />
+      <workItem from="1780384912392" duration="8193000" />
+      <workItem from="1780396343441" duration="5556000" />
+      <workItem from="1780414880190" duration="2688000" />
+      <workItem from="1780448830932" duration="7514000" />
+      <workItem from="1780473958854" duration="4498000" />
+      <workItem from="1780485016593" duration="3692000" />
+      <workItem from="1780488973808" duration="66000" />
+      <workItem from="1780534645999" duration="8059000" />
+      <workItem from="1780564581879" duration="2922000" />
+      <workItem from="1780572789194" duration="1972000" />
+      <workItem from="1780583466422" duration="7836000" />
+      <workItem from="1780623094949" duration="6209000" />
+      <workItem from="1780648858630" duration="3481000" />
+      <workItem from="1780672267910" duration="4336000" />
+      <workItem from="1780707649941" duration="1415000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/controller/admin/ProductController.java</url>
+          <line>135</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/controller/admin/UserController.java</url>
+          <line>80</line>
+          <option name="timeStamp" value="12" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/controller/admin/UserController.java</url>
+          <line>116</line>
+          <option name="timeStamp" value="15" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/vn/ecornomere/ecornomereAZ/controller/client/HomeController.java</url>
+          <line>164</line>
+          <option name="timeStamp" value="20" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
   </component>
 </project>

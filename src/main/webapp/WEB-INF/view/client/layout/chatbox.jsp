@@ -9,7 +9,7 @@
       <!-- Khung chat -->
       <div id="chat-box">
             <div id="chat-box-header">
-                  <span>🤖 AI Support</span>
+                  <span>🤖 AI Assistant</span>
                   <div>
                         <button id="clear-history-btn" onclick="clearChatHistory()" title="Xóa lịch sử">🗑️</button>
                         <button id="chat-close-btn" onclick="toggleChatBox()">×</button>

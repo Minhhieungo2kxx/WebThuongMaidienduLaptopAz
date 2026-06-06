@@ -2,8 +2,10 @@ package vn.ecornomere.ecornomereAZ.controller.client;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -23,30 +25,32 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
-import vn.ecornomere.ecornomereAZ.model.Order;
-
-import vn.ecornomere.ecornomereAZ.model.User;
 import vn.ecornomere.ecornomereAZ.model.dto.ForgotPasswordDTO;
+import vn.ecornomere.ecornomereAZ.model.dto.OrderHistoryDTO;
 import vn.ecornomere.ecornomereAZ.model.dto.RegisterDTO;
 import vn.ecornomere.ecornomereAZ.model.dto.Userupdate;
+import vn.ecornomere.ecornomereAZ.model.entity.Order;
+import vn.ecornomere.ecornomereAZ.model.entity.User;
 import vn.ecornomere.ecornomereAZ.service.ForgotPasswordService;
 
 import vn.ecornomere.ecornomereAZ.service.RoleService;
+import vn.ecornomere.ecornomereAZ.service.UploadFile.TemporaryUpload;
 import vn.ecornomere.ecornomereAZ.service.UserService;
 import vn.ecornomere.ecornomereAZ.utils.UploadFile;
 
 @Controller
+@RequiredArgsConstructor
 public class HomeController {
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-    @Autowired
-    private RoleService roleService;
 
-    @Autowired
-    private ForgotPasswordService forgotPasswordService;
-    private UploadFile uploadFile = new UploadFile();
+    private final UserService userService;
+
+    private final PasswordEncoder passwordEncoder;
+
+    private final RoleService roleService;
+
+    private final ForgotPasswordService forgotPasswordService;
+    private final TemporaryUpload temporaryUpload;
+    private final UploadFile uploadFile = new UploadFile();
 
     @GetMapping("/register")
     public String ShowRegister(Model model) {
@@ -96,9 +100,9 @@ public class HomeController {
     // gui email forget password
     @PostMapping("/forgot-password")
     public String processForgotPassword(@Valid @ModelAttribute("forgotPasswordDTO") ForgotPasswordDTO forgotPasswordDTO,
-            BindingResult result,
-            Model model,
-            RedirectAttributes redirectAttributes) {
+                                        BindingResult result,
+                                        Model model,
+                                        RedirectAttributes redirectAttributes) {
 
         if (result.hasErrors()) {
             return "client/authentication/forgot-password";
@@ -151,46 +155,43 @@ public class HomeController {
         return "client/authentication/updateuser";
     }
 
+
     @PostMapping("/setting-user")
-    public String SettingUser(
-            @ModelAttribute("Userupdate") @Valid Userupdate userupdate, BindingResult result,
-            @RequestParam(value = "avatarFile", required = false) MultipartFile avatarFile,
-            HttpServletRequest request) throws IOException {
-
-        // Kiểm tra lỗi validation
+    public String SettingUser(@ModelAttribute("Userupdate") @Valid Userupdate userupdate,
+                              BindingResult result, HttpServletRequest request) {
         if (result.hasErrors()) {
-            return "client/authentication/updateuser"; // Trả về form với lỗi
+            return "client/authentication/updateuser";
         }
-        User newUser = userService.getbyEmail(userupdate.getEmail().trim());
-        newUser.setFullName(userupdate.getFullName());
-        newUser.setAddress(userupdate.getAddress());
-        newUser.setPhone(userupdate.getPhone());
-
-        // Mã hóa mật khẩu trước khi lưu
-        if (userupdate.getPasswordnew() != null && !userupdate.getPasswordnew().isEmpty()) {
-            String encodedPassword = passwordEncoder.encode(userupdate.getPasswordnew());
-            newUser.setPassword(encodedPassword);
-        }
-        if (!avatarFile.isEmpty()) {
-            newUser.setAvatar(uploadFile.getnameFile(avatarFile, "avatars"));
-
-        } else {
-            // Người dùng không chọn ảnh mới → giữ ảnh cũ
-            User oldUser = userService.findUserById(userupdate.getId())
-                    .orElseThrow(() -> new IllegalArgumentException("Invalid user Id:" + userupdate.getId()));
-            newUser.setAvatar(oldUser.getAvatar());
+        User user = userService.getbyEmail(userupdate.getEmail().trim());
+        user.setFullName(userupdate.getFullName());
+        user.setPhone(userupdate.getPhone());
+        user.setAddress(userupdate.getAddress());
+        if (userupdate.getPassword() != null && !userupdate.getPassword().isBlank()) {
+            if (!userupdate.getPassword().equals(user.getPassword())) {
+                user.setPassword(
+                        passwordEncoder.encode(userupdate.getPassword()));
+            }
         }
 
-        userService.handleSaveUser(newUser);
+        if (userupdate.getAvatarPublicId() != null && !userupdate.getAvatarPublicId().isBlank()) {
+            String oldPublicId = user.getAvatarPublicId();
+            if (oldPublicId != null) {
+                temporaryUpload.markAsUnused(oldPublicId);
+            }
+            user.setAvatar(userupdate.getAvatar());
+            user.setAvatarPublicId(userupdate.getAvatarPublicId());
+            user.setAvatarResourceType(userupdate.getAvatarResourceType());
+            temporaryUpload.markAsUsed(userupdate.getAvatarPublicId());
+        }
+        userService.handleSaveUser(user);
         HttpSession session = request.getSession(false);
-        session.setAttribute("avatar", newUser.getAvatar().trim());
-
-        return "redirect:/"; // Sau khi lưu thì chuyển về danh sách user
+        session.setAttribute("avatar", user.getAvatar());
+        return "redirect:/";
     }
 
     @GetMapping("/order-history")
     public String showOrderHistory(@RequestParam(name = "page", defaultValue = "0") String pageParam, Model model,
-            HttpServletRequest request) {
+                                   HttpServletRequest request) {
         int page = 0;
         int pageSize = 6;
 
@@ -206,12 +207,13 @@ public class HomeController {
         HttpSession session = request.getSession();
         String email = (String) session.getAttribute("email");
         User user = userService.getbyEmail(email);
-
         Page<Order> orderlistPage = userService.getlistHistory(user, page, pageSize);
-        for (Order od : orderlistPage.getContent()) {
-            userService.recalculateOrderPrice(od);
-        }
-        model.addAttribute("listOrderbyUser", orderlistPage.getContent());
+
+        List<OrderHistoryDTO> dtoList = orderlistPage.getContent()
+                .stream()
+                .map(order -> userService.toDTO(order))
+                .toList();
+        model.addAttribute("listOrderbyUser", dtoList);
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", orderlistPage.getTotalPages());
         return "client/cart/orderhistory";

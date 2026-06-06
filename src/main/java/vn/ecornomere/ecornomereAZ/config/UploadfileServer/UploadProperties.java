@@ -1,0 +1,17 @@
+package vn.ecornomere.ecornomereAZ.config.UploadfileServer;
+
+import lombok.Data;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+import org.springframework.util.unit.DataSize;
+
+@Component
+@Data
+public class UploadProperties {
+     
+      @Value("${spring.servlet.multipart.max-file-size}")
+      private DataSize maxFileSize;
+      @Value("${spring.servlet.multipart.max-request-size}")
+      private DataSize maxRequestSize;
+
+}

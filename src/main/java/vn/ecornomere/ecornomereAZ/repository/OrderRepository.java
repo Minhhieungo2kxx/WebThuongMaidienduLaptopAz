@@ -1,6 +1,8 @@
 package vn.ecornomere.ecornomereAZ.repository;
 
-import vn.ecornomere.ecornomereAZ.model.*;
+
+import vn.ecornomere.ecornomereAZ.model.entity.Order;
+import vn.ecornomere.ecornomereAZ.model.entity.User;
 
 import java.util.List;
 

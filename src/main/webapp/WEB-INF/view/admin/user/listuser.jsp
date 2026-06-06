@@ -87,7 +87,7 @@
                                                     <td>${user.fullName}</td>
                                                     <td>${user.address}</td>
                                                     <td>${user.phone}</td>
-                                                    <td><img src="/uploads/avatars/${user.avatar}" alt="User Avatar"
+                                                    <td><img src="${user.avatar}" alt="User Avatar"
                                                         style="max-width:120px; max-height: 120px;" />
                                                     </td>
                                                     <td>${user.role.name}</td>

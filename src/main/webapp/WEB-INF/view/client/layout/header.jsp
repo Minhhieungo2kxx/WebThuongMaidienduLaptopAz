@@ -49,7 +49,7 @@
                                             aria-labelledby="profileDropdown">
                                             <li class="d-flex flex-column align-items-center dropdown-profile-header">
                                                 <img class="profile-avatar mb-3"
-                                                    src="/uploads/avatars/${sessionScope.avatar}" alt="User Profile" />
+                                                    src="${sessionScope.avatar}" alt="User Profile" />
                                                 <div class="text-center fw-bold">FPT Shop</div>
                                                 <div class="text-center text-muted small">
                                                     <c:out value="${sessionScope.email}" />

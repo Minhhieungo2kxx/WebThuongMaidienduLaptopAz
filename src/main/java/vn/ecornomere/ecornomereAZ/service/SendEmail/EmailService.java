@@ -15,8 +15,8 @@ import org.springframework.stereotype.Service;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
-import vn.ecornomere.ecornomereAZ.model.Order;
-import vn.ecornomere.ecornomereAZ.model.OrderDetail;
+import vn.ecornomere.ecornomereAZ.model.entity.Order;
+import vn.ecornomere.ecornomereAZ.model.entity.OrderDetail;
 
 @Service
 public class EmailService {
@@ -113,7 +113,7 @@ public class EmailService {
                 .append("</li>"); // Giả sử có thêm phí ship riêng
         sb.append("<li><strong>Tổng thanh toán:</strong> <strong>").append(formatCurrency(order.getTotalPriceaddShip()))
                 .append("</strong></li>");
-        sb.append("<li><strong>Thời gian:</strong> ").append(formatPaymentTime(order.getPaymentTime())).append("</li>");
+        sb.append("<li><strong>Thời gian:</strong> ").append(formatPaymentTime(order.getPaymentTime().toString())).append("</li>");
         sb.append("</ul>");
 
         sb.append("<h3>🛒 Chi tiết sản phẩm</h3>");

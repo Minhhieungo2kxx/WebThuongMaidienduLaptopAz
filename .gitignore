@@ -16,6 +16,9 @@ release.properties
 *.war
 *.ear
 
+*.tar
+*.tar.gz
+
 # === Spring Boot specific ===
 /bin/
 /logs/
@@ -65,5 +68,7 @@ service-account-key.json
 application-local.properties
 application-secret.properties
 
-myapp/uploads/
+myapp/
+
+
 
