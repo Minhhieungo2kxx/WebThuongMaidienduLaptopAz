@@ -1,8 +1,9 @@
 
-
 # === Maven ===
-/target/
+# ===== Maven =====
+target/
 !.mvn/wrapper/maven-wrapper.jar
+/target/
 .mvn/
 pom.xml.tag
 pom.xml.releaseBackup
@@ -36,7 +37,14 @@ release.properties
 *.iml
 *.iws
 out/
+# ===== Logs =====
+logs/
+# ===== OS =====
+.DS_Store
+Thumbs.db
 
+# ===== Upload runtime data (QUAN TRỌNG) =====
+myapp/uploads/
 ## Eclipse
 .project
 .classpath
@@ -47,16 +55,20 @@ out/
 ## VSCode
 .vscode/
 
-# === OS-specific files ===
-.DS_Store
-Thumbs.db
+# ===== Env / secret =====
+.env
+*.env
+application-local.properties
+application-secret.properties
+
+# ===== DB files =====
+
 
 # === Others ===
 *.swp
 *.bak
 *.old
-.env
-*.env
+
 
 # Ignore all .json files (general, if bạn không dùng .json cho data khác)
 *.json
@@ -65,8 +77,7 @@ Thumbs.db
 service-account-key.json
 
 # Ignore các file cấu hình riêng tư
-application-local.properties
-application-secret.properties
+
 
 myapp/
 
