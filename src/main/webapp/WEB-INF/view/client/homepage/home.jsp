@@ -156,7 +156,7 @@
                                                         <div class="col-md-6 col-lg-4 col-xl-3">
                                                             <div class="rounded position-relative laptop-item">
                                                                 <div class="laptop-img">
-                                                                    <img src="/uploads/products/${product.image}"
+                                                                    <img src="${product.image}"
                                                                         class="img-fluid w-100 rounded-top"
                                                                         alt="${product.name}" />
                                                                 </div>
@@ -215,7 +215,8 @@
                                             </div>
                                         </div>
                                         <nav aria-label="Page navigation" class="mt-4 justify-content-center">
-                                            <ul class="pagination justify-content-center mt-4">
+                                            <c:if test="${totalPages > 0}">
+                                             <ul class="pagination justify-content-center mt-4">
 
                                                 <!-- Nút Previous -->
                                                 <c:if test="${currentPage > 0}">
@@ -245,6 +246,7 @@
                                                 </c:if>
 
                                             </ul>
+                                            </c:if>
                                         </nav>
 
                                     </div>
@@ -257,7 +259,7 @@
                                                         <div class="col-md-6 col-lg-4 col-xl-3">
                                                             <div class="rounded position-relative laptop-item">
                                                                 <div class="laptop-img">
-                                                                    <img src="/uploads/products/${gamming.image}"
+                                                                    <img src="${gamming.image}"
                                                                         class="img-fluid w-100 rounded-top"
                                                                         alt="${gamming.name}" />
                                                                 </div>
@@ -315,7 +317,8 @@
                                             </div>
                                         </div>
                                         <nav aria-label="Page navigation" class="mt-4 justify-content-center">
-                                            <ul class="pagination justify-content-center mt-4">
+                                            <c:if test="${totalPages1 > 0}">
+                                                <ul class="pagination justify-content-center mt-4">
 
                                                 <!-- Nút Previous -->
                                                 <c:if test="${currentPage1 > 0}">
@@ -345,6 +348,7 @@
                                                 </c:if>
 
                                             </ul>
+                                            </c:if>
                                         </nav>
                                     </div>
                                     <!-- Tab for Laptop Văn Phòng -->
@@ -357,7 +361,7 @@
                                                         <div class="col-md-6 col-lg-4 col-xl-3">
                                                             <div class="rounded position-relative laptop-item">
                                                                 <div class="laptop-img">
-                                                                    <img src="/uploads/products/${office.image}"
+                                                                    <img src="${office.image}"
                                                                         class="img-fluid w-100 rounded-top"
                                                                         alt="${office.name}" />
                                                                 </div>
@@ -415,7 +419,8 @@
                                             </div>
                                         </div>
                                         <nav aria-label="Page navigation" class="mt-4 justify-content-center">
-                                            <ul class="pagination justify-content-center mt-4">
+                                            <c:if test="${totalPages2 > 0}">
+                                                <ul class="pagination justify-content-center mt-4">
 
                                                 <!-- Nút Previous -->
                                                 <c:if test="${currentPage2 > 0}">
@@ -445,6 +450,7 @@
                                                 </c:if>
 
                                             </ul>
+                                            </c:if>
                                         </nav>
                                     </div>
                                     <!-- Tab for Laptop Cao Cấp -->
@@ -456,7 +462,7 @@
                                                         <div class="col-md-6 col-lg-4 col-xl-3">
                                                             <div class="rounded position-relative laptop-item">
                                                                 <div class="laptop-img">
-                                                                    <img src="/uploads/products/${design.image}"
+                                                                    <img src="${design.image}"
                                                                         class="img-fluid w-100 rounded-top"
                                                                         alt="${office.name}" />
                                                                 </div>
@@ -513,7 +519,8 @@
                                             </div>
                                         </div>
                                         <nav aria-label="Page navigation" class="mt-4 justify-content-center">
-                                            <ul class="pagination justify-content-center mt-4">
+                                            <c:if test="${totalPages3 > 0}">
+                                                <ul class="pagination justify-content-center mt-4">
 
                                                 <!-- Nút Previous -->
                                                 <c:if test="${currentPage3 > 0}">
@@ -543,6 +550,7 @@
                                                 </c:if>
 
                                             </ul>
+                                            </c:if>
                                         </nav>
                                     </div>
                                     <!-- Tab for Phụ Kiện Laptop (tab-5) -->
@@ -554,7 +562,7 @@
                                                         <div class="col-md-6 col-lg-4 col-xl-3">
                                                             <div class="rounded position-relative laptop-item">
                                                                 <div class="laptop-img">
-                                                                    <img src="/uploads/products/${personal.image}"
+                                                                    <img src="${personal.image}"
                                                                         class="img-fluid w-100 rounded-top"
                                                                         alt="${personal.name}" />
                                                                 </div>
@@ -611,36 +619,45 @@
                                             </div>
                                         </div>
                                         <nav aria-label="Page navigation" class="mt-4 justify-content-center">
-                                            <ul class="pagination justify-content-center mt-4">
 
-                                                <!-- Nút Previous -->
-                                                <c:if test="${currentPage4 > 0}">
-                                                    <li class="page-item">
-                                                        <a class="page-link" href="?page=${currentPage4 - 1}"
-                                                            aria-label="Previous">
-                                                            <span aria-hidden="true">«</span>
-                                                        </a>
-                                                    </li>
-                                                </c:if>
+                                            <c:if test="${totalPages4 > 0}">
 
-                                                <!-- Duyệt qua số trang -->
-                                                <c:forEach var="i" begin="0" end="${totalPages4 - 1}">
-                                                    <li class="page-item ${i == currentPage4 ? 'active' : ''}">
-                                                        <a class="page-link" href="?page=${i}">${i + 1}</a>
-                                                    </li>
-                                                </c:forEach>
+                                                <ul class="pagination justify-content-center mt-4">
 
-                                                <!-- Nút Next -->
-                                                <c:if test="${currentPage4 < totalPages4 - 1}">
-                                                    <li class="page-item">
-                                                        <a class="page-link" href="?page=${currentPage4 + 1}"
-                                                            aria-label="Next">
-                                                            <span aria-hidden="true">»</span>
-                                                        </a>
-                                                    </li>
-                                                </c:if>
+                                                    <!-- Previous -->
+                                                    <c:if test="${currentPage4 > 0}">
+                                                        <li class="page-item">
+                                                            <a class="page-link"
+                                                               href="?page=${currentPage4 - 1}">
+                                                                «
+                                                            </a>
+                                                        </li>
+                                                    </c:if>
 
-                                            </ul>
+                                                    <!-- Page Numbers -->
+                                                    <c:forEach var="i" begin="0" end="${totalPages4 - 1}">
+                                                        <li class="page-item ${i == currentPage4 ? 'active' : ''}">
+                                                            <a class="page-link"
+                                                               href="?page=${i}">
+                                                                    ${i + 1}
+                                                            </a>
+                                                        </li>
+                                                    </c:forEach>
+
+                                                    <!-- Next -->
+                                                    <c:if test="${currentPage4 < totalPages4 - 1}">
+                                                        <li class="page-item">
+                                                            <a class="page-link"
+                                                               href="?page=${currentPage4 + 1}">
+                                                                »
+                                                            </a>
+                                                        </li>
+                                                    </c:if>
+
+                                                </ul>
+
+                                            </c:if>
+
                                         </nav>
                                     </div>
                                     <!-- Laptop doanh nhan -->

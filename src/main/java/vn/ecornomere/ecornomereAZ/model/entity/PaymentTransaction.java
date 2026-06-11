@@ -3,8 +3,8 @@ package vn.ecornomere.ecornomereAZ.model.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import vn.ecornomere.ecornomereAZ.model.Enum.PaymentMethod;
-import vn.ecornomere.ecornomereAZ.model.Enum.PaymentTransactionStatus;
+import vn.ecornomere.ecornomereAZ.enums.PaymentMethod;
+import vn.ecornomere.ecornomereAZ.enums.PaymentTransactionStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

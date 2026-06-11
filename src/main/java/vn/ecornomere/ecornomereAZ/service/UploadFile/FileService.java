@@ -1,9 +1,15 @@
 package vn.ecornomere.ecornomereAZ.service.UploadFile;
 
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.RequestParam;
 import vn.ecornomere.ecornomereAZ.config.UploadfileServer.UploadFileCloudinary;
 import vn.ecornomere.ecornomereAZ.config.UploadfileServer.UploadProperties;
+import vn.ecornomere.ecornomereAZ.dto.response.ApiResponse;
+import vn.ecornomere.ecornomereAZ.dto.response.UploadFileResponse;
 import vn.ecornomere.ecornomereAZ.model.entity.TemporaryUpload;
 import vn.ecornomere.ecornomereAZ.repository.TemporaryUploadRepository;
 
@@ -24,6 +30,7 @@ import com.cloudinary.utils.ObjectUtils;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class FileService {
 
       private final UploadProperties uploadProperties;
@@ -76,17 +83,43 @@ public class FileService {
 
       }
 
-      public void deleteFile(String publicId, String resourceType) throws IOException {
+      public void deleteFile(String publicId, String resourceType)  {
 
-            Map<?, ?> result = cloudinary.uploader().destroy(
-                        publicId,
-                        ObjectUtils.asMap("resource_type", resourceType));
+          Map<?, ?> result = null;
+          try {
+              result = cloudinary.uploader().destroy(
+                          publicId,
+                          ObjectUtils.asMap("resource_type", resourceType));
+          } catch (IOException e) {log.error("Cannot delete Cloudinary image {}",e.getMessage());
+              throw new RuntimeException(e);
+          }
 
-            String resultStatus = result.get("result").toString();
+          String resultStatus = result.get("result").toString();
 
             if (!"ok".equals(resultStatus)) {
                   throw new IllegalStateException("Không thể xóa file trên Cloudinary: " + resultStatus);
             }
       }
+    public ResponseEntity<?> uploadCloudinary(@RequestParam("file") MultipartFile file,
+            @RequestParam(value = "folder", defaultValue = "default") String folder, Authentication authentication) {
+        Map<String, String> uploadedFileName = null;
+        try {
+            uploadedFileName = uploadFile(file, folder, authentication);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        UploadFileResponse uploadFileResponse = UploadFileResponse.builder()
+                .fileName(uploadedFileName.get("url"))
+                .public_id(uploadedFileName.get("publicId"))
+                .resourceType(uploadedFileName.get("resourceType"))
+                .uploadedAt(Instant.now())
+                .fileSize(file.getSize())
+                .contentType(file.getContentType())
+                .folder(folder).build();
+        ApiResponse<?> apiResponse = new ApiResponse<>(HttpStatus.OK.value(), null,
+                "Tải file thành công lên Cloudinary",
+                uploadFileResponse);
+        return ResponseEntity.ok(apiResponse);
+    }
 
 }

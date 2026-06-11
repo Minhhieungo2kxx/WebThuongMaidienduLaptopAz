@@ -71,15 +71,11 @@ application-secret.properties
 
 
 # Ignore all .json files (general, if bạn không dùng .json cho data khác)
-*.json
-
-#  Google Cloud:
 service-account-key.json
+credentials.json
 
-# Ignore các file cấu hình riêng tư
 
 
-myapp/
 
 
 

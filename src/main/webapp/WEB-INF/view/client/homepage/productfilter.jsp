@@ -640,7 +640,7 @@
                                                                         <div class="col-md-6 col-xl-4">
                                                                               <div class="product-card">
                                                                                     <div class="product-img">
-                                                                                          <img src="/uploads/products/${product.image}"
+                                                                                          <img src="${product.image}"
                                                                                                 alt="${product.name}" />
                                                                                           <div class="product-badge">
                                                                                                 Laptop</div>

@@ -1,27 +1,66 @@
 version: "3.8"
+
 services:
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.15.0
-    container_name: elasticsearch
+
+  mysql:
+    image: mysql:8.0
+
+    container_name: mysql
+
+    restart: unless-stopped
 
     environment:
-      - discovery.type=single-node
-      - xpack.security.enabled=false
-      - ES_JAVA_OPTS=-Xms1g -Xmx1g
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: laptopshop
 
     ports:
-      - "9200:9200"
+      - "3307:3306"
+
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.15.0
+
+    container_name: elasticsearch
+
+    restart: unless-stopped
+
+    environment:
+      discovery.type: single-node
+      xpack.security.enabled: "false"
+      ES_JAVA_OPTS: "-Xms1g -Xmx1g"
+
+    ports:
+      - "9400:9200"
 
     volumes:
       - elastic_data:/usr/share/elasticsearch/data
 
+  laptopshop:
+
+    build: .
+
+    container_name: laptopshop
+
     restart: unless-stopped
 
-    healthcheck:
-      test: ["CMD-SHELL", "curl -s http://localhost:9200 >/dev/null || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
+    depends_on:
+      - mysql
+      - elasticsearch
+
+    ports:
+      - "8081:8081"
+
+    env_file:
+      - .env
+
+    environment:
+
+      SPRING_PROFILES_ACTIVE: dev
+
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
 
 volumes:
+  mysql_data:
   elastic_data:

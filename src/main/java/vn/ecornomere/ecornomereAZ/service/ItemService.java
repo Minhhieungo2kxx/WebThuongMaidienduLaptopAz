@@ -2,18 +2,19 @@ package vn.ecornomere.ecornomereAZ.service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+
 import java.time.format.DateTimeFormatter;
+import java.util.*;
 
-import java.util.List;
-
-import java.util.Map;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -22,22 +23,21 @@ import org.springframework.stereotype.Service;
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.transaction.Transactional;
-import vn.ecornomere.ecornomereAZ.model.Enum.OrderStatus;
-import vn.ecornomere.ecornomereAZ.model.Enum.PaymentMethod;
-import vn.ecornomere.ecornomereAZ.model.Enum.PaymentTransactionStatus;
-import vn.ecornomere.ecornomereAZ.model.dto.PaymentDefault;
-import vn.ecornomere.ecornomereAZ.model.entity.Cart;
-import vn.ecornomere.ecornomereAZ.model.entity.CartDetail;
-import vn.ecornomere.ecornomereAZ.model.entity.Order;
-import vn.ecornomere.ecornomereAZ.model.entity.OrderDetail;
-import vn.ecornomere.ecornomereAZ.model.entity.Product;
-import vn.ecornomere.ecornomereAZ.model.entity.User;
-import vn.ecornomere.ecornomereAZ.repository.CartDetailRepository;
-import vn.ecornomere.ecornomereAZ.repository.CartRepository;
-import vn.ecornomere.ecornomereAZ.repository.ItemRepository;
-import vn.ecornomere.ecornomereAZ.repository.OrderDetailRepository;
-import vn.ecornomere.ecornomereAZ.repository.OrderRepository;
-import vn.ecornomere.ecornomereAZ.service.SendEmail.ApplicationEmailService;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import vn.ecornomere.ecornomereAZ.dto.record.OrderPlacedEvent;
+import vn.ecornomere.ecornomereAZ.dto.request.MomoCallbackRequest;
+import vn.ecornomere.ecornomereAZ.enums.PaymentMethod;
+import vn.ecornomere.ecornomereAZ.enums.PaymentTransactionStatus;
+import vn.ecornomere.ecornomereAZ.dto.request.PaymentDefault;
+import vn.ecornomere.ecornomereAZ.model.entity.*;
+import vn.ecornomere.ecornomereAZ.repository.*;
+import vn.ecornomere.ecornomereAZ.service.payments.MomoService;
+import vn.ecornomere.ecornomereAZ.service.payments.VNPayService;
 import vn.ecornomere.ecornomereAZ.utils.PaymentTimeParser;
 
 @Service
@@ -58,8 +58,322 @@ public class ItemService {
 
     private final OrderDetailRepository orderDetailRepository;
 
-    private final ApplicationEmailService applicationEmailService;
+    private final ApplicationEventPublisher eventPublisher;
 
+    private final VNPayService vnPayService;
+    private final MomoService momoService;
+    private final PaymentTransactionRepository paymentTransactionRepository;
+    private final ObjectMapper objectMapper;
+
+    public String ShowDetailItemClient(Long id, Model model, HttpServletRequest request) {
+        Product detail = productService.getProductbyId(id)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid Product Id: " + id));
+        model.addAttribute("detailProduct", detail);
+        return "client/product/Detailproduct"; //
+    }
+    public String showHomePageClient(String pageParam, Model model) {
+        int page = 0;
+        int pageSize = 8;
+
+        try {
+            page = Integer.parseInt(pageParam);
+            if (page < 0)
+                page = 0;
+        } catch (NumberFormatException e) {
+            // Nếu người dùng nhập sai, mặc định về trang đầu
+            page = 0;
+        }
+        List<String> targets = Arrays.asList("Mong nhe", "Doanh nhan");
+        model.addAttribute("allProducts", getAllItems());
+        model.addAttribute("gamingProducts", listNameItems("Gaming"));
+        model.addAttribute("officeProducts", listNameItems("Van phong"));
+        model.addAttribute("designProducts", listNameItems("Thiet ke do hoa"));
+        model.addAttribute("personalProducts", getBytargetIn(targets));
+        // Lấy tất cả sản phẩm
+        Page<Product> productPage = getAllItemsPaginated(page, pageSize);
+        model.addAttribute("allProducts", productPage.getContent());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", productPage.getTotalPages());
+        // Lấy sản phẩm theo từng loại
+        Page<Product> productPageGamming = pagelistNameItems("Gaming", page, pageSize);
+        model.addAttribute("gamingProducts", productPageGamming.getContent());
+        model.addAttribute("currentPage1", page);
+        model.addAttribute("totalPages1", productPageGamming.getTotalPages());
+
+        // Lấy sản phẩm theo từng loại
+        Page<Product> productPageOffice = pagelistNameItems("Van phong", page, pageSize);
+        model.addAttribute("officeProducts", productPageOffice.getContent());
+        model.addAttribute("currentPage2", page);
+        model.addAttribute("totalPages2", productPageOffice.getTotalPages());
+
+        // Lấy sản phẩm theo từng loại
+        Page<Product> productPagedesign = pagelistNameItems("Thiet ke do hoa", page, pageSize);
+        model.addAttribute("designProducts", productPagedesign.getContent());
+        model.addAttribute("currentPage3", page);
+        model.addAttribute("totalPages3", productPageOffice.getTotalPages());
+
+        // Lấy sản phẩm theo từng loại + phan trang
+
+        Page<Product> productPersonal = getBytargetInPaginated(targets, page, pageSize);
+        model.addAttribute("personalProducts", productPersonal.getContent());
+        model.addAttribute("currentPage4", page);
+        model.addAttribute("totalPages4", productPageOffice.getTotalPages());
+        return "client/homepage/home";
+    }
+    @Transactional
+    public String AddCartItemClient(Long id, HttpServletRequest request) {
+        // Set thông tin vào session
+        HttpSession session = request.getSession();
+        String email = (String) session.getAttribute("email");
+        if (email == null || email.isEmpty()) {
+            return "redirect:/login"; // Nếu chưa đăng nhập thì chuyển đến trang đăng nhập
+        } else {
+            // Gọi service để thêm sản phẩm vào giỏ hàng
+            addCartItem(id, email, session);
+        }
+
+        return "redirect:/"; // Sau khi lưu thì chuyển về
+    }
+    @Transactional
+    public String AddCartItemFilterClient(Long id, HttpServletRequest request) {
+        // Set thông tin vào session
+        HttpSession session = request.getSession();
+        String email = (String) session.getAttribute("email");
+        if (email == null || email.isEmpty()) {
+            return "redirect:/login"; // Nếu chưa đăng nhập thì chuyển đến trang đăng nhập
+        } else {
+            // Gọi service để thêm sản phẩm vào giỏ hàng
+            addCartItem(id, email, session);
+        }
+
+        return "redirect:/products"; // Sau khi lưu thì chuyển về
+    }
+    public String ShowCartDetailClient(Model model, HttpServletRequest request) {
+        HttpSession session = request.getSession();
+        String email = (String) session.getAttribute("email");
+
+        if (email == null || email.isEmpty()) {
+            return "redirect:/login";
+        }
+
+        List<CartDetail> list =getbyCartDetails(email);
+        if (list == null) {
+            list = new ArrayList<>();
+
+        }
+        // Tính tổng tiền
+        double totalPrice = 0.0;
+        for (CartDetail detail : list) {
+            totalPrice += detail.getQuantity() * detail.getPrice();
+        }
+        model.addAttribute("sumPrice", totalPrice); // Gửi tổng tiền xuống view
+        model.addAttribute("listCartDetails", list);
+        return "client/cart/cartdetails";
+    }
+    @Transactional
+    public String deleteProductClient(Long id, HttpServletRequest request, RedirectAttributes redirectAttributes) {
+        HttpSession session = request.getSession();
+
+        if (session == null || session.getAttribute("email") == null) {
+            return "redirect:/login";
+        }
+        deleteCartDetail(id, session);
+        return "redirect:/cart";
+    }
+    @Transactional
+    public String savePlaceOrderClient(PaymentDefault paymentDefault, BindingResult result, HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        if (session == null) {
+            return "redirect:/login";
+        }
+        String email = (String) session.getAttribute("email");
+        if (email == null) {
+            return "redirect:/login";
+        }
+        if (result.hasErrors()) {
+            log.warn("Checkout validation failed. Email={}", email);
+            loadCheckoutData(email, request);
+            return "client/cart/checkout";
+        }
+        try {
+            List<CartDetail> cartDetails = getbyCartDetails(email);
+            if (cartDetails == null || cartDetails.isEmpty()) {
+                log.warn("Cart is empty. Email={}", email);
+                return "redirect:/cart";
+            }
+            BigDecimal totalAmount = cartDetails.stream().map(item -> BigDecimal.valueOf(item.getPrice())
+                            .multiply(BigDecimal.valueOf(item.getQuantity())))
+                    .reduce(BigDecimal.ZERO, BigDecimal::add)
+                    .add(BigDecimal.valueOf(50000));
+            PaymentMethod method = paymentDefault.getPaymentMethod();
+            log.info("Start place order. Email={}, Method={}, Amount={}", email, method, totalAmount
+            );
+            switch (method) {
+                case COD:
+                    SavePlaceOrder(email, paymentDefault, session, totalAmount.doubleValue());
+                    log.info("COD order created successfully. Email={}", email);
+                    return "redirect:/payment-success";
+                case MOMO:
+                    String payUrl = momoService.createMomoPayment(email, totalAmount, request, paymentDefault);
+                    log.info("MOMO payment url generated. Email={}", email);
+                    return "redirect:" + payUrl;
+
+                case VNPAY:
+                    String paymentUrl = vnPayService.createVNPayPayment(email, totalAmount, request, paymentDefault);
+                    log.info("VNPAY payment url generated. Email={}", email);
+                    return "redirect:" + paymentUrl;
+                default:
+                    log.error("Unsupported payment method. Email={}, Method={}", email, method
+                    );
+                    throw new IllegalArgumentException("Unsupported payment method");
+            }
+        } catch (Exception ex) {
+            log.error("Place order failed. Email={}", email, ex);
+            return "redirect:/checkout";
+        }
+    }
+    public String ShowCheckoutClient(Model model, HttpServletRequest request) {
+        HttpSession session = request.getSession();
+        String email = (String) session.getAttribute("email");
+
+        if (email == null || email.isEmpty()) {
+            return "redirect:/login";
+        }
+
+        List<CartDetail> list = getbyCartDetails(email);
+        if (list == null) {
+            list = new ArrayList<>();
+
+        }
+        // Tính tổng tiền
+        double totalPrice = 0.0;
+        for (CartDetail detail : list) {
+            totalPrice += detail.getQuantity() * detail.getPrice();
+        }
+        model.addAttribute("sumPrice", totalPrice); // Gửi tổng tiền xuống view
+        model.addAttribute("listCartDetails", list);
+        model.addAttribute("PaymentDefault", new PaymentDefault()); // hoặc đối tượng thật từ DB
+        return "client/cart/checkout";
+    }
+    public void loadCheckoutData(String email, HttpServletRequest request) {
+        HttpSession session = request.getSession();
+        List<CartDetail> list = getbyCartDetails(email);
+        if (list == null) {
+            list = new ArrayList<>();
+        }
+
+        double totalPrice = 0.0;
+        for (CartDetail detail : list) {
+            totalPrice += detail.getQuantity() * detail.getPrice();
+        }
+
+        request.setAttribute("listCartDetails", list);
+        request.setAttribute("sumPrice", totalPrice);
+    }
+
+    @Transactional
+    public String paymentCompletedVNPay(HttpServletRequest request, Model model, HttpSession session) {
+        int verifyResult = vnPayService.orderReturn(request);
+        if (verifyResult != 1) {
+            model.addAttribute("message", "Thanh toán thất bại");
+            return "client/vnpaynotification/failpayment";
+        }
+        String txnRef = request.getParameter("vnp_TxnRef");
+        PaymentTransaction transaction = paymentTransactionRepository.findByTxnRefForUpdate(txnRef).orElse(null);
+
+        if (transaction == null) {
+            model.addAttribute("message", "Không tìm thấy giao dịch");
+            return "client/vnpaynotification/failpayment";
+        }
+//     Idempotency
+        if (transaction.getStatus()
+                == PaymentTransactionStatus.SUCCESS) {
+            log.warn("Transaction already processed: {}", txnRef);
+            return "client/vnpaynotification/succesful";
+        }
+//     * Verify Amount
+        String amountParam = request.getParameter("vnp_Amount");
+        BigDecimal amountFromVNPay = BigDecimal.valueOf(Long.parseLong(amountParam)).divide(BigDecimal.valueOf(100));
+        if (transaction.getAmount().compareTo(amountFromVNPay) != 0) {
+            log.error("Amount mismatch txnRef={}", txnRef);
+            model.addAttribute("message", "Sai số tiền");
+            return "client/vnpaynotification/failpayment";
+        }
+        try {
+            PaymentDefault paymentDefault = objectMapper.readValue(transaction.getShippingInfoJson(), PaymentDefault.class);
+            SavePlaceOrderGateway(transaction.getEmail(), paymentDefault, amountFromVNPay, request.getParameter("vnp_PayDate"));
+            transaction.setStatus(PaymentTransactionStatus.SUCCESS);
+            transaction.setTransactionNo(request.getParameter("vnp_TransactionNo"));
+            transaction.setPaidAt(LocalDateTime.now());
+            paymentTransactionRepository.save(transaction);
+            log.info("Payment success txnRef={}", txnRef);
+            model.addAttribute("orderInfo", request.getParameter("vnp_OrderInfo"));
+            model.addAttribute("totalPrice", transaction.getAmount());
+            model.addAttribute("paymentTime",request.getParameter("vnp_PayDate")
+                    .formatted(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
+            model.addAttribute("transactionId", request.getParameter("vnp_TransactionNo"));
+            session.setAttribute("sum", 0);
+            model.addAttribute(
+                    "transactionId", transaction.getTransactionNo());
+            return "client/vnpaynotification/succesful";
+
+        } catch (Exception ex) {
+            log.error("Create order failed txnRef={}", txnRef, ex);
+            model.addAttribute("message", "Tạo đơn hàng thất bại");
+            return "client/vnpaynotification/failpayment";
+        }
+    }
+    @Transactional
+    public String momoReturnPayment(MomoCallbackRequest callback, Model model, HttpSession session) {
+        if (!momoService.verifyMomoCallbackSignature(callback)) {
+            model.addAttribute("message", "Thanh toán MoMo thất bại: " + callback.getMessage());
+            return "client/momonotification/failpayment-momo";
+        }
+        PaymentTransaction transaction = paymentTransactionRepository.findByTxnRefForUpdate(callback.getOrderId()).orElse(null);
+        if (transaction == null) {
+            model.addAttribute("message", "Không tìm thấy giao dịch");
+            return "client/momonotification/failpayment-momo";
+        }
+//        Idempotency
+        if (transaction.getStatus()
+                == PaymentTransactionStatus.SUCCESS) {
+            log.warn("Transaction already processed: {}",callback.getRequestId());
+            return "client/momonotification/succesful-momo";
+        }
+//        * Verify Amount
+        String amountParam = callback.getAmount();
+        BigDecimal amountFromVNPay = BigDecimal.valueOf(Long.parseLong(amountParam));
+        if (transaction.getAmount().compareTo(amountFromVNPay) != 0) {
+            log.error("Amount mismatch txnRef={}", callback.getOrderInfo());
+            model.addAttribute("message", "Sai số tiền");
+            return "client/momonotification/failpayment-momo";
+        }
+        try {
+            PaymentDefault paymentDefault = objectMapper.readValue(transaction.getShippingInfoJson(), PaymentDefault.class);
+            SavePlaceOrderGateway(transaction.getEmail(), paymentDefault, amountFromVNPay, callback.getResponseTime());
+            transaction.setStatus(PaymentTransactionStatus.SUCCESS);
+            transaction.setTransactionNo(callback.getTransId());
+            transaction.setPaidAt(LocalDateTime.now());
+            paymentTransactionRepository.save(transaction);
+            log.info("Payment success txnRef={}", callback.getRequestId());
+            // Gửi dữ liệu sang màn hình thông báo thành công
+            model.addAttribute("orderId", callback.getOrderId());
+            model.addAttribute("amount", callback.getAmount());
+            model.addAttribute("message", callback.getMessage());
+            model.addAttribute("transId", callback.getTransId());
+            model.addAttribute("orderInfo", callback.getOrderInfo());
+            model.addAttribute("payType", callback.getPayType());
+            model.addAttribute("paymentTime", callback.getResponseTime().formatted(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
+            session.setAttribute("sum", 0);
+            return "client/momonotification/succesful-momo";
+
+        } catch (Exception ex) {
+            log.error("Create order failed txnRef={}", callback.getRequestId(), ex);
+            model.addAttribute("message", "Thanh toán MoMo thất bại: ");
+            return "client/momonotification/failpayment-momo";
+        }
+
+    }
 
 
     public List<Product> listNameItems(String name) {
@@ -221,71 +535,19 @@ public class ItemService {
 
     @Transactional
     public void SavePlaceOrder(String email, PaymentDefault paymentDefault, HttpSession session,double totalAmount) {
-        User user = userService.getbyEmail(email);
-        if (user == null)
-            return;
-
-        Cart cart = cartRepository.findByUser(user);
-        if (cart == null)
-            return;
-
-        List<CartDetail> cartDetails = cartDetailRepository.findByCart(cart);
-        if (cartDetails == null || cartDetails.isEmpty())
-            return;
-
+        User user = getUser(email);
+        Cart cart = getCart(user);
+        List<CartDetail> cartDetails = getCartDetails(cart);
         // ====== Tạo đơn hàng ======
-        Order order = new Order();
-        order.setUser(user);
-        order.setReceiverName(paymentDefault.getReceiverName());
-        order.setReceiverAddress(paymentDefault.getReceiverAddress());
-        order.setReceiverPhone(paymentDefault.getReceiverPhone());
-        order.setTotalPrice(totalAmount - 50000);
-        order.setTotalPriceaddShip(totalAmount);
-        order.setStatus("PENDING"); // trạng thái mặc định
-
-        String method = paymentDefault.getPaymentMethod().toString(); // "cod", "vnpay", "momo", "zalopay"
-        order.setPaymentMethod(method); // Lưu đúng tên cổng thanh toán
-        String paymentTimeSession = (String) session.getAttribute("paymentTime");
-        order.setPaymentStatus("UNPAID");
-        order.setPaymentTime(null);
-
-        // ====== Lưu đơn hàng ======
+        Order order = createOrder(user, paymentDefault,BigDecimal.valueOf(totalAmount),null);
         Order savedOrder = orderRepository.save(order);
-        session.removeAttribute("paymentTime");
-        /*
-         * ================================
-         * CHUYỂN CART → ORDER DETAIL
-         * ================================
-         */
+        log.info("Order created id={}", savedOrder.getId());
+//         * CHUYỂN CART → ORDER DETAIL
+        checkout(savedOrder,cartDetails);
 
-        for (CartDetail cd : cartDetails) {
-
-            Product product = cd.getProduct();
-            if (product.getQuantity() < cd.getQuantity()) {
-                throw new IllegalArgumentException(
-                        "Sản phẩm " + product.getName() + " không đủ số lượng trong kho.");
-            }
-
-            product.setQuantity(product.getQuantity() - cd.getQuantity());
-            product.setSold(cd.getQuantity());
-            productService.saveProduct(product);
-
-            OrderDetail orderDetail = new OrderDetail();
-            orderDetail.setOrder(savedOrder);
-            orderDetail.setProduct(product);
-            orderDetail.setPrice(cd.getPrice());
-            orderDetail.setQuantity(cd.getQuantity());
-            orderDetail.setTotalPrice(cd.getPrice() * cd.getQuantity());
-
-            orderDetailRepository.save(orderDetail);
-
-            cartDetailRepository.deleteById(cd.getId());
-        }
         cartRepository.deleteById(cart.getId());
         session.setAttribute("sum", 0);
-        // ====== Gửi email xác nhận ======
-        List<OrderDetail> orderDetails = orderDetailRepository.findByOrder(savedOrder);
-        applicationEmailService.sendOrder(email, savedOrder, orderDetails);
+        eventPublisher.publishEvent(new OrderPlacedEvent(savedOrder.getId(),email));
     }
     @Transactional
     public void SavePlaceOrderGateway(String email, PaymentDefault paymentDefault, BigDecimal totalAmount, String paymentTime) {
@@ -299,8 +561,7 @@ public class ItemService {
         checkout(savedOrder,cartDetails);
         cartRepository.deleteById(cart.getId());
         // ====== Gửi email xác nhận ======
-        List<OrderDetail> orderDetails = orderDetailRepository.findByOrder(savedOrder);
-        applicationEmailService.sendOrder(email, savedOrder, orderDetails);
+        eventPublisher.publishEvent(new OrderPlacedEvent(savedOrder.getId(),email));
         log.info("Email sent to {}", email);
     }
     @Transactional

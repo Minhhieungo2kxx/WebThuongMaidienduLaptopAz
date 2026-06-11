@@ -17,17 +17,13 @@ public class ProductMigrationService {
     private final ProductIndexService productIndexService;
 
     @Transactional(readOnly = true)
-    public void migrateAllProducts() throws IOException {
+    public void migrateAllProducts() {
         int page = 0;
         int size = 500;
         Page<Product> productPage;
         do {
-            productPage =
-                    productRepository.findAll(
-                            PageRequest.of(page, size));
-            for (Product product : productPage.getContent()) {
-                productIndexService.indexProduct(product);
-            }
+            productPage = productRepository.findAll(PageRequest.of(page, size));
+            productIndexService.bulkIndex(productPage.getContent());
             page++;
         } while (productPage.hasNext());
     }

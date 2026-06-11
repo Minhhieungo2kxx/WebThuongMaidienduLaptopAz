@@ -32,26 +32,13 @@ public class UserController {
 
     private final UserService userService;
 
-    private final RoleService roleService;
-
-    private final PasswordEncoder passwordEncoder;
-
-    private final UploadFile uploadFile = new UploadFile();
-
-    private final TemporaryUpload temporaryUpload;
-
-    // Detail User:
 
     @GetMapping("/admin/user/detail/{id}")
     public String showDetailForm(@PathVariable("id") Long id, Model model) {
-        User userdetail = userService.findUserById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid user Id: " + id));
-        model.addAttribute("detailUser", userdetail);
-        return "admin/user/detailuser"; //
+       return userService.showDetailFormUser(id,model);
     }
 
     // Delete user
-
     @GetMapping("/admin/user/delete/{id}")
     public String deleteUser(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         userService.findUserById(id).ifPresent(userService::deleteUser);
@@ -69,72 +56,17 @@ public class UserController {
         return "admin/user/update"; // JSP tên update_user.jsp
     }
 
-
     @PostMapping("/admin/user/update")
     public String updateUser(
             @ModelAttribute("updatedUser") User updatedUser,
             RedirectAttributes redirectAttributes) {
-
-        User existingUser = userService.findUserById(updatedUser.getId())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid user Id"));
-
-        String oldPublicId = existingUser.getAvatarPublicId();
-
-        ModelMapper map = new ModelMapper();
-        map.typeMap(User.class, User.class)
-                .addMappings(m -> m.skip(User::setId))
-                .addMappings(m -> m.skip(User::setPassword))
-                .addMappings(m -> m.skip(User::setReviews))
-                .addMappings(m -> m.skip(User::setStocks))
-                .addMappings(m -> m.skip(User::setChatMessages))
-                .addMappings(m -> m.skip(User::setRole));
-
-        map.map(updatedUser, existingUser);
-        // password
-        if (updatedUser.getPassword() != null
-                && !updatedUser.getPassword().isBlank()) {
-
-            if (!updatedUser.getPassword().equals(existingUser.getPassword())) {
-
-                existingUser.setPassword(
-                        passwordEncoder.encode(updatedUser.getPassword()));
-            }
-        }
-
-        // avatar update
-        if (updatedUser.getAvatarPublicId() != null &&
-                !updatedUser.getAvatarPublicId().isEmpty()) {
-
-            existingUser.setAvatar(updatedUser.getAvatar());
-            existingUser.setAvatarPublicId(updatedUser.getAvatarPublicId());
-            existingUser.setAvatarResourceType(updatedUser.getAvatarResourceType());
-
-            // đánh dấu file cũ là unused
-            temporaryUpload.markAsUnused(oldPublicId);
-        }
-        userService.handleSaveUser(existingUser);
-        redirectAttributes.addFlashAttribute("successMessage", "Cập nhật thành công!");
-        return "redirect:/admin/list/user";
+        return userService.updateUserAD(updatedUser,redirectAttributes);
     }
 
     // Hiển thị danh sách user
     @GetMapping("/admin/list/user")
     public String listUsers(@RequestParam(name = "page", defaultValue = "0") String pageParam, Model model) {
-        int page = 0;
-        int pageSize = 5;
-        try {
-            page = Integer.parseInt(pageParam);
-            if (page < 0)
-                page = 0;
-        } catch (NumberFormatException e) {
-            // Nếu người dùng nhập sai, mặc định về trang đầu
-            page = 0;
-        }
-        Page<User> userPage = userService.getUserPaginated(page, pageSize);
-        model.addAttribute("users", userPage.getContent());
-        model.addAttribute("currentPage", page);
-        model.addAttribute("totalPages", userPage.getTotalPages());
-        return "admin/user/listuser"; // tạo 1 file JSP hiển thị danh sách
+        return userService.listUsersAd(pageParam,model);
     }
 
     // Save user
@@ -146,37 +78,10 @@ public class UserController {
 
 
     @PostMapping("/admin/user/create")
-    public String createUser(
-            @ModelAttribute("newuser")
-            @Valid User user,
-            BindingResult result,
+    public String createUser(@ModelAttribute("newuser") @Valid User user
+            ,BindingResult result,
             @RequestParam("role_id") Long roleId) {
-
-        if (result.hasErrors()) {
-            return "admin/user/create";
-        }
-
-        Role role = roleService.findRoleId(roleId);
-
-        if (role == null) {
-            throw new IllegalArgumentException(
-                    "Invalid role id : " + roleId);
-        }
-
-        user.setRole(role);
-
-        if (user.getPassword() != null
-                && !user.getPassword().isEmpty()) {
-
-            user.setPassword(
-                    passwordEncoder.encode(
-                            user.getPassword()));
-        }
-
-        userService.handleSaveUser(user);
-        temporaryUpload.markAsUsed(user.getAvatarPublicId());
-
-        return "redirect:/admin/list/user";
+        return userService.createUserAd(user,result,roleId);
     }
 
 }

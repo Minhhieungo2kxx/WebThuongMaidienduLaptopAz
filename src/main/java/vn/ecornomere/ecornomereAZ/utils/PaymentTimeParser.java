@@ -1,6 +1,6 @@
 package vn.ecornomere.ecornomereAZ.utils;
 
-import vn.ecornomere.ecornomereAZ.model.Enum.PaymentMethod;
+import vn.ecornomere.ecornomereAZ.enums.PaymentMethod;
 
 import java.time.Instant;
 import java.time.LocalDateTime;

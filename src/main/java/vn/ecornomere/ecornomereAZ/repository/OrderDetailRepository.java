@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import vn.ecornomere.ecornomereAZ.model.dto.ProductSales;
+import vn.ecornomere.ecornomereAZ.dto.request.ProductSales;
 import vn.ecornomere.ecornomereAZ.model.entity.Order;
 import vn.ecornomere.ecornomereAZ.model.entity.OrderDetail;
 
@@ -19,7 +19,7 @@ public interface OrderDetailRepository extends JpaRepository<OrderDetail, Long> 
 
       List<OrderDetail> findByProductId(Long productId);
 
-      @Query("SELECT new vn.ecornomere.ecornomereAZ.model.dto.ProductSales(od.product, SUM(od.quantity)) " +
+      @Query("SELECT new vn.ecornomere.ecornomereAZ.dto.request.ProductSales(od.product, SUM(od.quantity)) " +
                   "FROM OrderDetail od " +
                   "GROUP BY od.product " +
                   "ORDER BY SUM(od.quantity) DESC")
