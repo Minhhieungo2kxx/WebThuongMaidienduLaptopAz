@@ -1,16 +1,20 @@
 package vn.ecornomere.ecornomereAZ.service.ChatBoxAi;
 
+import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
@@ -18,29 +22,29 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.transaction.Transactional;
-import vn.ecornomere.ecornomereAZ.Exception.ChatHistoryException;
-import vn.ecornomere.ecornomereAZ.Exception.ChatProcessingException;
-import vn.ecornomere.ecornomereAZ.Exception.GeminiUnavailableException;
-import vn.ecornomere.ecornomereAZ.model.dto.ChatMessageDto;
+import vn.ecornomere.ecornomereAZ.controller.client.ChatController;
+import vn.ecornomere.ecornomereAZ.exception.ChatHistoryException;
+import vn.ecornomere.ecornomereAZ.exception.ChatProcessingException;
+import vn.ecornomere.ecornomereAZ.exception.GeminiUnavailableException;
+import vn.ecornomere.ecornomereAZ.dto.response.ChatMessageDto;
 import vn.ecornomere.ecornomereAZ.model.entity.ChatMessage;
 import vn.ecornomere.ecornomereAZ.model.entity.Product;
 import vn.ecornomere.ecornomereAZ.model.entity.User;
 import vn.ecornomere.ecornomereAZ.repository.ChatMessageRepository;
 import vn.ecornomere.ecornomereAZ.service.Elasticsearch.ProductIndexService;
 import vn.ecornomere.ecornomereAZ.service.ProductService;
+import vn.ecornomere.ecornomereAZ.service.UserService;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.*;
 
-import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ChatService {
     private static final Logger logger = LoggerFactory.getLogger(ChatService.class);
 
@@ -48,9 +52,8 @@ public class ChatService {
 
     private final ProductService productService;
 
-    private final ProductIndexService productIndexService;
+    private final UserService userService;
 
-    // Lưu trữ lịch sử chat theo session
     private final Map<String, List<ChatMessageDto>> chatHistory = new ConcurrentHashMap<>();
 
     @Value("${gemini.api.key}")
@@ -142,6 +145,72 @@ public class ChatService {
 
             Luôn ưu tiên dữ liệu DATABASE hơn kiến thức của mô hình.
             """;
+
+    @Transactional
+    public ResponseEntity<Map<String, Object>> sendMessageChat(ChatMessageDto messageDto, BindingResult bindingResult,
+            HttpSession session) {
+        Map<String, Object> response = new HashMap<>();
+        if (bindingResult.hasErrors()) {
+            response.put("success", false);
+            response.put("message", "Dữ liệu không hợp lệ");
+            response.put("errors", bindingResult.getAllErrors());
+            return ResponseEntity.badRequest().body(response);
+        }
+        String sessionId = session.getId();
+        logger.info("Gửi tin nhắn mới từ session: {}", sessionId);
+        String email = (String) session.getAttribute("email");
+        User user = null;
+        if (email != null && !email.isEmpty()) {
+            user = userService.getbyEmail(email);
+        } else {
+            logger.warn("Email trong session bị null hoặc rỗng");
+        }
+        ChatMessageDto result =processMessage(messageDto, sessionId, user);
+        response.put("success", true);
+        response.put("message", "Tin nhắn đã được xử lý thành công");
+        response.put("data", result);
+        response.put("timestamp", System.currentTimeMillis());
+        return ResponseEntity.ok(response);
+
+    }
+    public ResponseEntity<Map<String, Object>> getChatHistoryChat(HttpSession session) {
+        Map<String, Object> response = new HashMap<>();
+        String sessionId = session.getId();
+
+        String email = (String) session.getAttribute("email");
+        User user = null;
+
+        if (email != null && !email.isEmpty()) {
+            user = userService.getbyEmail(email);
+        } else {
+            logger.warn("Email trong session bị null hoặc rỗng");
+        }
+        List<ChatMessageDto> history = getChatHistory(sessionId, user);
+        response.put("success", true);
+        response.put("data", history);
+        response.put("count", history.size());
+        response.put("timestamp", System.currentTimeMillis());
+        return ResponseEntity.ok(response);
+    }
+    @Transactional
+    public ResponseEntity<Map<String, Object>> clearChatHistoryChat(HttpSession session)  {
+        Map<String, Object> response = new HashMap<>();
+        String sessionId = session.getId();
+
+        String email = (String) session.getAttribute("email");
+        User user = null;
+
+        if (email != null && !email.isEmpty()) {
+            user = userService.getbyEmail(email);
+        } else {
+            logger.warn("Email trong session bị null hoặc rỗng");
+        }
+        clearChatHistory(sessionId, user);
+        response.put("success", true);
+        response.put("message", "Lịch sử chat đã được xóa thành công");
+        return ResponseEntity.ok(response);
+
+    }
 
     @Transactional
     public ChatMessageDto processMessage(ChatMessageDto messageDto, String sessionId, User user) {
@@ -354,8 +423,8 @@ private String callGeminiWithFallback(
 
     }
 
-    @Transactional
-    public void clearChatHistory(String sessionId, User user) throws Exception {
+
+    public void clearChatHistory(String sessionId, User user) throws RuntimeException {
         try {
             if (user != null) {
                 // Xóa trong DB theo user
@@ -370,8 +439,8 @@ private String callGeminiWithFallback(
             // Nếu bạn vẫn đang lưu lịch sử chat tạm trong RAM thì xóa luôn:
             chatHistory.remove(sessionId);
 
-        }catch (Exception e){
-            throw new Exception("Lỗi khi xóa lịch sử chat :"+e.getMessage());
+        }catch (RuntimeException e){
+            throw new RuntimeException("Lỗi khi xóa lịch sử chat :"+e.getMessage());
         }
     }
 

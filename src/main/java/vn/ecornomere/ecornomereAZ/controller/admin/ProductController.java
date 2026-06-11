@@ -31,7 +31,7 @@ public class ProductController {
 
 
     private final ProductService productService;
-    private final UploadFile uploadFile = new UploadFile();
+
 
 
     // Save san pham
@@ -42,113 +42,36 @@ public class ProductController {
     }
 
     @PostMapping("/admin/product/create")
-    public String createNewProduct(
-            @ModelAttribute("NewProduct") @Valid Product product,
-            BindingResult result,
+    public String createNewProduct(@ModelAttribute("NewProduct") @Valid Product product, BindingResult result,
             RedirectAttributes redirectAttributes) {
-
-        if (result.hasErrors()) {
-            return "admin/product/create_product";
-        }
-        productService.createProduct(product);
-        redirectAttributes.addFlashAttribute(
-                "successMessage",
-                "Thêm sản phẩm thành công!");
-
-        return "redirect:/admin/product";
+       return productService.createNewProductAd(product,result,redirectAttributes);
     }
 
     // Hiển thị danh sách
     @GetMapping("/admin/product")
     public String listProducts(@RequestParam(name = "page", defaultValue = "0") String pageParam, Model model) {
-        int page = 0;
-        int pageSize = 5;
-
-        try {
-            page = Integer.parseInt(pageParam);
-            if (page < 0)
-                page = 0;
-        } catch (NumberFormatException e) {
-            // Nếu người dùng nhập sai, mặc định về trang đầu
-            page = 0;
-        }
-
-        Page<Product> productPage = productService.getProductsPaginated(page, pageSize);
-        model.addAttribute("Listproduct", productPage.getContent());
-        model.addAttribute("currentPage", page);
-        model.addAttribute("totalPages", productPage.getTotalPages());
-
-        return "admin/product/product_index";
+        return productService.listProductsAdmin(pageParam,model);
     }
 
     // Detail :
 
     @GetMapping("/admin/product/detail/{id}")
     public String showDetailForm(@PathVariable(value = "id", required = false) Long id, Model model) {
-        Product detail = productService.getProductbyId(id)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid Product Id: " + id));
-        model.addAttribute("detailProduct", detail);
-        return "admin/product/detail_product"; //
+        return productService.showDetailFormAD(id,model);
     }
 
     // Update User:
     // Hiển thị form cập nhật
     @GetMapping("/admin/product/edit/{id}")
     public String showEditForm(@PathVariable("id") Long id, Model model) {
-
-        Product product = productService.getProductbyId(id)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid Product Id: " + id));
-
-        model.addAttribute("updateProduct", product);
-
-        // Danh sách Factory
-        Map<String, String> factoryList = new LinkedHashMap<>();
-        factoryList.put("Apple", "Apple (Macbook)");
-        factoryList.put("Asus", "Asus");
-        factoryList.put("Lenovo", "Lenovo");
-        factoryList.put("Dell", "Dell");
-        factoryList.put("LG", "LG");
-        factoryList.put("Acer", "Acer");
-        factoryList.put("HP", "HP");
-
-        model.addAttribute("factoryList", factoryList);
-
-        // Danh sách Target
-        Map<String, String> targetList = new LinkedHashMap<>();
-        targetList.put("Gaming", "Gamming");
-        targetList.put("Văn phòng", "Sinh viên - Văn phòng");
-        targetList.put("Thiết kế đồ họa", "Thiết kế đồ họa");
-        targetList.put("Mỏng nhẹ", "Mỏng nhẹ");
-        targetList.put("Doanh nhân", "Doanh nhân");
-
-        model.addAttribute("targetList", targetList);
-
-        return "admin/product/edit_product";
+        return productService.showEditFormAd(id,model);
     }
 
     @PostMapping("/admin/product/edit")
     public String editProduct(
             @ModelAttribute("updateProduct") Product updateProduct,
             RedirectAttributes redirectAttributes) {
-
-        try {
-
-            productService.updateProduct(updateProduct);
-
-            redirectAttributes.addFlashAttribute(
-                    "successMessage",
-                    "Edit sản phẩm thành công!");
-
-            return "redirect:/admin/product";
-
-        } catch (Exception e) {
-
-            redirectAttributes.addFlashAttribute(
-                    "errorMessage",
-                    e.getMessage());
-            return "redirect:/admin/product/edit/"
-                    + updateProduct.getId();
-        }
+       return productService.editProductAd(updateProduct,redirectAttributes);
     }
 
     // Delete user

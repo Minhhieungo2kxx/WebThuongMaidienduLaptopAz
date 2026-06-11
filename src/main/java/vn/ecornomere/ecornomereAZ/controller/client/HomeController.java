@@ -1,12 +1,10 @@
 package vn.ecornomere.ecornomereAZ.controller.client;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,20 +17,20 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
-import vn.ecornomere.ecornomereAZ.model.dto.ForgotPasswordDTO;
-import vn.ecornomere.ecornomereAZ.model.dto.OrderHistoryDTO;
-import vn.ecornomere.ecornomereAZ.model.dto.RegisterDTO;
-import vn.ecornomere.ecornomereAZ.model.dto.Userupdate;
+import vn.ecornomere.ecornomereAZ.dto.request.ForgotPasswordDTO;
+import vn.ecornomere.ecornomereAZ.dto.response.OrderHistoryDTO;
+import vn.ecornomere.ecornomereAZ.dto.request.RegisterDTO;
+import vn.ecornomere.ecornomereAZ.dto.request.Userupdate;
 import vn.ecornomere.ecornomereAZ.model.entity.Order;
 import vn.ecornomere.ecornomereAZ.model.entity.User;
 import vn.ecornomere.ecornomereAZ.service.ForgotPasswordService;
 
+import vn.ecornomere.ecornomereAZ.service.HomeService;
 import vn.ecornomere.ecornomereAZ.service.RoleService;
 import vn.ecornomere.ecornomereAZ.service.UploadFile.TemporaryUpload;
 import vn.ecornomere.ecornomereAZ.service.UserService;
@@ -42,15 +40,7 @@ import vn.ecornomere.ecornomereAZ.utils.UploadFile;
 @RequiredArgsConstructor
 public class HomeController {
 
-    private final UserService userService;
-
-    private final PasswordEncoder passwordEncoder;
-
-    private final RoleService roleService;
-
-    private final ForgotPasswordService forgotPasswordService;
-    private final TemporaryUpload temporaryUpload;
-    private final UploadFile uploadFile = new UploadFile();
+    private final HomeService homeService;
 
     @GetMapping("/register")
     public String ShowRegister(Model model) {
@@ -60,23 +50,11 @@ public class HomeController {
 
     // Save
     @PostMapping("/register/create")
-    public String createRegister(
-            @Valid @ModelAttribute("newRegister") RegisterDTO registerDTO, BindingResult result,
-            Model model) {
+    public String createRegister(@Valid @ModelAttribute("newRegister") RegisterDTO registerDTO
+            , BindingResult result
+            , Model model) {
+        return homeService.createRegisterClient(registerDTO, result, model);
 
-        if (result.hasErrors()) {
-            model.addAttribute("newRegister", registerDTO);
-            return "client/authentication/register"; // Trả về form với lỗi
-        }
-        User user = userService.registertoDTO(registerDTO);
-        // Mã hóa mật khẩu trước khi lưu
-        if (registerDTO.getPassword() != null && !registerDTO.getPassword().isEmpty()) {
-            String encodedPassword = passwordEncoder.encode(registerDTO.getPassword());
-            user.setPassword(encodedPassword);
-        }
-        user.setRole(roleService.findRoleByName("USER"));
-        userService.handleSaveUser(user);
-        return "redirect:/login"; // Sau khi lưu thì chuyển về
     }
 
     // Hiển thị danh sách user
@@ -103,27 +81,12 @@ public class HomeController {
                                         BindingResult result,
                                         Model model,
                                         RedirectAttributes redirectAttributes) {
+        return homeService.processForgotPasswordClient(forgotPasswordDTO, result, model, redirectAttributes);
 
-        if (result.hasErrors()) {
-            return "client/authentication/forgot-password";
-        }
-
-        boolean success = forgotPasswordService.processForgotPassword(forgotPasswordDTO.getEmail());
-
-        if (success) {
-
-            model.addAttribute("successMessage",
-                    "Mật khẩu mới đã được gửi đến email của bạn. Vui lòng kiểm tra hộp thư.");
-            return "client/authentication/forgot-password";
-        } else {
-            model.addAttribute("errorMessage", "Email không tồn tại trong hệ thống.");
-            return "client/authentication/forgot-password";
-        }
     }
 
     @GetMapping("/news")
     public String showNews(Model model) {
-
         return "client/homepage/news";
     }
 
@@ -139,84 +102,20 @@ public class HomeController {
 
     @GetMapping("/update-user")
     public String showUserupdate(Model model, HttpServletRequest request) {
-        // Set thông tin vào session
-        HttpSession session = request.getSession();
-        String email = (String) session.getAttribute("email");
-        User olduser = userService.getbyEmail(email);
-        Userupdate userupdate = new Userupdate();
-        userupdate.setId(olduser.getId());
-        userupdate.setFullName(olduser.getFullName());
-        userupdate.setEmail(olduser.getEmail());
-        userupdate.setPassword(olduser.getPassword());
-        userupdate.setAddress(olduser.getAddress());
-        userupdate.setPhone(olduser.getPhone());
-        userupdate.setAvatar(olduser.getAvatar());
-        model.addAttribute("Userupdate", userupdate);
-        return "client/authentication/updateuser";
+        return homeService.showUserupdateClient(model, request);
     }
 
 
     @PostMapping("/setting-user")
     public String SettingUser(@ModelAttribute("Userupdate") @Valid Userupdate userupdate,
                               BindingResult result, HttpServletRequest request) {
-        if (result.hasErrors()) {
-            return "client/authentication/updateuser";
-        }
-        User user = userService.getbyEmail(userupdate.getEmail().trim());
-        user.setFullName(userupdate.getFullName());
-        user.setPhone(userupdate.getPhone());
-        user.setAddress(userupdate.getAddress());
-        if (userupdate.getPassword() != null && !userupdate.getPassword().isBlank()) {
-            if (!userupdate.getPassword().equals(user.getPassword())) {
-                user.setPassword(
-                        passwordEncoder.encode(userupdate.getPassword()));
-            }
-        }
-
-        if (userupdate.getAvatarPublicId() != null && !userupdate.getAvatarPublicId().isBlank()) {
-            String oldPublicId = user.getAvatarPublicId();
-            if (oldPublicId != null) {
-                temporaryUpload.markAsUnused(oldPublicId);
-            }
-            user.setAvatar(userupdate.getAvatar());
-            user.setAvatarPublicId(userupdate.getAvatarPublicId());
-            user.setAvatarResourceType(userupdate.getAvatarResourceType());
-            temporaryUpload.markAsUsed(userupdate.getAvatarPublicId());
-        }
-        userService.handleSaveUser(user);
-        HttpSession session = request.getSession(false);
-        session.setAttribute("avatar", user.getAvatar());
-        return "redirect:/";
+        return homeService.SettingUserClient(userupdate, result, request);
     }
 
     @GetMapping("/order-history")
     public String showOrderHistory(@RequestParam(name = "page", defaultValue = "0") String pageParam, Model model,
                                    HttpServletRequest request) {
-        int page = 0;
-        int pageSize = 6;
-
-        try {
-            page = Integer.parseInt(pageParam);
-            if (page < 0)
-                page = 0;
-        } catch (NumberFormatException e) {
-            // Nếu người dùng nhập sai, mặc định về trang đầu
-            page = 0;
-        }
-        // Set thông tin vào session
-        HttpSession session = request.getSession();
-        String email = (String) session.getAttribute("email");
-        User user = userService.getbyEmail(email);
-        Page<Order> orderlistPage = userService.getlistHistory(user, page, pageSize);
-
-        List<OrderHistoryDTO> dtoList = orderlistPage.getContent()
-                .stream()
-                .map(order -> userService.toDTO(order))
-                .toList();
-        model.addAttribute("listOrderbyUser", dtoList);
-        model.addAttribute("currentPage", page);
-        model.addAttribute("totalPages", orderlistPage.getTotalPages());
-        return "client/cart/orderhistory";
+        return homeService.showOrderHistoryClient(pageParam, model, request);
 
     }
 
@@ -226,21 +125,7 @@ public class HomeController {
             @PathVariable long id,
             HttpServletRequest request) {
 
-        HttpSession session = request.getSession();
-        String email = (String) session.getAttribute("email");
+        return homeService.cancelOrderDetailAjaxClient(id, request);
 
-        User user = userService.getbyEmail(email);
-
-        try {
-            Map<String, Object> result = userService.cancelOrderDetailAjax(id, user.getId());
-            return ResponseEntity.ok(result);
-
-        } catch (Exception e) {
-
-            Map<String, Object> error = new HashMap<>();
-            error.put("error", e.getMessage());
-            return ResponseEntity.badRequest().body(error);
-        }
     }
-
 }

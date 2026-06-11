@@ -7,7 +7,6 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.time.LocalDateTime;
 import java.util.Date;
-import java.util.UUID;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -25,10 +24,10 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import vn.ecornomere.ecornomereAZ.model.Enum.PaymentMethod;
-import vn.ecornomere.ecornomereAZ.model.Enum.PaymentTransactionStatus;
-import vn.ecornomere.ecornomereAZ.model.dto.MomoCallbackRequest;
-import vn.ecornomere.ecornomereAZ.model.dto.PaymentDefault;
+import vn.ecornomere.ecornomereAZ.enums.PaymentMethod;
+import vn.ecornomere.ecornomereAZ.enums.PaymentTransactionStatus;
+import vn.ecornomere.ecornomereAZ.dto.request.MomoCallbackRequest;
+import vn.ecornomere.ecornomereAZ.dto.request.PaymentDefault;
 import vn.ecornomere.ecornomereAZ.model.entity.PaymentTransaction;
 import vn.ecornomere.ecornomereAZ.repository.PaymentTransactionRepository;
 

@@ -7,8 +7,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
@@ -16,11 +17,17 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import vn.ecornomere.ecornomereAZ.model.Enum.PaymentMethod;
-import vn.ecornomere.ecornomereAZ.model.dto.OrderDetailDTO;
-import vn.ecornomere.ecornomereAZ.model.dto.OrderHistoryDTO;
-import vn.ecornomere.ecornomereAZ.model.dto.ProductSales;
-import vn.ecornomere.ecornomereAZ.model.dto.RegisterDTO;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import vn.ecornomere.ecornomereAZ.enums.PaymentMethod;
+import vn.ecornomere.ecornomereAZ.dto.response.OrderDetailDTO;
+import vn.ecornomere.ecornomereAZ.dto.response.OrderHistoryDTO;
+import vn.ecornomere.ecornomereAZ.dto.request.ProductSales;
+import vn.ecornomere.ecornomereAZ.dto.request.RegisterDTO;
 import vn.ecornomere.ecornomereAZ.model.entity.Cart;
 import vn.ecornomere.ecornomereAZ.model.entity.Order;
 import vn.ecornomere.ecornomereAZ.model.entity.OrderDetail;
@@ -62,17 +69,104 @@ public class UserService {
 
 
 
+  public String showDetailFormUser(Long id, Model model) {
+    User userdetail =findUserById(id)
+            .orElseThrow(() -> new IllegalArgumentException("Invalid user Id: " + id));
+    model.addAttribute("detailUser", userdetail);
+    return "admin/user/detailuser"; //
+  }
+  @Transactional
+  public String updateUserAD(User updatedUser, RedirectAttributes redirectAttributes) {
+    User existingUser = findUserById(updatedUser.getId())
+            .orElseThrow(() -> new IllegalArgumentException("Invalid user Id"));
+    String oldPublicId = existingUser.getAvatarPublicId();
+
+    ModelMapper map = new ModelMapper();
+    map.typeMap(User.class, User.class)
+            .addMappings(m -> m.skip(User::setId))
+            .addMappings(m -> m.skip(User::setPassword))
+            .addMappings(m -> m.skip(User::setReviews))
+            .addMappings(m -> m.skip(User::setStocks))
+            .addMappings(m -> m.skip(User::setChatMessages))
+            .addMappings(m -> m.skip(User::setRole));
+
+    map.map(updatedUser, existingUser);
+    // password
+    if (updatedUser.getPassword() != null
+            && !updatedUser.getPassword().isBlank()) {
+
+      if (!updatedUser.getPassword().equals(existingUser.getPassword())) {
+        existingUser.setPassword(
+                passwordEncoder.encode(updatedUser.getPassword()));
+      }
+    }
+
+    // avatar update
+    if (updatedUser.getAvatarPublicId() != null &&
+            !updatedUser.getAvatarPublicId().isEmpty()) {
+
+      existingUser.setAvatar(updatedUser.getAvatar());
+      existingUser.setAvatarPublicId(updatedUser.getAvatarPublicId());
+      existingUser.setAvatarResourceType(updatedUser.getAvatarResourceType());
+
+      // đánh dấu file cũ là unused
+      temporaryUpload.markAsUnused(oldPublicId);
+    }
+    handleSaveUser(existingUser);
+    redirectAttributes.addFlashAttribute("successMessage", "Cập nhật thành công!");
+    return "redirect:/admin/list/user";
+  }
+
+  public String listUsersAd(String pageParam, Model model) {
+    int page = 0;
+    int pageSize = 5;
+    try {
+      page = Integer.parseInt(pageParam);
+      if (page < 0)
+        page = 0;
+    } catch (NumberFormatException e) {
+      // Nếu người dùng nhập sai, mặc định về trang đầu
+      page = 0;
+    }
+    Page<User> userPage = getUserPaginated(page, pageSize);
+    model.addAttribute("users", userPage.getContent());
+    model.addAttribute("currentPage", page);
+    model.addAttribute("totalPages", userPage.getTotalPages());
+    return "admin/user/listuser"; // tạo 1 file JSP hiển thị danh sách
+  }
+  @Transactional
+  public String createUserAd(User user, BindingResult result, Long roleId) {
+    if (result.hasErrors()) {
+      return "admin/user/create";
+    }
+    Role role = roleService.findRoleId(roleId);
+
+    if (role == null) {
+      throw new IllegalArgumentException("Invalid role id : " + roleId);
+    }
+    user.setRole(role);
+    if (user.getPassword() != null
+            && !user.getPassword().isEmpty()) {
+      user.setPassword(passwordEncoder.encode(user.getPassword()));
+        handleSaveUser(user);
+    } else {
+        handleSaveUser(user);
+    }
+      temporaryUpload.markAsUsed(user.getAvatarPublicId());
+
+    return "redirect:/admin/list/user";
+  }
+
+
   public Optional<User> findUserById(Long id) {
     return this.userRepository.findById(id);
   }
 
   @Transactional
   public void deleteUser(User user) {
-
     if (user == null) {
       throw new IllegalArgumentException("User không hợp lệ.");
     }
-
     // 1. Xử lý Order
     List<Order> orders = orderRepository.findByUserId(user.getId());
     if (!orders.isEmpty()) {
@@ -81,19 +175,16 @@ public class UserService {
       }
       orderRepository.saveAll(orders);
     }
-
     // 2. Xử lý Cart
     Cart cart = cartRepository.findByUser(user);
     if (cart != null) {
       cart.setUser(null);
       cartRepository.save(cart);
     }
-
     // 3. KHÔNG xóa Cloudinary ngay → chỉ mark
     if (user.getAvatarPublicId() != null) {
       temporaryUpload.markAsUnused(user.getAvatarPublicId());
     }
-
     // 4. Xóa user
     userRepository.delete(user);
   }

@@ -11,15 +11,14 @@ import java.util.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.transaction.annotation.Transactional;
 import vn.ecornomere.ecornomereAZ.config.Payments.VNPayConfig;
-import vn.ecornomere.ecornomereAZ.model.Enum.PaymentMethod;
-import vn.ecornomere.ecornomereAZ.model.Enum.PaymentTransactionStatus;
-import vn.ecornomere.ecornomereAZ.model.dto.PaymentDefault;
+import vn.ecornomere.ecornomereAZ.enums.PaymentMethod;
+import vn.ecornomere.ecornomereAZ.enums.PaymentTransactionStatus;
+import vn.ecornomere.ecornomereAZ.dto.request.PaymentDefault;
 import vn.ecornomere.ecornomereAZ.model.entity.PaymentTransaction;
 import vn.ecornomere.ecornomereAZ.repository.PaymentTransactionRepository;
 

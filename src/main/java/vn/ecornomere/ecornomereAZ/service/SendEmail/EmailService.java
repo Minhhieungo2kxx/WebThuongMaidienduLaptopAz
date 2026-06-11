@@ -113,7 +113,14 @@ public class EmailService {
                 .append("</li>"); // Giả sử có thêm phí ship riêng
         sb.append("<li><strong>Tổng thanh toán:</strong> <strong>").append(formatCurrency(order.getTotalPriceaddShip()))
                 .append("</strong></li>");
-        sb.append("<li><strong>Thời gian:</strong> ").append(formatPaymentTime(order.getPaymentTime().toString())).append("</li>");
+        sb.append("<li><strong>Thời gian:</strong> ");
+        if (order.getPaymentTime() != null) {
+            sb.append(formatPaymentTime(order.getPaymentTime().toString()));
+        } else {
+            sb.append("Chưa xác định");
+        }
+
+        sb.append("</li>");
         sb.append("</ul>");
 
         sb.append("<h3>🛒 Chi tiết sản phẩm</h3>");

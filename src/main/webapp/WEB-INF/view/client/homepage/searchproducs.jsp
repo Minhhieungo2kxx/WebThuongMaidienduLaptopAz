@@ -157,7 +157,7 @@
                                                                               <div
                                                                                     class="rounded position-relative laptop-item">
                                                                                     <div class="laptop-img">
-                                                                                          <img src="/uploads/products/${product.image}"
+                                                                                          <img src="${product.image}"
                                                                                                 class="img-fluid w-100 rounded-top"
                                                                                                 alt="${product.name}" />
                                                                                     </div>

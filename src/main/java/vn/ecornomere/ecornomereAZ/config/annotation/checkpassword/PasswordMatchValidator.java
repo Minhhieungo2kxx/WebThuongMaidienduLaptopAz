@@ -2,7 +2,7 @@ package vn.ecornomere.ecornomereAZ.config.annotation.checkpassword;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
-import vn.ecornomere.ecornomereAZ.model.dto.RegisterDTO;
+import vn.ecornomere.ecornomereAZ.dto.request.RegisterDTO;
 
 public class PasswordMatchValidator implements ConstraintValidator<PasswordMatch, RegisterDTO> {
 

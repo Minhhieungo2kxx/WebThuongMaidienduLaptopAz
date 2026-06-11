@@ -367,38 +367,40 @@
             </div>
         </div>
     </div>
-    <nav aria-label="Page navigation" class="mt-4 justify-content-center">
-        <ul class="pagination justify-content-center mt-4">
+    <c:if test="${totalPages > 0}">
+        <nav aria-label="Page navigation" class="mt-4 justify-content-center">
+            <ul class="pagination justify-content-center mt-4">
 
-            <!-- Nút Previous -->
-            <c:if test="${currentPage > 0}">
-                <li class="page-item">
-                    <a class="page-link" href="?page=${currentPage - 1}"
-                       aria-label="Previous">
-                        <span aria-hidden="true">«</span>
-                    </a>
-                </li>
-            </c:if>
+                <!-- Previous -->
+                <c:if test="${currentPage > 0}">
+                    <li class="page-item">
+                        <a class="page-link" href="?page=${currentPage - 1}">
+                            <span aria-hidden="true">«</span>
+                        </a>
+                    </li>
+                </c:if>
 
-            <!-- Duyệt qua số trang -->
-            <c:forEach var="i" begin="0" end="${totalPages - 1}">
-                <li class="page-item ${i == currentPage ? 'active' : ''}">
-                    <a class="page-link" href="?page=${i}">${i + 1}</a>
-                </li>
-            </c:forEach>
+                <!-- Page numbers -->
+                <c:forEach var="i" begin="0" end="${totalPages - 1}">
+                    <li class="page-item ${i == currentPage ? 'active' : ''}">
+                        <a class="page-link" href="?page=${i}">
+                                ${i + 1}
+                        </a>
+                    </li>
+                </c:forEach>
 
-            <!-- Nút Next -->
-            <c:if test="${currentPage < totalPages - 1}">
-                <li class="page-item">
-                    <a class="page-link" href="?page=${currentPage + 1}"
-                       aria-label="Next">
-                        <span aria-hidden="true">»</span>
-                    </a>
-                </li>
-            </c:if>
+                <!-- Next -->
+                <c:if test="${currentPage < totalPages - 1}">
+                    <li class="page-item">
+                        <a class="page-link" href="?page=${currentPage + 1}">
+                            <span aria-hidden="true">»</span>
+                        </a>
+                    </li>
+                </c:if>
 
-        </ul>
-    </nav>
+            </ul>
+        </nav>
+    </c:if>
 </div>
 
 <jsp:include page="../layout/footer.jsp" />
