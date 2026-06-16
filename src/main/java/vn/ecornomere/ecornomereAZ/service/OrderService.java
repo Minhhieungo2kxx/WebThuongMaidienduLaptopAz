@@ -63,7 +63,6 @@ public class OrderService {
         model.addAttribute("listOrderDetail", listcart);
         return "admin/order/order_detail"; //
     }
-    @GetMapping("/admin/order/edit/{id}")
     public String getEditOrderAdmin(Long id, Model model) {
 
         Order order = orderRepository.findById(id).orElse(null);
