@@ -189,13 +189,9 @@ public class UserService {
     userRepository.delete(user);
   }
 
-  public List<User> findAllUsers() {
-    return this.userRepository.findAll();
-  }
 
-  public List<User> findAllUsersByEmailAndAddress(String email, String address) {
-    return this.userRepository.findByEmailAndAddress(email, address);
-  }
+
+
 
   public User handleSaveUser(User newUser) {
     return this.userRepository.save(newUser);
@@ -354,33 +350,9 @@ public class UserService {
     return response;
   }
 
-  public void recalculateOrderPrice(Order order) {
 
-    List<OrderDetail> details = orderDetailRepository.findByOrder(order);
-
-    if (details.isEmpty()) {
-      // Không còn chi tiết nào → Order sẽ bị xóa ở phần khác
-      return;
-    }
-
-    double newTotal = details.stream()
-        .mapToDouble(OrderDetail::getTotalPrice)
-        .sum();
-
-    order.setTotalPrice(newTotal);
-
-    // Nếu có phí ship cố định (ví dụ 50k):
-    double shipFee = 50000;
-
-    order.setTotalPriceaddShip(newTotal + shipFee);
-
-    orderRepository.save(order);
-  }
 
   // Lấy tất cả đơn hàng
-  public List<Order> getAllOrder() {
-    return orderRepository.findAll();
-  }
 
   public List<Order> getOrdersThisYear() {
     int currentYear = LocalDate.now().getYear();

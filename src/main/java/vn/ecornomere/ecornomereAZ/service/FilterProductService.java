@@ -10,12 +10,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import vn.ecornomere.ecornomereAZ.dto.request.ProductFilterDTO;
 import vn.ecornomere.ecornomereAZ.dto.request.ProductSearchRequest;
 import vn.ecornomere.ecornomereAZ.model.entity.Product;
+import vn.ecornomere.ecornomereAZ.repository.ProductRepository;
 
 @Service
 @RequiredArgsConstructor
 public class FilterProductService {
 
     private final ItemService itemService;
+    private final ProductRepository productRepository;
 
     private final ProductService productService;
     public String ShowProductSortUser( String pageParam, String sort, Model model) {

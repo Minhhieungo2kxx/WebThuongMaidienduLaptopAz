@@ -264,7 +264,7 @@ public class ChatService {
     }
 
 
-private String callGeminiWithFallback(
+public String callGeminiWithFallback(
         String userMessage,
         List<ChatMessageDto> history,
         String productContext) throws Exception {
