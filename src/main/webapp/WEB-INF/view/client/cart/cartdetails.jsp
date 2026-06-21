@@ -184,7 +184,7 @@
                                             <tr>
                                                 <th scope="row">
                                                     <div class="d-flex align-items-center">
-                                                        <img src="/uploads/products/${cartdetail.product.image}"
+                                                        <img src="${cartdetail.product.image}"
                                                             class="img-fluid rounded-circle"
                                                             style="width: 80px; height: 80px; object-fit: cover;"
                                                             alt="Big Banana">

@@ -230,7 +230,7 @@
                                                                                     <td>
                                                                                           <div
                                                                                                 class="d-flex align-items-center">
-                                                                                                <img src="/uploads/products/${cartdetail.product.image}"
+                                                                                                <img src="${cartdetail.product.image}"
                                                                                                       class="img-fluid rounded product-image"
                                                                                                       alt="${cartdetail.product.name}">
                                                                                           </div>

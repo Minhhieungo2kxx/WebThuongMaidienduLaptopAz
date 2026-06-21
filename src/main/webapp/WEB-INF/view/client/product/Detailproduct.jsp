@@ -200,7 +200,7 @@
                                         <div class="col-lg-6">
                                             <div class="border rounded">
                                                 <a href="#">
-                                                    <img src="/uploads/products/${detailProduct.image}"
+                                                    <img src="${detailProduct.image}"
                                                         class="img-fluid rounded" alt="Image">
                                                 </a>
                                             </div>
